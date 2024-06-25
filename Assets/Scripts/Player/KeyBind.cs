@@ -5,7 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public class KeyBind
 {
-    public KeyCode[] primary = new KeyCode[1], secondary;
+    public KeyCode[] primary = new KeyCode[2], secondary;
     public bool IsPressed()
     {
         bool primaryPressed = false, secondaryPressed = false;

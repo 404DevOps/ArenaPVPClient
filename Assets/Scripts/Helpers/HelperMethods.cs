@@ -17,8 +17,9 @@ namespace Assets.Scripts.Helpers
                 var str = key.ToString();
 
                 str = str.Replace("Keypad", "");
+                str = str.Replace("None", "");
                 str = str.Replace("Alpha", "");
-                str.Replace("Shift", "s");
+                str.Replace("LeftShift", "s");
 
                 fullStr += str;
             }

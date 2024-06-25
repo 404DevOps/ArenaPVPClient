@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -7,18 +8,18 @@ using UnityEngine.UI;
 public class ControlsMenuUIScript : MonoBehaviour
 {
     public Button closeButton;
-    public Button saveButton;
+    public Button resetDefaultsButton;
 
     MenuHandlerUIScript menuHandler;
-    SettingsScriptableObject settings;
+    PlayerSettings settings;
 
     // Start is called before the first frame update
     void Start()
     {
         menuHandler = FindObjectOfType<MenuHandlerUIScript>();
         closeButton.onClick.AddListener(CloseMenu);
-        saveButton.onClick.AddListener(SaveControls);
-        settings = FindObjectOfType<PlayerSettings>().Settings;
+        resetDefaultsButton.onClick.AddListener(ResetDefaultControls);
+        settings = FindObjectOfType<PlayerSettings>();
 
     }
 
@@ -26,8 +27,22 @@ public class ControlsMenuUIScript : MonoBehaviour
     {
         menuHandler.CloseMenu();
     }
-    public void SaveControls()
+    public void ResetDefaultControls()
     {
-        menuHandler.CloseMenu();
+        settings.ResetKeybinds();
+        var inputHandlers = GetComponentsInChildren<InputBoxHandler>();
+        foreach (var inputHandler in inputHandlers)
+        {
+            inputHandler.SetKeyBindText();
+        }    
+    }
+
+    public void OnNewBoxSelected()
+    {
+        var inputHandlers = GetComponentsInChildren<InputBoxHandler>();
+        foreach (var inputHandler in inputHandlers.Where(ih => ih.IsInputListenerActive))
+        {
+            inputHandler.ResetBox();
+        }
     }
 }
