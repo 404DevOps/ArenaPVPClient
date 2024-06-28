@@ -9,7 +9,7 @@ public class SettingsMenuUIScript : MonoBehaviour
     public Button saveButton;
 
     MenuHandlerUIScript menuHandler;
-    SettingsScriptableObject settings;
+    GeneralSettings settings;
 
     public Toggle LockActionBars;
     public Toggle ShowHealthAsPercentage;
@@ -21,10 +21,10 @@ public class SettingsMenuUIScript : MonoBehaviour
         closeButton.onClick.AddListener(CloseMenu);
         saveButton.onClick.AddListener(SaveSettings);
         settings = FindObjectOfType<PlayerSettings>().Settings;
-        MapSettings();
+        InitializeSettingsInputs();
     }
 
-    private void MapSettings()
+    private void InitializeSettingsInputs()
     {
         LockActionBars.isOn = settings.LockActionBars;
         ShowHealthAsPercentage.isOn = settings.ShowHealthAsPercentage;
@@ -38,6 +38,7 @@ public class SettingsMenuUIScript : MonoBehaviour
     {
         settings.LockActionBars = LockActionBars.isOn;
         settings.ShowHealthAsPercentage = ShowHealthAsPercentage.isOn;
+        settings.SaveSettings();
         menuHandler.CloseMenu();
     }
 }

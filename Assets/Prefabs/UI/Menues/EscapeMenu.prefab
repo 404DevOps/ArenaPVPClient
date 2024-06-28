@@ -51,7 +51,7 @@ MonoBehaviour:
   controlsButton: {fileID: 7561239679105764311}
   abilitiesMenuPrefab: {fileID: 8746366294278781418, guid: a404784a245864b4796b7af5f046ca0e, type: 3}
   settingsMenuPrefab: {fileID: 8746366294278781418, guid: 01c25660801e9b249a4ff9ca2ac52a33, type: 3}
-  controlsMenuPrefab: {fileID: 8746366294278781418, guid: 6cf5212588c12b24f8cd414ec1b7aaf7, type: 3}
+  KeybindsMenuPrefab: {fileID: 8746366294278781418, guid: 6cf5212588c12b24f8cd414ec1b7aaf7, type: 3}
   MainMenu: {fileID: 3911130811988678258}
 --- !u!1 &1455612705274293875
 GameObject:
@@ -209,7 +209,7 @@ GameObject:
   - component: {fileID: 7561239679105764311}
   - component: {fileID: 8364208023666132804}
   m_Layer: 5
-  m_Name: ControlsButton
+  m_Name: KeybindsButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -939,7 +939,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Controls
+  m_text: Keybinds
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

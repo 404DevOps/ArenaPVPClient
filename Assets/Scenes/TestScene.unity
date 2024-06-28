@@ -822,7 +822,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f17996ea75ae0034985166583081f869, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Settings: {fileID: 11400000, guid: 2b16df53cba7c20418cdd959e3ed2a1e, type: 2}
+  Settings:
+    Controls:
+      forwards:
+        primary: 0000000000000000
+        secondary: 
+      backwards:
+        primary: 0000000000000000
+        secondary: 
+      strafeLeft:
+        primary: 0000000000000000
+        secondary: 
+      strafeRight:
+        primary: 0000000000000000
+        secondary: 
+      jump:
+        primary: 0000000000000000
+        secondary: 
+      targetNext:
+        primary: 0000000000000000
+        secondary: 
+      targetSelf:
+        primary: 0000000000000000
+        secondary: 
+      Abilities: []
+    LockActionBars: 0
+    ShowHealthAsPercentage: 0
 --- !u!4 &1962106889
 Transform:
   m_ObjectHideFlags: 0
@@ -999,6 +1024,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1928104967}
     m_Modifications:
+    - target: {fileID: 1565497757936540570, guid: c01485b323d9c5842a91a5f06ccb3325, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1565497757936540570, guid: c01485b323d9c5842a91a5f06ccb3325, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1565497757936540570, guid: c01485b323d9c5842a91a5f06ccb3325, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1565497757936540570, guid: c01485b323d9c5842a91a5f06ccb3325, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3461952296366669006, guid: c01485b323d9c5842a91a5f06ccb3325, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1079,9 +1120,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5545650025869922004, guid: c01485b323d9c5842a91a5f06ccb3325, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5545650025869922004, guid: c01485b323d9c5842a91a5f06ccb3325, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5545650025869922004, guid: c01485b323d9c5842a91a5f06ccb3325, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5545650025869922004, guid: c01485b323d9c5842a91a5f06ccb3325, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9037088249803014286, guid: c01485b323d9c5842a91a5f06ccb3325, type: 3}
       propertyPath: m_Name
-      value: SkillBarsUI
+      value: ActionBarsUI
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

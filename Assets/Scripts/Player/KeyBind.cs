@@ -9,25 +9,33 @@ public class KeyBind
     public bool IsPressed()
     {
         bool primaryPressed = false, secondaryPressed = false;
+        if (!Input.anyKey)
+            return false;
 
         foreach (KeyCode keyCode in primary)
         {
-            if (!Input.GetKey(keyCode))
+            if (!Input.GetKey(keyCode) && keyCode != KeyCode.None)
             {
                 primaryPressed = false;
                 break;
             }
-            primaryPressed = true;
+            else if(keyCode != KeyCode.None)
+            {
+                primaryPressed = true;
+            }
         }
 
         foreach (KeyCode keyCode in secondary)
-        {          
-            if (!Input.GetKey(keyCode))
+        {
+            if (!Input.GetKey(keyCode) && keyCode != KeyCode.None)
             {
                 secondaryPressed = false;
                 break;
             }
-            secondaryPressed = true;
+            else if (keyCode != KeyCode.None)
+            {
+                secondaryPressed = true;
+            }
         }
 
         return primaryPressed || secondaryPressed;
@@ -39,22 +47,28 @@ public class KeyBind
 
         foreach (KeyCode keyCode in primary)
         {
-            if (!Input.GetKeyDown(keyCode))
+            if (!Input.GetKeyDown(keyCode) && keyCode != KeyCode.None)
             {
                 primaryPressed = false;
                 break;
             }
-            primaryPressed = true;
+            else if (keyCode != KeyCode.None)
+            {
+                primaryPressed = true;
+            }
         }
 
         foreach (KeyCode keyCode in secondary)
         {
-            if (!Input.GetKeyDown(keyCode))
+            if (!Input.GetKeyDown(keyCode) && keyCode != KeyCode.None)
             {
                 secondaryPressed = false;
                 break;
             }
-            secondaryPressed = true;
+            else if (keyCode != KeyCode.None)
+            {
+                secondaryPressed = true;
+            }
         }
 
         return primaryPressed || secondaryPressed;

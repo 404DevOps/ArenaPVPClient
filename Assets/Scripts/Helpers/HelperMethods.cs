@@ -9,17 +9,25 @@ namespace Assets.Scripts.Helpers
 {
     public class HelperMethods
     {
-        public static string GetKeyBindNameShort(KeyCode[] primary)
+        public static string GetKeyBindNameShort(KeyCode[] keycodes)
         {
             string fullStr = "";
-            foreach (KeyCode key in primary)
+            foreach (KeyCode key in keycodes)
             {
                 var str = key.ToString();
 
                 str = str.Replace("Keypad", "");
                 str = str.Replace("None", "");
                 str = str.Replace("Alpha", "");
-                str.Replace("LeftShift", "s");
+                str = str.Replace("LeftShift", "s");
+                str = str.Replace("LeftControl", "c");
+                str = str.Replace("LeftAlt", "a");
+                str = str.Replace("Mouse0", "ML");
+                str = str.Replace("Mouse1", "MR");
+                str = str.Replace("Mouse2", "M3");
+                str = str.Replace("Mouse3", "M4");
+                str = str.Replace("Mouse4", "M5");
+                str = str.Replace("Space", "SB");
 
                 fullStr += str;
             }

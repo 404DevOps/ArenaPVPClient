@@ -4,6 +4,8 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+using Assets.Scripts.Enums;
+using TMPro;
 
 public class ControlsMenuUIScript : MonoBehaviour
 {
@@ -13,6 +15,9 @@ public class ControlsMenuUIScript : MonoBehaviour
     MenuHandlerUIScript menuHandler;
     PlayerSettings settings;
 
+    public GameObject AdjustRebindInputPrefab;
+    public Transform ActionSlotFrame;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -20,7 +25,26 @@ public class ControlsMenuUIScript : MonoBehaviour
         closeButton.onClick.AddListener(CloseMenu);
         resetDefaultsButton.onClick.AddListener(ResetDefaultControls);
         settings = FindObjectOfType<PlayerSettings>();
+        InitializeActionSlotFrame();
+    }
 
+    private void InitializeActionSlotFrame()
+    {
+        int i = 0;
+        foreach (var action in settings.Settings.Controls.Abilities)
+        { 
+            var gO = Instantiate(AdjustRebindInputPrefab, ActionSlotFrame);
+            var inputs = gO.GetComponentsInChildren<KeybindInputHandler>();
+            var label = gO.GetComponentInChildren<TextMeshProUGUI>();
+            label.text = "Action Slot " + (i + 1).ToString();
+
+            foreach (var input in inputs)
+            {
+                input.actionToRebind = i.ToString();
+                input.isAbilityKeybind = true;
+            }
+            i++;
+        }
     }
 
     public void CloseMenu()
@@ -30,16 +54,16 @@ public class ControlsMenuUIScript : MonoBehaviour
     public void ResetDefaultControls()
     {
         settings.ResetKeybinds();
-        var inputHandlers = GetComponentsInChildren<InputBoxHandler>();
+        var inputHandlers = GetComponentsInChildren<KeybindInputHandler>();
         foreach (var inputHandler in inputHandlers)
         {
             inputHandler.SetKeyBindText();
-        }    
+        }
     }
 
     public void OnNewBoxSelected()
     {
-        var inputHandlers = GetComponentsInChildren<InputBoxHandler>();
+        var inputHandlers = GetComponentsInChildren<KeybindInputHandler>();
         foreach (var inputHandler in inputHandlers.Where(ih => ih.IsInputListenerActive))
         {
             inputHandler.ResetBox();

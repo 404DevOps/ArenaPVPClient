@@ -12,7 +12,7 @@ public class EscapeMenuUIScript : MonoBehaviour
 
     public Object abilitiesMenuPrefab;
     public Object settingsMenuPrefab;
-    public Object controlsMenuPrefab;
+    public Object KeybindsMenuPrefab;
 
     public Object MainMenu;
 
@@ -25,7 +25,7 @@ public class EscapeMenuUIScript : MonoBehaviour
         exitGameButton.onClick.AddListener(ExitGame);
         abilitiesButton.onClick.AddListener(ShowAbilitiesMenu);
         settingsButton.onClick.AddListener(ShowSettingsMenu);
-        controlsButton.onClick.AddListener(ShowControlsMenu);
+        controlsButton.onClick.AddListener(ShowKeybindMenu);
     }
 
     public void ShowAbilitiesMenu()
@@ -33,10 +33,10 @@ public class EscapeMenuUIScript : MonoBehaviour
         CloseSubMenu();
         activeSubMenu = Instantiate(abilitiesMenuPrefab, transform);
     }
-    public void ShowControlsMenu()
+    public void ShowKeybindMenu()
     {
         CloseSubMenu();
-        activeSubMenu = Instantiate(controlsMenuPrefab, transform);
+        activeSubMenu = Instantiate(KeybindsMenuPrefab, transform);
     }
     public void ShowSettingsMenu()
     {

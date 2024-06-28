@@ -14,7 +14,7 @@ public class ActionSlot : MonoBehaviour, IDropHandler
     public Image Icon;
     public Image Border;
     public TextMeshProUGUI KeyBindText;
-    public Ability Ability;
+    public CharacterAbility Ability;
     public KeyBind KeyBind;
 
     private float FlashTime = 0.05f;
@@ -36,6 +36,11 @@ public class ActionSlot : MonoBehaviour, IDropHandler
 
     private void Update()
     {
+        FlashActionSlot();
+    }
+
+    private void FlashActionSlot()
+    {
         if (KeyBind.IsPressed())
         {
             Debug.Log($"Actionslot {Id} pressed");
@@ -53,13 +58,10 @@ public class ActionSlot : MonoBehaviour, IDropHandler
                 timerStarted = false;
             }
         }
-       
     }
 
     private void Awake()
     {
         KeyBindText.text = HelperMethods.GetKeyBindNameShort(KeyBind.primary);
     }
-
-   
 }

@@ -34,8 +34,7 @@ public class CharacterController: MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        var settingsGO = FindObjectOfType<PlayerSettings>();
-        controls = settingsGO.Settings.Controls;
+        ReloadControlSettings();
         rb = GetComponent<Rigidbody>();
     }
 
@@ -130,5 +129,11 @@ public class CharacterController: MonoBehaviour
 
         return dir;
 
+    }
+
+    public void ReloadControlSettings() 
+    {
+        var settingsGO = FindObjectOfType<PlayerSettings>();
+        controls = settingsGO.Settings.Controls;
     }
 }
