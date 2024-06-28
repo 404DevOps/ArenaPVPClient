@@ -14,6 +14,7 @@ public abstract class CharacterAbility : ScriptableObject
     public float Cooldown;
     public float ResourceCost;
     public float Range;
+    public Sprite Icon;
 
     //TODO: make ServerCharacter owner and target
     public void TryUseAbility(Transform owner, Transform[] target)
