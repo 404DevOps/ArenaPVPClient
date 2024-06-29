@@ -35,24 +35,24 @@ MonoBehaviour:
       targetSelf:
         primary: 4501000000000000
         secondary: 
-      Abilities:
-      - primary: 3100000000000000
-        secondary: 00000000
+      AbilityKeybinds:
+      - primary: 31000000
+        secondary: 
       - primary: 32000000
-        secondary: 00000000
+        secondary: 
       - primary: 33000000
-        secondary: 00000000
+        secondary: 
       - primary: 34000000
-        secondary: 00000000
+        secondary: 
       - primary: 76000000
-        secondary: 00000000
+        secondary: 
       - primary: 71000000
-        secondary: 00000000
+        secondary: 
       - primary: 65000000
-        secondary: 00000000
-      - primary: 72000000
-        secondary: 00000000
+        secondary: 
       - primary: 66000000
-        secondary: 00000000
+        secondary: 
+      - primary: 72000000
+        secondary: 
     LockActionBars: 0
     ShowHealthAsPercentage: 0

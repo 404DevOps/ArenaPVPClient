@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
 public abstract class CharacterAbility : ScriptableObject
 {
     public AbilityInfo AbilityInfo;

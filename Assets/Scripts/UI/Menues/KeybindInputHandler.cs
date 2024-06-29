@@ -44,7 +44,7 @@ public class KeybindInputHandler : MonoBehaviour, IPointerClickHandler
         settings = FindObjectOfType<PlayerSettings>().Settings;
         if (int.TryParse(actionToRebind, out int slot))
         {
-            SetPrimarySecondaryText(settings.Controls.Abilities[slot]);
+            SetPrimarySecondaryText(settings.Controls.AbilityKeybinds[slot]);
         }
         else
         {
@@ -127,12 +127,12 @@ public class KeybindInputHandler : MonoBehaviour, IPointerClickHandler
         if (int.TryParse(actionToRebind, out int slot))
         {
             if (KeybindType == KeyBindType.Primary)
-                settings.Controls.Abilities[slot].primary = keys;
+                settings.Controls.AbilityKeybinds[slot].primary = keys;
             else
-                settings.Controls.Abilities[slot].secondary = keys;
+                settings.Controls.AbilityKeybinds[slot].secondary = keys;
 
-            SetPrimarySecondaryText(settings.Controls.Abilities[slot]);
-            FindObjectOfType<ActionBarsUIController>()?.RebuildActionBars();
+            SetPrimarySecondaryText(settings.Controls.AbilityKeybinds[slot]);
+            FindObjectOfType<ActionBarUIHandler>()?.RebuildActionBars();
         }
         else { 
             var fieldInfo = typeof(Controls).GetField(actionToRebind);
@@ -149,7 +149,7 @@ public class KeybindInputHandler : MonoBehaviour, IPointerClickHandler
                 FindObjectOfType<CharacterController>()?.ReloadControlSettings();
             }
         }
-        settings.SaveSettings();
+        settings.SaveSettingsToFile();
     }
 
     public void OnPointerClick(PointerEventData eventData)

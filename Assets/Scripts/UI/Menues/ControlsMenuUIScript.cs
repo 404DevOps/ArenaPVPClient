@@ -31,7 +31,7 @@ public class ControlsMenuUIScript : MonoBehaviour
     private void InitializeActionSlotFrame()
     {
         int i = 0;
-        foreach (var action in settings.Settings.Controls.Abilities)
+        foreach (var action in settings.Settings.Controls.AbilityKeybinds)
         { 
             var gO = Instantiate(AdjustRebindInputPrefab, ActionSlotFrame);
             var inputs = gO.GetComponentsInChildren<KeybindInputHandler>();

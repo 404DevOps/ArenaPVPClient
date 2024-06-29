@@ -5,9 +5,9 @@ using UnityEngine;
 
 public class AbilityManager : MonoBehaviour
 {
-    public List<CharacterAbility> AllAbilities;
-    // Start is called before the first frame update
-    void Start()
+    public static List<CharacterAbility> AllAbilities;
+
+    void Awake()
     {
         AllAbilities = new List<CharacterAbility>();
         var abilities = Resources.LoadAll("ScriptableObjects/Abilities/", typeof(CharacterAbility));

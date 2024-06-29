@@ -11,8 +11,7 @@ GameObject:
   - component: {fileID: 8796743774879463392}
   - component: {fileID: 342871310240609524}
   - component: {fileID: 153846873804262393}
-  - component: {fileID: 3657881125762470648}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Front
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -62,7 +61,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 75290cbb1d35ca5459ac2e984d00b9df, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -84,27 +83,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &3657881125762470648
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2531519877289977640}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7733519839792366999
 GameObject:
   m_ObjectHideFlags: 0
@@ -121,7 +99,8 @@ GameObject:
   - component: {fileID: 7512340352461888630}
   - component: {fileID: 3616687285714677600}
   - component: {fileID: 4691904191183403833}
-  m_Layer: 0
+  - component: {fileID: 962177836361031764}
+  m_Layer: 6
   m_Name: PlayerDummy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -201,13 +180,13 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7733519839792366999}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: cceb26380c179fd47a7df614ba1fb0a6, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
@@ -233,7 +212,7 @@ MonoBehaviour:
   rotationSpeed: 0.1
   isJumping: 0
   isFalling: 0
-  isGrounded: 0
+  isGrounded: 1
   jumpSpeed: 6.5
   jumpDirectionalSpeed: 0
   currentFallSpeed: 0.01
@@ -256,14 +235,8 @@ MonoBehaviour:
     strafeRight:
       primary: 64000000
       secondary: 
-    walkRun:
-      primary: 00000000
-      secondary: 
     jump:
       primary: 20000000
-      secondary: 
-    autorun:
-      primary: 00000000
       secondary: 
     targetNext:
       primary: 09000000
@@ -271,30 +244,7 @@ MonoBehaviour:
     targetSelf:
       primary: 45010000
       secondary: 
-    ability1:
-      primary: 00000000
-      secondary: 
-    ability2:
-      primary: 00000000
-      secondary: 
-    ability3:
-      primary: 00000000
-      secondary: 
-    ability4:
-      primary: 00000000
-      secondary: 
-    ability5:
-      primary: 00000000
-      secondary: 
-    ability6:
-      primary: 00000000
-      secondary: 
-    ability7:
-      primary: 00000000
-      secondary: 
-    ability8:
-      primary: 00000000
-      secondary: 
+    AbilityKeybinds: []
   mainCam: {fileID: 0}
 --- !u!114 &7512340352461888630
 MonoBehaviour:
@@ -309,62 +259,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentTarget: {fileID: 0}
-  controls:
-    forwards:
-      primary: 00000000
-      secondary: 
-    backwards:
-      primary: 00000000
-      secondary: 
-    strafeLeft:
-      primary: 00000000
-      secondary: 
-    strafeRight:
-      primary: 00000000
-      secondary: 
-    walkRun:
-      primary: 00000000
-      secondary: 
-    jump:
-      primary: 00000000
-      secondary: 
-    autorun:
-      primary: 00000000
-      secondary: 
-    targetNext:
-      primary: 00000000
-      secondary: 
-    targetSelf:
-      primary: 00000000
-      secondary: 
-    ability1:
-      primary: 00000000
-      secondary: 
-    ability2:
-      primary: 00000000
-      secondary: 
-    ability3:
-      primary: 00000000
-      secondary: 
-    ability4:
-      primary: 00000000
-      secondary: 
-    ability5:
-      primary: 00000000
-      secondary: 
-    ability6:
-      primary: 00000000
-      secondary: 
-    ability7:
-      primary: 00000000
-      secondary: 
-    ability8:
-      primary: 00000000
-      secondary: 
   targetClosedList: []
   previousTarget: {fileID: 0}
-  mainCam: {fileID: 0}
-  camController: {fileID: 0}
   searchRadius: 50
 --- !u!114 &3616687285714677600
 MonoBehaviour:
@@ -387,7 +283,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7733519839792366999}
   serializedVersion: 4
-  m_Mass: 0.0000001
+  m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -403,6 +299,21 @@ Rigidbody:
   m_ImplicitTensor: 0
   m_UseGravity: 0
   m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 80
-  m_CollisionDetection: 0
+  m_Interpolate: 2
+  m_Constraints: 116
+  m_CollisionDetection: 1
+--- !u!114 &962177836361031764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7733519839792366999}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 803dea4ecf924ad4d879e8a023f89c3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: Kevin
+  IsOwnedByMe: 1
+  ClassType: 1

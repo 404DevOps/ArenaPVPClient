@@ -30,6 +30,7 @@ public class CharacterController: MonoBehaviour
     public bool steer;
 
     public Controls controls;
+    private PlayerSettings settings;
 
     [HideInInspector]
     public CameraController mainCam;
@@ -41,7 +42,8 @@ public class CharacterController: MonoBehaviour
         if (!player.IsOwnedByMe)
             return;
 
-        ReloadControlSettings();
+        settings = FindObjectOfType<PlayerSettings>();
+        settings.OnSettingsLoaded.AddListener(ReloadControlSettings);
     }
 
     // Update is called once per frame
@@ -60,8 +62,9 @@ public class CharacterController: MonoBehaviour
             currentDirection = GetDirection();
         }
 
+        //rb.velocity = currentDirection * walkSpeed * Time.deltaTime;
         transform.Translate(currentDirection * walkSpeed * Time.deltaTime);
-        rb.velocity = Vector3.zero;
+        //rb.velocity = Vector3.zero;
         HandleJump();
     }
 
@@ -142,7 +145,6 @@ public class CharacterController: MonoBehaviour
 
     public void ReloadControlSettings() 
     {
-        var settingsGO = FindObjectOfType<PlayerSettings>();
-        controls = settingsGO.Settings.Controls;
+        controls = settings.Settings.Controls;
     }
 }

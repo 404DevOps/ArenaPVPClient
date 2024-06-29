@@ -139,8 +139,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc22be37f7db150449bc38f82ae75b11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  closeButton: {fileID: 3248670182721600347}
-  SkillDisplayPrefab: {fileID: 8267826725291293960, guid: 3e7e9754763e63046a1659f4bc86e185, type: 3}
+  CloseButton: {fileID: 3248670182721600347}
+  AbilityDisplayPrefab: {fileID: 8267826725291293960, guid: 3e7e9754763e63046a1659f4bc86e185, type: 3}
   SkillGrid: {fileID: 591348825017871378}
 --- !u!1 &1822473261726875112
 GameObject:

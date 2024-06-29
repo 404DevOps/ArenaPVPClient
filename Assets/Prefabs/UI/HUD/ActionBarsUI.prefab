@@ -292,4 +292,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Actionbar1: {fileID: 8747184533922861788}
   Actionbar2: {fileID: 3011220027175184210}
-  actionSlotPrefab: {fileID: 4278888769006303548, guid: 455e55edfb92415478240a3f0f781a87, type: 3}
+  ActionSlotPrefab: {fileID: 4278888769006303548, guid: 455e55edfb92415478240a3f0f781a87, type: 3}

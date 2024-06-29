@@ -1,3 +1,4 @@
+using System;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -24,6 +25,8 @@ public class SettingsMenuUIScript : MonoBehaviour
         InitializeSettingsInputs();
     }
 
+
+
     private void InitializeSettingsInputs()
     {
         LockActionBars.isOn = settings.LockActionBars;
@@ -38,7 +41,14 @@ public class SettingsMenuUIScript : MonoBehaviour
     {
         settings.LockActionBars = LockActionBars.isOn;
         settings.ShowHealthAsPercentage = ShowHealthAsPercentage.isOn;
-        settings.SaveSettings();
+        settings.SaveSettingsToFile();
+        ReloadUI();
         menuHandler.CloseMenu();
+    }
+
+    private void ReloadUI()
+    {
+        var actionBarsController = FindObjectOfType<ActionBarUIHandler>();
+        actionBarsController.RebuildActionBars();
     }
 }

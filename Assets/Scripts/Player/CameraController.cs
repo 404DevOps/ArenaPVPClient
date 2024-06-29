@@ -129,9 +129,11 @@ public class CameraController: MonoBehaviour
                     currentPan -= camPanSpeed * Mathf.Abs(signedAngle) * Time.deltaTime;
                 if (Mathf.Round(signedAngle) < 0)
                     currentPan += camPanSpeed * Mathf.Abs(signedAngle) * Time.deltaTime;
+                Cursor.visible = true;
                 break;
             case CameraState.Steer:
             case CameraState.Run:
+                Cursor.visible = false;
                 if (previousState == CameraState.Rotate && State == CameraState.Run)
                 { 
                     playerTransform.transform.eulerAngles = new Vector3(playerTransform.eulerAngles.x, currentPan, playerTransform.eulerAngles.z);
@@ -139,6 +141,7 @@ public class CameraController: MonoBehaviour
                 currentPan = playerTransform.eulerAngles.y;
                 break;
             case CameraState.Rotate:
+                Cursor.visible = false;
                 break;
             default:
                 break;

@@ -21,14 +21,15 @@ public class GeneralSettings
         Controls.backwards = controls.backwards;
         Controls.strafeLeft = controls.strafeLeft;
         Controls.strafeRight = controls.strafeRight;
+        Controls.AbilityKeybinds = new KeyBind[controls.AbilityKeybinds.Length];
 
-        for (int i = 0; i < Controls.Abilities.Length; i++)
+        for (int i = 0; i < controls.AbilityKeybinds.Length; i++)
         {
-            Controls.Abilities[i] = new KeyBind() { primary = new KeyCode[] { controls.Abilities[i].primary.FirstOrDefault() }, secondary = new KeyCode[] { controls.Abilities[i].secondary.FirstOrDefault() } };
+            Controls.AbilityKeybinds[i] = new KeyBind() { primary = new KeyCode[] { controls.AbilityKeybinds[i].primary.FirstOrDefault() }, secondary = new KeyCode[] { controls.AbilityKeybinds[i].secondary.FirstOrDefault() } };
         }
     }
 
-    public void SaveSettings()
+    public void SaveSettingsToFile()
     {
         var str = JsonUtility.ToJson(this);
         File.WriteAllText(PlayerSettings.settingsPath, str);

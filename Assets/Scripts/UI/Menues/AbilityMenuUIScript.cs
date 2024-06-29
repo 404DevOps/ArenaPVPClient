@@ -6,8 +6,8 @@ using UnityEngine.UI;
 
 public class AbilityMenuUIScript : MonoBehaviour
 {
-    public Button closeButton;
-    public GameObject SkillDisplayPrefab;
+    public Button CloseButton;
+    public GameObject AbilityDisplayPrefab;
     public Transform SkillGrid;
 
     MenuHandlerUIScript menuHandler;
@@ -16,17 +16,16 @@ public class AbilityMenuUIScript : MonoBehaviour
     void Start()
     {
         menuHandler = FindObjectOfType<MenuHandlerUIScript>();
-        closeButton.onClick.AddListener(CloseMenu);
+        CloseButton.onClick.AddListener(CloseMenu);
 
-        AbilityManager abilityManager = FindObjectOfType<AbilityManager>();
         Player player = FindObjectsOfType<Player>().FirstOrDefault(p => p.IsOwnedByMe);
 
         ClearGrid();
 
-        foreach (var ability in abilityManager.AllAbilities.Where(a => a.ClassType == player.ClassType))
+        foreach (var ability in AbilityManager.AllAbilities.Where(a => a.ClassType == player.ClassType))
         {
-            var skillDisplay = Instantiate(SkillDisplayPrefab, SkillGrid);
-            var holder = skillDisplay.GetComponent<AbilityUIDisplay>();
+            var abilityDisplay = Instantiate(AbilityDisplayPrefab, SkillGrid);
+            var holder = abilityDisplay.GetComponent<AbilityUIDisplay>();
             holder.Ability = ability;
         }
 

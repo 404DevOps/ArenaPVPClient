@@ -19,37 +19,71 @@ public class ActionSlot : MonoBehaviour, IDropHandler
     public KeyBind KeyBind;
     public PlayerSettings playerSettings;
     private Color DefaultBorderColor;
+    private Color DefaultIconColor;
 
     private float FlashTime = 0.05f;
     private float TimePassed = 0f;
     private bool timerStarted = false;
 
+    private AbilityUIDisplay abilityDisplay;
 
-    public void OnDrop(PointerEventData eventData)
-    {
-        Debug.Log("Dropped: " + eventData.pointerDrag.name);
-        var skillDragHandler = eventData.pointerDrag.GetComponent<AbilitylDragHandler>();
-        var droppedAbility = eventData.pointerDrag.GetComponent<AbilityUIDisplay>();
-
-        var display = GetComponent<AbilityUIDisplay>();
-        display.Ability = droppedAbility.Ability;
-        Icon.sprite = display.Ability.AbilityInfo.Icon;
-        Icon.color = Color.white; //set alpha
-
-        SetBarLock();
-
-        Destroy(skillDragHandler.duplicate);
-    }
+    public Action<int, CharacterAbility> OnAbilityChanged;
 
     private void Update()
     {
         FlashActionSlot();
     }
 
+
+    public void OnDrop(PointerEventData eventData)
+    {
+        if (eventData.pointerDrag.GetComponent<ActionSlot>()?.Id == Id)
+            return;
+
+        var dragHandler = eventData.pointerDrag.GetComponent<AbilityUIDragHandler>();
+        var droppedAbility = eventData.pointerDrag.GetComponent<AbilityUIDisplay>();
+
+        Ability = droppedAbility.Ability;
+        abilityDisplay.Ability = Ability;
+        SetIcon();
+        SetBarLock();
+        OnAbilityChanged.Invoke(Id, Ability);
+
+        //If dragged item is ActionSlot, move ability instead of copy
+        if (eventData.pointerDrag.GetComponent<ActionSlot>() != null)
+        {
+            eventData.pointerDrag.GetComponent<ActionSlot>().ResetSlot();
+        }
+
+        Destroy(dragHandler.duplicate);
+        
+    }
+
+    private void ResetSlot()
+    {
+        Ability = null;
+        SetIcon();
+        SetBarLock();
+        OnAbilityChanged.Invoke(Id, null);
+    }
+    private void SetIcon()
+    {
+        if (Ability == null)
+        {
+            Icon.sprite = null;
+            Icon.color = DefaultIconColor;
+        }
+        else 
+        {
+            Icon.sprite = Ability.AbilityInfo.Icon;
+            Icon.color = Color.white; //set alpha
+        }
+    }
+
     public void SetBarLock() 
     {
         //if no ability, no dragging, if has ability, set according to bar lock.
-        GetComponent<AbilitylDragHandler>().enabled = Ability != null ? !playerSettings.Settings.LockActionBars : false;
+        GetComponent<AbilityUIDragHandler>().enabled = Ability != null ? !playerSettings.Settings.LockActionBars : false;
     }
 
     private void FlashActionSlot()
@@ -76,9 +110,14 @@ public class ActionSlot : MonoBehaviour, IDropHandler
     private void Awake()
     {
         playerSettings = FindObjectOfType<PlayerSettings>();
-        SetBarLock();
-
+        abilityDisplay = GetComponent<AbilityUIDisplay>();
+        if (Ability != null)
+            abilityDisplay.Ability = Ability;
         KeyBindText.text = HelperMethods.GetKeyBindNameShort(KeyBind.primary);
         DefaultBorderColor = Border.color;
+        DefaultBorderColor = Icon.color;
+        SetBarLock();
+        SetIcon();
+        
     }
 }
