@@ -14,7 +14,6 @@ public abstract class CharacterAbility : ScriptableObject
     public float Cooldown;
     public float ResourceCost;
     public float Range;
-    public Sprite Icon;
 
     //TODO: make ServerCharacter owner and target
     public void TryUseAbility(Transform owner, Transform[] target)
@@ -61,9 +60,10 @@ public abstract class CharacterAbility : ScriptableObject
     protected abstract void Use(object owner, object target);
 }
 
+[Serializable]
 public class AbilityInfo 
 {
     public string Name;
-    public string TooltipText;
+    public string Description;
     public Sprite Icon;
 }

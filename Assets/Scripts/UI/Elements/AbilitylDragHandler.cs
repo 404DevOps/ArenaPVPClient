@@ -4,7 +4,8 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class SkillDragHandler : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
+[RequireComponent(typeof(AbilityUIDisplay))]
+public class AbilitylDragHandler : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
     public GameObject duplicate;
     private Canvas canvas;
@@ -29,7 +30,7 @@ public class SkillDragHandler : MonoBehaviour, IDragHandler, IBeginDragHandler, 
             cloneRect.sizeDelta = rect.sizeDelta;
             duplicate.transform.position = eventData.position;
 
-            var cloneDragHandler = duplicate.GetComponent<SkillDragHandler>();
+            var cloneDragHandler = duplicate.GetComponent<AbilitylDragHandler>();
             cloneDragHandler.canvasGroup.alpha = .6f;
             cloneDragHandler.canvasGroup.blocksRaycasts = false;
         }

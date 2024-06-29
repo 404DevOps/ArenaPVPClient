@@ -34,8 +34,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.79999924, y: -0.56497955}
-  m_SizeDelta: {x: -1.5999978, y: -1.1300385}
+  m_AnchoredPosition: {x: -1, y: 0}
+  m_SizeDelta: {x: -12, y: -10}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2944843320008458746
 CanvasRenderer:
@@ -149,6 +149,7 @@ GameObject:
   - component: {fileID: 1836158584724066072}
   - component: {fileID: 5482885245353822972}
   - component: {fileID: 6401026221990630938}
+  - component: {fileID: 3574181352073572698}
   m_Layer: 5
   m_Name: ActionSlot
   m_TagString: Untagged
@@ -198,7 +199,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -263,13 +264,7 @@ MonoBehaviour:
   Icon: {fileID: 5294738751000869379}
   Border: {fileID: 8581595251213071328}
   KeyBindText: {fileID: 6354899796707265631}
-  Ability:
-    Champion: 0
-    Icon: {fileID: 0}
-    Name: 
-    Description: 
-    Id: 0
-    AbilityTargets: 
+  Ability: {fileID: 0}
   KeyBind:
     primary: 00000000
     secondary: 
@@ -282,10 +277,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 4278888769006303548}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9d24f28ffa08dd443a2469777d4fd039, type: 3}
+  m_Script: {fileID: 11500000, guid: e879551904d6fbb4b9102ee7f65bc999, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   duplicate: {fileID: 0}
+--- !u!114 &3574181352073572698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4278888769006303548}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b9bfb4a02e45e14c8e75a873f9938c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Ability: {fileID: 0}
+  Icon: {fileID: 5294738751000869379}
+  TooltipPrefab: {fileID: 8267826725291293960, guid: 0682d294457306040b4cb1adba640fbf, type: 3}
+  isBeingDragged: 0
 --- !u!1 &8058552430918402476
 GameObject:
   m_ObjectHideFlags: 0
@@ -322,7 +333,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: -6, y: -6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7927758960518774600
 CanvasRenderer:

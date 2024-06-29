@@ -24,6 +24,8 @@ public class CharacterController: MonoBehaviour
 
     Rigidbody rb;
 
+    Player player;
+
     //[HideInInspector]
     public bool steer;
 
@@ -34,13 +36,20 @@ public class CharacterController: MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        ReloadControlSettings();
+        player = GetComponent<Player>();
         rb = GetComponent<Rigidbody>();
+        if (!player.IsOwnedByMe)
+            return;
+
+        ReloadControlSettings();
     }
 
     // Update is called once per frame
     void LateUpdate()
     {
+        if(!player.IsOwnedByMe)
+            return;
+
         if (steer)
         {
             var rotation = Input.GetAxis("Mouse X") * mainCam.CameraSpeed;

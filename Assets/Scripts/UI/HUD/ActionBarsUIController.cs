@@ -7,9 +7,7 @@ public class ActionBarsUIController : MonoBehaviour
 {
     public GameObject Actionbar1;
     public GameObject Actionbar2;
-
     public GameObject actionSlotPrefab;
-
     private PlayerSettings playerSettings;
     // Start is called before the first frame update
     void Start()
@@ -44,6 +42,15 @@ public class ActionBarsUIController : MonoBehaviour
         for (int i = 0; i < Actionbar2.transform.childCount; i++)
         {
             Destroy(Actionbar2.transform.GetChild(i).gameObject);
+        }
+    }
+
+    public void SetAllActionBarLocks()
+    {
+        var actionSlots = GetComponentsInChildren<ActionSlot>();
+        foreach (var actionSlot in actionSlots)
+        { 
+            actionSlot.SetBarLock();
         }
     }
 }

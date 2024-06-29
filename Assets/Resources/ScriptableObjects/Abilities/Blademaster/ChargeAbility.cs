@@ -10,10 +10,16 @@ public class ChargeAbility : CharacterAbility
 {
     public float chargeSpeed;
     public float stunDuration;
+
     protected override void Use(object owner, object target)
     {
         //applyAura(AuraType.Stun, target)
         //get transform, move towards
         throw new System.NotImplementedException();
     }
+}
+
+public interface IAbility
+{
+    public string AbilityName { get; set; }
 }

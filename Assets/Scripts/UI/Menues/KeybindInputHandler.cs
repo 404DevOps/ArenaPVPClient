@@ -28,11 +28,13 @@ public class KeybindInputHandler : MonoBehaviour, IPointerClickHandler
     [HideInInspector] public bool isAbilityKeybind = false;
 
     private KeyCode[] pressedKeys = new KeyCode[2];
+    private ControlsMenuUIScript controlsMenu;
 
 
     // Start is called before the first frame update
     void Start()
     {
+        controlsMenu = FindAnyObjectByType<ControlsMenuUIScript>();
         settings = FindObjectOfType<PlayerSettings>().Settings;
         SetKeyBindText();
     }
@@ -152,6 +154,7 @@ public class KeybindInputHandler : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        controlsMenu.OnNewBoxSelected();
         IsInputListenerActive = true;
         Timer = 0;
         box.color = Color.yellow;
