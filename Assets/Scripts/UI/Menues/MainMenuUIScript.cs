@@ -3,45 +3,42 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class EscapeMenuUIScript : MonoBehaviour
+public class MainMenuUIScript : MonoBehaviour
 {
     public Button exitGameButton;
     public Button abilitiesButton;
     public Button settingsButton;
     public Button controlsButton;
+    public Button closeButton;
 
     public Object abilitiesMenuPrefab;
     public Object settingsMenuPrefab;
     public Object KeybindsMenuPrefab;
-
-    public Object MainMenu;
+    public Object MainMenuPrefab;
 
     Object activeSubMenu;
 
     // Start is called before the first frame update
     void Start()
     {
-        activeSubMenu = MainMenu;
         exitGameButton.onClick.AddListener(ExitGame);
         abilitiesButton.onClick.AddListener(ShowAbilitiesMenu);
         settingsButton.onClick.AddListener(ShowSettingsMenu);
         controlsButton.onClick.AddListener(ShowKeybindMenu);
+        closeButton.onClick.AddListener(CloseEscapeMenu);
     }
 
     public void ShowAbilitiesMenu()
     {
-        CloseSubMenu();
-        activeSubMenu = Instantiate(abilitiesMenuPrefab, transform);
+        OpenSubMenu(abilitiesMenuPrefab);
     }
     public void ShowKeybindMenu()
     {
-        CloseSubMenu();
-        activeSubMenu = Instantiate(KeybindsMenuPrefab, transform);
+        OpenSubMenu(KeybindsMenuPrefab);
     }
     public void ShowSettingsMenu()
     {
-        CloseSubMenu();
-        activeSubMenu = Instantiate(settingsMenuPrefab, transform);
+        OpenSubMenu(settingsMenuPrefab);
     }
     public void ExitGame()
     {
@@ -51,12 +48,19 @@ public class EscapeMenuUIScript : MonoBehaviour
                 Application.Quit();
         #endif
     }
+    private void OpenSubMenu(Object subMenuPrefab)
+    {
+        UIEvents.onOpenSubMenu.Invoke(subMenuPrefab);
+    }
+
 
     private void CloseSubMenu()
     {
-        if(activeSubMenu != null)
-        {
-            Destroy(activeSubMenu);
-        }
+        OpenSubMenu(MainMenuPrefab);
+    }
+
+    public void CloseEscapeMenu()
+    {
+        UIEvents.onCloseMainMenu.Invoke();
     }
 }

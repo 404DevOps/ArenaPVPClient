@@ -28,13 +28,11 @@ public class KeybindInputHandler : MonoBehaviour, IPointerClickHandler
     [HideInInspector] public bool isAbilityKeybind = false;
 
     private KeyCode[] pressedKeys = new KeyCode[2];
-    private ControlsMenuUIScript controlsMenu;
 
 
     // Start is called before the first frame update
     void Start()
     {
-        controlsMenu = FindAnyObjectByType<ControlsMenuUIScript>();
         settings = FindObjectOfType<PlayerSettings>().Settings;
         SetKeyBindText();
     }
@@ -132,7 +130,8 @@ public class KeybindInputHandler : MonoBehaviour, IPointerClickHandler
                 settings.Controls.AbilityKeybinds[slot].secondary = keys;
 
             SetPrimarySecondaryText(settings.Controls.AbilityKeybinds[slot]);
-            FindObjectOfType<ActionBarUIHandler>()?.RebuildActionBars();
+            UIEvents.onKeyBindsChanged.Invoke();
+            //FindObjectOfType<ActionBarUIHandler>()?.RebuildActionBars();
         }
         else { 
             var fieldInfo = typeof(Controls).GetField(actionToRebind);
@@ -146,7 +145,8 @@ public class KeybindInputHandler : MonoBehaviour, IPointerClickHandler
 
                 fieldInfo.SetValueOptimized(settings.Controls, kb);
                 SetPrimarySecondaryText(kb);
-                FindObjectOfType<CharacterController>()?.ReloadControlSettings();
+                UIEvents.onControlsChanged.Invoke();
+                //FindObjectOfType<CharacterController>()?.ReloadControlSettings();
             }
         }
         settings.SaveSettingsToFile();
@@ -154,7 +154,7 @@ public class KeybindInputHandler : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        controlsMenu.OnNewBoxSelected();
+        UIEvents.onNewKeyBindInputSelected.Invoke();
         IsInputListenerActive = true;
         Timer = 0;
         box.color = Color.yellow;

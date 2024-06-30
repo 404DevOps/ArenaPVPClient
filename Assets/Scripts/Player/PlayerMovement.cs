@@ -1,7 +1,7 @@
 using UnityEditorInternal;
 using UnityEngine;
 
-public class CharacterController: MonoBehaviour
+public class PlayerMovement: MonoBehaviour
 {
     [SerializeField]
     public float walkSpeed = 2f;
@@ -20,9 +20,11 @@ public class CharacterController: MonoBehaviour
     public float groundLevel = 1f;
 
     public Vector3 currentDirection;
+    private float rotation;
     public float gravity = 0.18f;
 
     Rigidbody rb;
+    CharacterController characterController;
 
     Player player;
 
@@ -37,34 +39,41 @@ public class CharacterController: MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        characterController = GetComponent<CharacterController>();
         player = GetComponent<Player>();
         rb = GetComponent<Rigidbody>();
         if (!player.IsOwnedByMe)
             return;
 
         settings = FindObjectOfType<PlayerSettings>();
-        settings.OnSettingsLoaded.AddListener(ReloadControlSettings);
+
     }
 
     // Update is called once per frame
     void LateUpdate()
     {
-        if(!player.IsOwnedByMe)
+        if (!player.IsOwnedByMe)
             return;
 
         if (steer)
         {
-            var rotation = Input.GetAxis("Mouse X") * mainCam.CameraSpeed;
+            rotation = Input.GetAxis("Mouse X") * mainCam.CameraSpeed;
             transform.eulerAngles += new Vector3(0, rotation, 0);
         }
+
         if (isGrounded)
         {
             currentDirection = GetDirection();
         }
+    }
+    private void FixedUpdate()
+    {
+        if (!player.IsOwnedByMe)
+            return;
 
-        //rb.velocity = currentDirection * walkSpeed * Time.deltaTime;
-        transform.Translate(currentDirection * walkSpeed * Time.deltaTime);
-        //rb.velocity = Vector3.zero;
+        
+        characterController.Move(currentDirection * walkSpeed * Time.deltaTime);
+
         HandleJump();
     }
 
@@ -130,21 +139,40 @@ public class CharacterController: MonoBehaviour
 
     private Vector3 GetDirection() 
     {
-        var dir = new Vector3();
-        if (Input.GetKey(KeyCode.Mouse0) && Input.GetKey(KeyCode.Mouse1))
-        {
-            dir.z = 1f;
-        }
+        var direction = new Vector3();
+        //if (Input.GetKey(KeyCode.Mouse0) && Input.GetKey(KeyCode.Mouse1))
+        //{
+        //    direction.z = 1f;
+        //}
+        if (controls.forwards.IsPressed() || Input.GetKey(KeyCode.Mouse0) && steer)
+            direction += transform.forward;
+        if (controls.backwards.IsPressed())
+            direction += -transform.forward;
+        if (controls.strafeLeft.IsPressed())
+            direction += -transform.right;
+        if (controls.strafeRight.IsPressed())
+            direction += transform.right;
 
-        dir.z = Axis(controls.forwards.IsPressed() || (Input.GetKey(KeyCode.Mouse0) && steer), controls.backwards.IsPressed());
-        dir.x = Axis(controls.strafeRight.IsPressed(), controls.strafeLeft.IsPressed());
+        //direction.z = Axis(controls.forwards.IsPressed() || (Input.GetKey(KeyCode.Mouse0) && steer), controls.backwards.IsPressed());
+        //direction.x = Axis(controls.strafeRight.IsPressed(), controls.strafeLeft.IsPressed());
 
-        return dir;
+        return direction;
 
     }
 
     public void ReloadControlSettings() 
     {
         controls = settings.Settings.Controls;
+    }
+
+    private void OnEnable()
+    {
+        GameEvents.onSettingsLoaded.AddListener(ReloadControlSettings);
+        UIEvents.onControlsChanged.AddListener(ReloadControlSettings);
+    }
+    private void OnDisable()
+    {
+        GameEvents.onSettingsLoaded.RemoveListener(ReloadControlSettings);
+        UIEvents.onControlsChanged.RemoveListener(ReloadControlSettings);
     }
 }

@@ -12,29 +12,34 @@ public class TargetingSystem : MonoBehaviour
 {
     [SerializeField]
     public Targetable currentTarget;
-    private Controls controls;
-
     public List<Targetable> targetClosedList;
     public Targetable previousTarget;
+    public float searchRadius = 30f;
+
+    private Controls controls;
     private Camera mainCam;
     private CameraController camController;
-    private MenuHandlerUIScript menuHandler;
+    private PlayerSettings playerSettings;
+    private bool isMenuOpen;
+    private bool isClickTargetLocked;
 
-    public float searchRadius = 30f;
     // Start is called before the first frame update
     void Start()
     {
-        var settignsGO = FindObjectOfType<PlayerSettings>();
-        menuHandler = FindObjectOfType<MenuHandlerUIScript>();
-        controls = settignsGO.Settings.Controls;
+       
         mainCam = Camera.main;
         camController = mainCam.GetComponentInParent<CameraController>();
+    }
+    public void ReloadControls()
+    {
+        playerSettings = FindObjectOfType<PlayerSettings>();
+        controls = playerSettings.Settings.Controls;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (menuHandler.isMenuOpen)
+        if (isMenuOpen)
             return;
 
         //targetEnemy with tab
@@ -51,16 +56,11 @@ public class TargetingSystem : MonoBehaviour
             DoSelectTarget(self, true);
         }
         //target with leftMouse
-        if (Input.GetKeyUp(KeyCode.Mouse0) && MouseNotUsedByCam())
-        { 
-            var ray = mainCam.ScreenPointToRay(Input.mousePosition);
-            if(Physics.Raycast(ray, out RaycastHit hitInfo))
+        if (!isClickTargetLocked) {
+            if (Input.GetKeyUp(KeyCode.Mouse0) && MouseNotUsedByCam())
             {
-                var tar = hitInfo.collider.gameObject.GetComponent<Targetable>();
-                if (tar != null)
-                {
-                    DoSelectTarget(tar, true);
-                }
+                Debug.Log("GetTarget");
+                GetTargetUnderMouse();
             } 
         }
         //removeTarget
@@ -75,9 +75,21 @@ public class TargetingSystem : MonoBehaviour
         }
     }
 
+    private void GetTargetUnderMouse()
+    {
+        var ray = mainCam.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hitInfo))
+        {
+            var tar = hitInfo.collider.gameObject.GetComponent<Targetable>();
+            if (tar != null)
+            {
+                DoSelectTarget(tar, true);
+            }
+        }
+    }
+
     private bool MouseNotUsedByCam()
     {
-        //only
         return
             !camController.isDragging &&
             (camController.State == CameraState.None || camController.State == CameraState.Rotate) &&
@@ -106,7 +118,7 @@ public class TargetingSystem : MonoBehaviour
 
     private Targetable GetNextTabTarget()
     {
-        var possibleTargets = FindObjectsByType<Targetable>(FindObjectsSortMode.None).Where(t => IsInFront(t, InFrontMode.Camera) && !t.isSelf).ToList();
+        var possibleTargets = FindObjectsByType<Targetable>(FindObjectsSortMode.None).Where(t => IsInFront(t, TargetInFrontMode.Camera) && !t.isSelf).ToList();
 
         if (targetClosedList.Count >= possibleTargets.Count)
             targetClosedList.Clear();
@@ -137,15 +149,15 @@ public class TargetingSystem : MonoBehaviour
         return null;
     }
 
-    private bool IsInFront(Targetable target, InFrontMode mode )
+    private bool IsInFront(Targetable target, TargetInFrontMode mode )
     {
         Transform transform;
         switch (mode)
         {
-            case InFrontMode.Camera:
+            case TargetInFrontMode.Camera:
                 transform = mainCam.transform;
                 break;
-            case InFrontMode.Player:
+            case TargetInFrontMode.Player:
                 transform = this.transform;
                 break;
             default:
@@ -161,7 +173,7 @@ public class TargetingSystem : MonoBehaviour
     private Targetable GetClosestTarget(List<Targetable> possibleTargets)
     {
         var orderedTargets = possibleTargets.OrderBy(t => GetDistance(t.transform));
-        var targetsInFrontOfPlayer = orderedTargets.Where(t => IsInFront(t, InFrontMode.Player));
+        var targetsInFrontOfPlayer = orderedTargets.Where(t => IsInFront(t, TargetInFrontMode.Player));
         if(targetsInFrontOfPlayer.Any())
             return targetsInFrontOfPlayer.First();
         else if(orderedTargets.Any())
@@ -177,9 +189,24 @@ public class TargetingSystem : MonoBehaviour
         return Vector3.Distance(screenPointOfTransform, new Vector3(0.5f, 0.5f, 0));
     }
 
-    public enum InFrontMode 
+    private void OnEnable()
     {
-        Camera,
-        Player
+        GameEvents.onSettingsLoaded.AddListener(ReloadControls);
+        UIEvents.onAbilityDrag.AddListener(SetTargetLock);
+        UIEvents.onMainMenuOpen.AddListener(SetMenuOpen);
+    }
+    private void OnDisable()
+    {
+        GameEvents.onSettingsLoaded.RemoveListener(ReloadControls);
+        UIEvents.onAbilityDrag.RemoveListener(SetTargetLock);
+        UIEvents.onMainMenuOpen.AddListener(SetMenuOpen);
+    }
+    private void SetTargetLock(bool isLock)
+    {
+        isClickTargetLocked = isLock;
+    }
+    private void SetMenuOpen(bool isOpen)
+    {
+        isMenuOpen = isOpen;  
     }
 }

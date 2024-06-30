@@ -12,16 +12,22 @@ public class ControlsMenuUIScript : MonoBehaviour
     public Button closeButton;
     public Button resetDefaultsButton;
 
-    MenuHandlerUIScript menuHandler;
     PlayerSettings settings;
 
     public GameObject AdjustRebindInputPrefab;
     public Transform ActionSlotFrame;
 
+    private void OnEnable()
+    {
+        UIEvents.onNewKeyBindInputSelected.AddListener(OnNewBoxSelected);
+    }
+    private void OnDisable()
+    {
+        UIEvents.onNewKeyBindInputSelected.RemoveListener(OnNewBoxSelected);
+    }
     // Start is called before the first frame update
     void Start()
     {
-        menuHandler = FindObjectOfType<MenuHandlerUIScript>();
         closeButton.onClick.AddListener(CloseMenu);
         resetDefaultsButton.onClick.AddListener(ResetDefaultControls);
         settings = FindObjectOfType<PlayerSettings>();
@@ -49,7 +55,7 @@ public class ControlsMenuUIScript : MonoBehaviour
 
     public void CloseMenu()
     {
-        menuHandler.CloseMenu();
+        UIEvents.onCloseSubMenu.Invoke();
     }
     public void ResetDefaultControls()
     {

@@ -10,12 +10,10 @@ public class AbilityMenuUIScript : MonoBehaviour
     public GameObject AbilityDisplayPrefab;
     public Transform SkillGrid;
 
-    MenuHandlerUIScript menuHandler;
 
     // Start is called before the first frame update
     void Start()
     {
-        menuHandler = FindObjectOfType<MenuHandlerUIScript>();
         CloseButton.onClick.AddListener(CloseMenu);
 
         Player player = FindObjectsOfType<Player>().FirstOrDefault(p => p.IsOwnedByMe);
@@ -28,12 +26,11 @@ public class AbilityMenuUIScript : MonoBehaviour
             var holder = abilityDisplay.GetComponent<AbilityUIDisplay>();
             holder.Ability = ability;
         }
-
     }
 
     public void CloseMenu()
     {
-        menuHandler.CloseMenu(); ;
+        UIEvents.onCloseSubMenu.Invoke();
     }
 
     public void ClearGrid() 

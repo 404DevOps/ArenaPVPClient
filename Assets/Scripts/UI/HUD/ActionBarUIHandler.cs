@@ -16,13 +16,25 @@ public class ActionBarUIHandler : MonoBehaviour
     private ActionBarMapping actionBarMapping;
     private Player player;
 
+    private void OnEnable()
+    {
+        GameEvents.onSettingsLoaded.AddListener(InitializeActionBars);
+        UIEvents.onSettingsSaved.AddListener(RebuildActionBars);
+        UIEvents.onKeyBindsChanged.AddListener(RebuildActionBars);
+    }
+    private void OnDisable()
+    {
+        GameEvents.onSettingsLoaded.RemoveListener(InitializeActionBars);
+        UIEvents.onSettingsSaved.RemoveListener(RebuildActionBars);
+        UIEvents.onKeyBindsChanged.RemoveListener(RebuildActionBars);
+    }
+
     // Start is called before the first frame update
     void Start()
     {
         player = FindObjectsOfType<Player>().FirstOrDefault(p => p.IsOwnedByMe);
         actionBarMappingPath = Application.persistentDataPath + "/ActionBarMapping_" + player.ClassType.ToString() + ".json";
         playerSettings = FindObjectOfType<PlayerSettings>();
-        playerSettings.OnSettingsLoaded.AddListener(InitializeActionBars);
     }
 
     public void InitializeActionBars() 

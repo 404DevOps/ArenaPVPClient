@@ -10,9 +10,6 @@ public class PlayerSettings : MonoBehaviour
     public GeneralSettings Settings;
     public static string settingsPath;
 
-    [HideInInspector]
-    public UnityEvent OnSettingsLoaded;
-
     public void Start()
     {
         settingsPath = Application.persistentDataPath + "/GeneralSettings.json";
@@ -39,6 +36,6 @@ public class PlayerSettings : MonoBehaviour
         {
             Settings = JsonUtility.FromJson<GeneralSettings>(File.ReadAllText(settingsPath));
         }
-        OnSettingsLoaded.Invoke();
+        GameEvents.onSettingsLoaded.Invoke();
     }
 }

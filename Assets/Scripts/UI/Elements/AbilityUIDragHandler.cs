@@ -1,36 +1,38 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(AbilityUIDisplay))]
-public class AbilityUIDragHandler : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
+public class AbilityUIDragHandler : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler, IPointerDownHandler, IPointerUpHandler
 {
-    public GameObject duplicate;
+    public GameObject Duplicate;
+
     private Canvas canvas;
-    bool isClone = false;
-
+    private bool isClone = false;
     private CanvasGroup canvasGroup;
+    private RectTransform rect;
 
-    RectTransform rect;
     public void OnDrag(PointerEventData eventData)
     { 
-        duplicate.transform.position = eventData.position;
+        Duplicate.transform.position = eventData.position;
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        
         if (!isClone)
         {
-            duplicate = Instantiate(this.gameObject, canvas.transform);
-            duplicate.name = "SkillDisplay Duplicate";
+            Duplicate = Instantiate(this.gameObject, canvas.transform);
+            Duplicate.name = "SkillDisplay Duplicate";
 
-            var cloneRect = duplicate.GetComponent<RectTransform>();
+            var cloneRect = Duplicate.GetComponent<RectTransform>();
             cloneRect.sizeDelta = rect.sizeDelta;
-            duplicate.transform.position = eventData.position;
+            Duplicate.transform.position = eventData.position;
 
-            var cloneDragHandler = duplicate.GetComponent<AbilityUIDragHandler>();
+            var cloneDragHandler = Duplicate.GetComponent<AbilityUIDragHandler>();
             cloneDragHandler.canvasGroup.alpha = .6f;
             cloneDragHandler.canvasGroup.blocksRaycasts = false;
         }
@@ -38,7 +40,7 @@ public class AbilityUIDragHandler : MonoBehaviour, IDragHandler, IBeginDragHandl
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        Destroy(duplicate);
+        Destroy(Duplicate);
     }
 
     // Update is called once per frame
@@ -47,5 +49,15 @@ public class AbilityUIDragHandler : MonoBehaviour, IDragHandler, IBeginDragHandl
         canvasGroup = GetComponent<CanvasGroup>();
         rect = GetComponent<RectTransform>();
         canvas = FindObjectOfType<Canvas>(); 
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        UIEvents.onAbilityDrag.Invoke(true);
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        UIEvents.onAbilityDrag.InvokeDelayed(false, 5);
     }
 }

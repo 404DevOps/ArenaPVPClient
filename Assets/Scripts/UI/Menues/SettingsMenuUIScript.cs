@@ -25,8 +25,6 @@ public class SettingsMenuUIScript : MonoBehaviour
         InitializeSettingsInputs();
     }
 
-
-
     private void InitializeSettingsInputs()
     {
         LockActionBars.isOn = settings.LockActionBars;
@@ -35,20 +33,13 @@ public class SettingsMenuUIScript : MonoBehaviour
 
     public void CloseMenu()
     {
-        menuHandler.CloseMenu();
+        UIEvents.onCloseSubMenu.Invoke();
     }
     public void SaveSettings()
     {
         settings.LockActionBars = LockActionBars.isOn;
         settings.ShowHealthAsPercentage = ShowHealthAsPercentage.isOn;
         settings.SaveSettingsToFile();
-        ReloadUI();
-        menuHandler.CloseMenu();
-    }
-
-    private void ReloadUI()
-    {
-        var actionBarsController = FindObjectOfType<ActionBarUIHandler>();
-        actionBarsController.RebuildActionBars();
+        UIEvents.onSettingsSaved.Invoke();
     }
 }

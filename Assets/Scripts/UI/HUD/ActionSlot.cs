@@ -9,7 +9,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 
-public class ActionSlot : MonoBehaviour, IDropHandler
+public class ActionSlot : MonoBehaviour, IDropHandler, IPointerDownHandler
 {
     public int Id;
     public Image Icon;
@@ -31,15 +31,16 @@ public class ActionSlot : MonoBehaviour, IDropHandler
 
     private void Update()
     {
-        FlashActionSlot();
+        if (KeyBind.IsPressed())
+        {
+            FlashActionSlot();
+        }
+        ResetActionSlotFlash();
     }
 
 
     public void OnDrop(PointerEventData eventData)
     {
-        if (eventData.pointerDrag.GetComponent<ActionSlot>()?.Id == Id)
-            return;
-
         var dragHandler = eventData.pointerDrag.GetComponent<AbilityUIDragHandler>();
         var droppedAbility = eventData.pointerDrag.GetComponent<AbilityUIDisplay>();
 
@@ -50,16 +51,17 @@ public class ActionSlot : MonoBehaviour, IDropHandler
         OnAbilityChanged.Invoke(Id, Ability);
 
         //If dragged item is ActionSlot, move ability instead of copy
-        if (eventData.pointerDrag.GetComponent<ActionSlot>() != null)
+        var slot = eventData.pointerDrag.GetComponent<ActionSlot>();
+        if (slot != null)
         {
-            eventData.pointerDrag.GetComponent<ActionSlot>().ResetSlot();
+            if (slot.Id != Id)
+                slot.ResetSlot();
         }
 
-        Destroy(dragHandler.duplicate);
+        Destroy(dragHandler.Duplicate);
         
     }
-
-    private void ResetSlot()
+    public void ResetSlot()
     {
         Ability = null;
         SetIcon();
@@ -79,23 +81,21 @@ public class ActionSlot : MonoBehaviour, IDropHandler
             Icon.color = Color.white; //set alpha
         }
     }
-
     public void SetBarLock() 
     {
         //if no ability, no dragging, if has ability, set according to bar lock.
         GetComponent<AbilityUIDragHandler>().enabled = Ability != null ? !playerSettings.Settings.LockActionBars : false;
     }
-
     private void FlashActionSlot()
     {
-        if (KeyBind.IsPressed())
-        {
+
             Debug.Log($"Actionslot {Id} pressed");
             Border.color = Color.yellow;
             TimePassed = 0;
             timerStarted = true;
-        }
-
+    }
+    private void ResetActionSlotFlash()
+    {
         if (timerStarted)
         {
             TimePassed += Time.deltaTime;
@@ -115,9 +115,14 @@ public class ActionSlot : MonoBehaviour, IDropHandler
             abilityDisplay.Ability = Ability;
         KeyBindText.text = HelperMethods.GetKeyBindNameShort(KeyBind.primary);
         DefaultBorderColor = Border.color;
-        DefaultBorderColor = Icon.color;
+        DefaultIconColor = Icon.color;
         SetBarLock();
         SetIcon();
         
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        FlashActionSlot();
     }
 }

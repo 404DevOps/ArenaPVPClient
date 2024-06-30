@@ -11,7 +11,7 @@ public class Targetable : MonoBehaviour
     public bool isSelf = false;
     public void Start()
     {
-        isSelf = GetComponent<CharacterController>() != null;
+        isSelf = GetComponent<PlayerMovement>() != null;
     }
 
     public void Select()

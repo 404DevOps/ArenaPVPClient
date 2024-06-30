@@ -268,6 +268,7 @@ MonoBehaviour:
   KeyBind:
     primary: 00000000
     secondary: 
+  playerSettings: {fileID: 0}
 --- !u!114 &6401026221990630938
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -280,7 +281,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e879551904d6fbb4b9102ee7f65bc999, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  duplicate: {fileID: 0}
+  Duplicate: {fileID: 0}
 --- !u!114 &3574181352073572698
 MonoBehaviour:
   m_ObjectHideFlags: 0
