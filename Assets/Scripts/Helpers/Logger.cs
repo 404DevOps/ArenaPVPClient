@@ -9,10 +9,10 @@ namespace Assets.Scripts.Helpers
 {
     public static class Logger
     {
-        public static void Log(object sender, string message)
+        public static void Log(string message)
         {
             StackTrace stackTrace = new StackTrace();
-            UnityEngine.Debug.Log($"{sender.GetType()}::{stackTrace.GetFrame(1).GetMethod().Name}::{message}");
+            UnityEngine.Debug.Log($"{stackTrace.GetFrame(1).GetType()}::{stackTrace.GetFrame(1).GetMethod().Name}::{message}");
         }
     }
 }

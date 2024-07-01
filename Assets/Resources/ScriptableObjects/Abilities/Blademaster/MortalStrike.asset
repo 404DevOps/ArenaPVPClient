@@ -10,17 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3d367d07c6c60324ca3d31bc56f95ed1, type: 3}
-  m_Name: ChargeAbility
+  m_Name: MortalStrike
   m_EditorClassIdentifier: 
   AbilityInfo:
-    Name: Charge
-    TooltipText: Stuns your Target an rushes towards them.
-    Icon: {fileID: 21300000, guid: bc894b40f78a8124480df3a9a3f41f33, type: 3}
-  ClassType: 1
+    Name: Mortal Strike
+    Description: A vicious strike that deals 200 Physical damage and reduces the
+      effectiveness of healing on the target by 50% for 10 sec.
+    CastTime: 2
+    Cooldown: 45
+    ResourceCost: 20
+    Range: 5
+    Icon: {fileID: 21300000, guid: 5823071ed29bd614daaab81fac729776, type: 3}
+    ClassType: 1
   TargetingType: 3
-  CastTime: 0
-  Cooldown: 8
-  ResourceCost: 0
-  Range: 30
-  chargeSpeed: 5
-  stunDuration: 1
+  weaponDamagePercentage: 75
+  AurasToApply: []

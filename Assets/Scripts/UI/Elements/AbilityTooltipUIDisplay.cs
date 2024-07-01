@@ -19,7 +19,6 @@ public class AbilityTooltipUIDisplay : MonoBehaviour
 
     void OnEnable()
     {
-        firstFramePassed = false;
         Name.text = abilityInfo.Name;
         Description.text = abilityInfo.Description;
         Cooldown.text = abilityInfo.Cooldown.ToString() + "sec Cooldown";
@@ -32,8 +31,6 @@ public class AbilityTooltipUIDisplay : MonoBehaviour
     IEnumerator WaitForFrame()
     {
         yield return 0;
-
-        firstFramePassed = true;
         OnTooltipInstantiated?.Invoke();
 
     }

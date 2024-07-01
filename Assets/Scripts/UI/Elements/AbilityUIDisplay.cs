@@ -14,8 +14,9 @@ public class AbilityUIDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExi
     private GameObject Tooltip;
     private Transform canvas;
 
-    private float offsetX = 10;
-    private float offsetY = 20;
+    private float offsetX = 30;
+    private float offsetY = 30;
+    private float abilityMenuOffsetX = 45;
 
     private bool isInActionSlot = false;
     private bool showTooltip = false;
@@ -66,13 +67,13 @@ public class AbilityUIDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
         if (isInActionSlot)
         {
-            var pos = new Vector3(Screen.width - rect.sizeDelta.x - offsetX, 0 + rect.sizeDelta.y + offsetY);
-            Logger.Log(this, pos.ToString());
+            var pos = new Vector3(Screen.width - rect.sizeDelta.x / 2 - offsetX, 0 + rect.sizeDelta.y / 2 + offsetY);
+            Logger.Log(pos.ToString());
             Tooltip.transform.position = pos;
-        } //instantiate ActionSlotTooltip on bottom right instead of 
+        }
         else
         {
-            Tooltip.transform.position = new Vector3(transform.position.x + rect.sizeDelta.x / 2 + 35, transform.position.y + rect.sizeDelta.y / 2 + 35);
+            Tooltip.transform.position = new Vector3(transform.position.x + rect.sizeDelta.x / 2 + abilityMenuOffsetX, transform.position.y);
         }
     }
 

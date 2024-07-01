@@ -5,11 +5,12 @@ using Unity.VisualScripting;
 using UnityEngine;
 
 
-[CreateAssetMenu(menuName = "Abilities/Blademaster/ChargeAbility", fileName = "ChargeAbility")]
-public class ChargeAbility : CharacterAbility
+[CreateAssetMenu(menuName = "Abilities/Blademaster/MortalStrike", fileName = "Mortal Strike")]
+public class MortalStrikeAbility : CharacterAbility
 {
-    public float chargeSpeed;
-    public float stunDuration;
+    [Range(1,100)]
+    public float weaponDamagePercentage;
+    public AuraBase[] AurasToApply;
 
     protected override void Use(object owner, object target)
     {
@@ -17,9 +18,4 @@ public class ChargeAbility : CharacterAbility
         //get transform, move towards
         throw new System.NotImplementedException();
     }
-}
-
-public interface IAbility
-{
-    public string AbilityName { get; set; }
 }

@@ -59,6 +59,7 @@ public abstract class CharacterAbility : ScriptableObject
 public class AbilityInfo 
 {
     public string Name;
+    [TextArea]
     public string Description;
     public float CastTime;
     public float Cooldown;
