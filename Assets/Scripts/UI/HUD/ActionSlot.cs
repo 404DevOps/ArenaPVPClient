@@ -56,10 +56,9 @@ public class ActionSlot : MonoBehaviour, IDropHandler
         {
             if (slot.Id != Id)
                 slot.ResetSlot();
-        }
 
-        Destroy(dragHandler.Duplicate);
-        
+            Destroy(dragHandler.Duplicate);
+        }
     }
     public void ResetSlot()
     {

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -42,10 +43,21 @@ public class AbilityUIDragHandler : MonoBehaviour, IDragHandler, IBeginDragHandl
     public void OnEndDrag(PointerEventData eventData)
     {
         Destroy(Duplicate);
-        if (!eventData.hovered.Any())
+
+        var thisSlot = GetComponent<ActionSlot>();
+        if (eventData.hovered.Any() && thisSlot != null)
+        {
+            var hoveredSlot = eventData.hovered.FirstOrDefault(a => a.GetComponent<ActionSlot>())?.GetComponent<ActionSlot>();
+            if (hoveredSlot == null || thisSlot.Id != hoveredSlot.Id)
+            {
+                GetComponent<ActionSlot>()?.ResetSlot();
+            }
+        }
+        else 
         {
             GetComponent<ActionSlot>()?.ResetSlot();
         }
+       
     }
 
     // Update is called once per frame
