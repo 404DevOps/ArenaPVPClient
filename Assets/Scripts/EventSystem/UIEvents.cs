@@ -16,6 +16,4 @@ public static class UIEvents
     public static readonly Event onSettingsSaved = new Event();
     public static readonly Event onKeyBindsChanged = new Event();
     public static readonly Event onControlsChanged = new Event();
-
-    //public static readonly Event onEndAbilityDrag = new Event();
 }

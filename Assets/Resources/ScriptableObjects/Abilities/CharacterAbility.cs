@@ -8,13 +8,7 @@ using UnityEngine;
 public abstract class CharacterAbility : ScriptableObject
 {
     public AbilityInfo AbilityInfo;
-    public AbilityClassType ClassType;
     public AbilityTargetType TargetingType;
-
-    public float CastTime;
-    public float Cooldown;
-    public float ResourceCost;
-    public float Range;
 
     //TODO: make ServerCharacter owner and target
     public void TryUseAbility(Transform owner, Transform[] target)
@@ -66,5 +60,11 @@ public class AbilityInfo
 {
     public string Name;
     public string Description;
+    public float CastTime;
+    public float Cooldown;
+    public float ResourceCost;
+    public float Range;
     public Sprite Icon;
+
+    public AbilityClassType ClassType;
 }

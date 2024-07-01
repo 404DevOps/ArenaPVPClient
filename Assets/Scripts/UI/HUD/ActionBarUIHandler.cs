@@ -117,7 +117,7 @@ public class ActionBarUIHandler : MonoBehaviour
     {
         actionBarMapping = new ActionBarMapping();
         int i = 0;
-        foreach (var ability in AbilityManager.AllAbilities.Where(a => a.ClassType == player.ClassType))
+        foreach (var ability in AbilityManager.AllAbilities.Where(a => a.AbilityInfo.ClassType == player.ClassType))
         {
             actionBarMapping.AddOrUpdateSlot(i, ability);
         }

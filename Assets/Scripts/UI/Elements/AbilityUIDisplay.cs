@@ -3,39 +3,97 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Logger = Assets.Scripts.Helpers.Logger;
 
-public class AbilityUIDisplay : MonoBehaviour
+public class AbilityUIDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
 {
     public CharacterAbility Ability;
     public Image Icon;
 
     public GameObject TooltipPrefab;
-    private GameObject CurrentTooltip;
+    private GameObject Tooltip;
+    private Transform canvas;
 
-    public bool isBeingDragged = false;
+    private float offsetX = 10;
+    private float offsetY = 20;
+
+    private bool isInActionSlot = false;
+    private bool showTooltip = false;
+
+    private float timer = 0f;
+    private float delay = 0.2f;
     private void Start()
     {
+        canvas = FindFirstObjectByType<Canvas>().transform;
+        if (transform.GetComponent<ActionSlot>() != null)
+            isInActionSlot = true;
         if(Ability != null)
             Icon.sprite = Ability.AbilityInfo.Icon;
     }
 
-    private void OnMouseEnter()
+    public void Update()
     {
-        if (isBeingDragged)
-            return;
+        if (showTooltip)
+        {
+            timer += Time.deltaTime;
 
-        CurrentTooltip = Instantiate(TooltipPrefab);
-        var tooltip = CurrentTooltip.GetComponent<AbilityTooltipUIDisplay>();
-        tooltip.abilityInfo = Ability.AbilityInfo;
-        var rect = CurrentTooltip.GetComponent<RectTransform>();
-        CurrentTooltip.transform.position = new Vector3(transform.position.y - rect.sizeDelta.y / 2, transform.position.x + rect.sizeDelta.x / 2);
+            if (timer >= delay)
+            { 
+                ShowTooltip();
+                showTooltip = false;
+            }
+        }
     }
 
-    private void OnMouseExit()
+    public void ShowTooltip()
     {
-        if (isBeingDragged)
+        //make inactive parent first so we can delay onEnable until abilityInfo is set
+        GameObject parent = new GameObject();
+        parent.SetActive(false);
+        Tooltip = Instantiate(TooltipPrefab, parent.transform);
+        var tooltip = Tooltip.GetComponent<AbilityTooltipUIDisplay>();
+        tooltip.OnTooltipInstantiated += SetTooltipPosition;
+        tooltip.abilityInfo = Ability.AbilityInfo;
+        parent.SetActive(true);
+        Tooltip.transform.parent = canvas.transform;
+        Destroy(parent);
+    }
+
+    void SetTooltipPosition()
+    {
+        var tooltip = Tooltip.GetComponent<AbilityTooltipUIDisplay>();
+        var rect = Tooltip.GetComponent<RectTransform>();
+
+        if (isInActionSlot)
+        {
+            var pos = new Vector3(Screen.width - rect.sizeDelta.x - offsetX, 0 + rect.sizeDelta.y + offsetY);
+            Logger.Log(this, pos.ToString());
+            Tooltip.transform.position = pos;
+        } //instantiate ActionSlotTooltip on bottom right instead of 
+        else
+        {
+            Tooltip.transform.position = new Vector3(transform.position.x + rect.sizeDelta.x / 2 + 35, transform.position.y + rect.sizeDelta.y / 2 + 35);
+        }
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (Ability == null)
             return;
 
-        Destroy(CurrentTooltip);
+        showTooltip = true;
+        timer = 0;
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        showTooltip = false;
+        Destroy(Tooltip);
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        showTooltip = false;
+        Destroy(Tooltip);
     }
 }

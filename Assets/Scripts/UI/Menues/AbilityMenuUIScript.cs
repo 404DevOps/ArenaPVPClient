@@ -20,7 +20,7 @@ public class AbilityMenuUIScript : MonoBehaviour
 
         ClearGrid();
 
-        foreach (var ability in AbilityManager.AllAbilities.Where(a => a.ClassType == player.ClassType))
+        foreach (var ability in AbilityManager.AllAbilities.Where(a => a.AbilityInfo.ClassType == player.ClassType))
         {
             var abilityDisplay = Instantiate(AbilityDisplayPrefab, SkillGrid);
             var holder = abilityDisplay.GetComponent<AbilityUIDisplay>();
