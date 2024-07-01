@@ -74,7 +74,6 @@ public class CameraController: MonoBehaviour
         
         State = newState;
     }
-
     void CameraRotation()
     {
         if (State != CameraState.None)

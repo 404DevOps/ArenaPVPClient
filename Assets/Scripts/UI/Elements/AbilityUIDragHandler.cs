@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -41,6 +42,10 @@ public class AbilityUIDragHandler : MonoBehaviour, IDragHandler, IBeginDragHandl
     public void OnEndDrag(PointerEventData eventData)
     {
         Destroy(Duplicate);
+        if (!eventData.hovered.Any())
+        {
+            GetComponent<ActionSlot>()?.ResetSlot();
+        }
     }
 
     // Update is called once per frame

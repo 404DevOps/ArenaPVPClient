@@ -9,7 +9,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 
-public class ActionSlot : MonoBehaviour, IDropHandler, IPointerDownHandler
+public class ActionSlot : MonoBehaviour, IDropHandler
 {
     public int Id;
     public Image Icon;
@@ -121,7 +121,7 @@ public class ActionSlot : MonoBehaviour, IDropHandler, IPointerDownHandler
         
     }
 
-    public void OnPointerDown(PointerEventData eventData)
+    public void OnMouseUp(PointerEventData eventData)
     {
         FlashActionSlot();
     }
