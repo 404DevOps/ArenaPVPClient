@@ -32,7 +32,7 @@ public class TargetingSystem : MonoBehaviour
     }
     public void ReloadControls()
     {
-        playerSettings = FindObjectOfType<PlayerSettings>();
+        playerSettings = GameObject.FindGameObjectsWithTag("PlayerSettings")?[0]?.GetComponent<PlayerSettings>();
         controls = playerSettings.Settings.Controls;
     }
 

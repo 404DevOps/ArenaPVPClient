@@ -61,17 +61,15 @@ public class PlayerMovement: MonoBehaviour
             transform.eulerAngles += new Vector3(0, rotation, 0);
         }
 
+        //todo. use character controller isGrounded
         if (isGrounded)
-        {
             currentDirection = GetDirection();
-        }
     }
     private void FixedUpdate()
     {
         if (!player.IsOwnedByMe)
             return;
 
-        
         characterController.Move(currentDirection * walkSpeed * Time.deltaTime);
 
         HandleJump();

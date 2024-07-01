@@ -17,6 +17,14 @@ public class AbilityUIDragHandler : MonoBehaviour, IDragHandler, IBeginDragHandl
     private CanvasGroup canvasGroup;
     private RectTransform rect;
 
+    // Update is called once per frame
+    void OnEnable()
+    {
+        canvasGroup = GetComponent<CanvasGroup>();
+        rect = GetComponent<RectTransform>();
+        canvas = FindObjectOfType<Canvas>();
+    }
+
     public void OnDrag(PointerEventData eventData)
     { 
         Duplicate.transform.position = eventData.position;
@@ -58,14 +66,6 @@ public class AbilityUIDragHandler : MonoBehaviour, IDragHandler, IBeginDragHandl
             GetComponent<ActionSlot>()?.ResetSlot();
         }
        
-    }
-
-    // Update is called once per frame
-    void Awake()
-    {
-        canvasGroup = GetComponent<CanvasGroup>();
-        rect = GetComponent<RectTransform>();
-        canvas = FindObjectOfType<Canvas>(); 
     }
 
     public void OnPointerDown(PointerEventData eventData)
