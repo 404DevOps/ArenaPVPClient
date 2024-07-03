@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19acb3430314c2a4684573360bbbbce6, type: 3}
+  m_Name: Frostbolt
+  m_EditorClassIdentifier: 
+  AbilityInfo:
+    Name: Frostbolt
+    Description: Hurls a bolt of Ice towards the Target, slowing the Target by 25%
+      for 10 seconds
+    CastTime: 2
+    Cooldown: 5
+    ResourceCost: 20
+    Range: 30
+    Icon: {fileID: 21300000, guid: 9630d91883cce584fa74114783636a1d, type: 3}
+    ClassType: 2
+  TargetingType: 3
+  NeedLineOfSight: 1
+  NeedTargetInFront: 1
+  damageAmount: 0
+  projectilePrefab: {fileID: 7151622442908913835, guid: 2ec56a7db9e24454babab573b49bbad9, type: 3}
+  ApplyAuras: []
