@@ -33,9 +33,9 @@ public class CooldownManager : MonoBehaviour
     {
         if (abilityLastUsedDictionary.ContainsKey(ability.Identifier))
         {
-            var entry = abilityLastUsedDictionary[ability.Identifier];
-            var remainingCooldown = entry - Time.time;
-            return remainingCooldown < 0 ? remainingCooldown  : 0;
+            var lastUsedTime = abilityLastUsedDictionary[ability.Identifier];
+            var timeSinceLastUse = Time.time - lastUsedTime;
+            return timeSinceLastUse;
         }
         else 
         {

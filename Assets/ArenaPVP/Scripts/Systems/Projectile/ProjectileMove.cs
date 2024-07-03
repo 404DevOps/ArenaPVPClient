@@ -20,9 +20,10 @@ public class ProjectileMove : MonoBehaviour
 
 
     private float _currentRotateSpeed;
-    private float _rotateMaxSpeed = 1000;
-    private float _rotateMinSpeed = 400;
+    private float _rotateMaxSpeed = 1400;
+    private float _rotateMinSpeed = 300;
     private float _rotateIncrement = 200;
+    private float _minDistance = 3f;
 
     private void OnEnable()
     {
@@ -35,8 +36,12 @@ public class ProjectileMove : MonoBehaviour
     {
         _rb.velocity = MoveSpeed * transform.forward;
 
-        _currentRotateSpeed += _rotateIncrement * Time.deltaTime;
+        _currentRotateSpeed += _rotateIncrement * Time.fixedDeltaTime;
         _currentRotateSpeed = Mathf.Min(_currentRotateSpeed, _rotateMaxSpeed);
+        if (Math.Abs(Vector3.Distance(transform.position, Target.position)) < _minDistance) 
+        {
+            _currentRotateSpeed = _rotateMaxSpeed;
+        }
         RotateProjectile();
     }
 
@@ -46,10 +51,7 @@ public class ProjectileMove : MonoBehaviour
         var rotation = Quaternion.LookRotation(direction);
         Debug.DrawRay(transform.position, direction, Color.blue);
 
-        //if (_currentDistance < _minDistance)
-        //    _rb.rotation = rotation;
-        //else
-        _rb.MoveRotation(Quaternion.RotateTowards(transform.rotation, rotation, _currentRotateSpeed * Time.deltaTime));
+        _rb.MoveRotation(Quaternion.RotateTowards(transform.rotation, rotation, _currentRotateSpeed * Time.fixedDeltaTime));
 
     }
 

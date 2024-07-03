@@ -63,7 +63,7 @@ public abstract class AbilityBase : ScriptableObject
         {
             return true;
         }
-        else if (CooldownManager.Instance.TimeSinceLastUse(abilityWithOwner) + AbilityInfo.Cooldown >= 0f)
+        else if (CooldownManager.Instance.TimeSinceLastUse(abilityWithOwner) >= AbilityInfo.Cooldown)
         {
             return true;
         }

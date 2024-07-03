@@ -15,6 +15,8 @@ public class ActionSlot : MonoBehaviour, IDropHandler
     public int Id;
     public Image Icon;
     public Image Border;
+    public Image Swipe;
+    public TextMeshProUGUI CooldownText;
     public TextMeshProUGUI KeyBindText;
     public AbilityBase Ability;
     public KeyBind KeyBind;
@@ -32,18 +34,53 @@ public class ActionSlot : MonoBehaviour, IDropHandler
 
     private void Update()
     {
+        var target = FindObjectOfType<TargetingSystem>().CurrentTarget;
+        var player = FindObjectOfType<Player>().transform;
+
         if (KeyBind.IsPressed())
         {
-            var target = FindObjectOfType<TargetingSystem>().CurrentTarget;
-            var player = FindObjectOfType<Player>().transform;
-            FlashActionSlot();
-            if (target != null)
-                Ability.TryUseAbility(player, target.transform);
-            else
-                Logger.Log("No Target selected.");
 
+            FlashActionSlot();
+            if (Ability != null)
+            {
+                if (target != null)
+                    Ability.TryUseAbility(player, target.transform);
+                else
+                    Logger.Log("No Target selected.");
+            }
         }
         ResetActionSlotFlash();
+        ShowCooldown(player.GetInstanceID());
+    }
+
+    private void ShowCooldown(int ownerId)
+    {
+        if (Ability == null)
+        {
+            Swipe.gameObject.SetActive(false);
+            CooldownText.gameObject.SetActive(false);
+            return;
+        }
+
+            Swipe.gameObject.SetActive(true);
+            CooldownText.gameObject.SetActive(true);
+            var identifier = new AbilityWithOwner(ownerId, Ability.AbilityInfo.Name);
+            var timeSinceLastUse = CooldownManager.Instance.TimeSinceLastUse(identifier);
+            var remainingCooldown = timeSinceLastUse - Ability.AbilityInfo.Cooldown;
+            if (CooldownManager.Instance.Contains(identifier) && remainingCooldown < 0)
+            {
+                var absCd = Mathf.Abs(remainingCooldown);
+                CooldownText.text = (Mathf.Ceil(absCd)).ToString();
+                var cdPercentage = (absCd / Ability.AbilityInfo.Cooldown);
+                Logger.Log("CD Percentage: " + cdPercentage);
+                Swipe.fillAmount = cdPercentage;
+            }
+            else
+            {
+                Swipe.fillAmount = 0;
+                CooldownText.gameObject.SetActive(false);
+            }
+        
     }
 
     public void OnDrop(PointerEventData eventData)
@@ -116,13 +153,17 @@ public class ActionSlot : MonoBehaviour, IDropHandler
         playerSettings = FindObjectOfType<PlayerConfiguration>();
         abilityDisplay = GetComponent<AbilityUIDisplay>();
         if (Ability != null)
+        {
             abilityDisplay.Ability = Ability;
+        }
+            
         KeyBindText.text = HelperMethods.GetKeyBindNameShort(KeyBind.primary);
         DefaultBorderColor = Border.color;
         DefaultIconColor = Icon.color;
         SetBarLock();
         SetIcon();
-        
+        Swipe.fillAmount = 0;
+
     }
 
     public void OnMouseUp(PointerEventData eventData)
