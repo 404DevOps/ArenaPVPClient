@@ -7,6 +7,7 @@ using UnityEngine;
 using Unity.VisualScripting;
 using Assets.ArenaPVP.Scripts.Helpers;
 using GameKit.Dependencies.Utilities;
+using FishNet.Editing;
 
 [Serializable]
 public abstract class AbilityBase : ScriptableObject
@@ -17,11 +18,13 @@ public abstract class AbilityBase : ScriptableObject
     public bool NeedLineOfSight;
     public bool NeedTargetInFront;
 
+
     //TODO: make ServerCharacter owner and target
     public void TryUseAbility(Transform owner, Transform target)
     {
         if (CanBeUsed(owner, target))
         {
+            CooldownManager.Instance.AddOrUpdate(new AbilityWithOwner(owner.GetInstanceID(), AbilityInfo.Name));
             Use(owner, target);
         }
     }
@@ -43,13 +46,31 @@ public abstract class AbilityBase : ScriptableObject
             Logger.Log("Target not in Front");
             return false;
         }
-        //if (!IsCooldownReady()) 
-        //{
-        
-        //}
-
+        if (!IsCooldownReady(owner.GetInstanceID())) 
+        {
+            Logger.Log("Cooldown is not ready.");
+            return false;
+        }
 
         return canbeUse;
+    }
+
+    private bool IsCooldownReady(int ownerId)
+    {
+        var abilityWithOwner = new AbilityWithOwner(ownerId, AbilityInfo.Name);
+        
+        if (!CooldownManager.Instance.Contains(abilityWithOwner.Identifier))
+        {
+            return true;
+        }
+        else if (CooldownManager.Instance.TimeSinceLastUse(abilityWithOwner) + AbilityInfo.Cooldown >= 0f)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     private bool IsInFront(Transform owner, Transform target)

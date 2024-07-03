@@ -121,8 +121,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Origin: {fileID: 0}
   Target: {fileID: 0}
-  MoveSpeed: 15
-  RotateSpeed: 100
+  MoveSpeed: 20
   LayerMask:
     serializedVersion: 2
     m_Bits: 192

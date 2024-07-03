@@ -17,42 +17,40 @@ public class ProjectileMove : MonoBehaviour
     public LayerMask LayerMask;
 
     private Rigidbody _rb;
-    private Vector3 _prediction;
 
 
-    private float _maxDistance = 40;
-    private float _minDistance = 3f;
-    private float _rotateMaxSpeed = 999;
-    private float _rotateMinSpeed = 50;
     private float _currentRotateSpeed;
+    private float _rotateMaxSpeed = 1000;
+    private float _rotateMinSpeed = 400;
+    private float _rotateIncrement = 200;
 
     private void OnEnable()
     {
         _rb = GetComponent<Rigidbody>();
         transform.SetRotation(false, Origin.rotation);
+        _currentRotateSpeed = _rotateMinSpeed;
     }
     // Update is called once per frame
     void FixedUpdate()
     {
         _rb.velocity = MoveSpeed * transform.forward;
-        var currentDistance = Vector3.Distance(transform.position, Target.position);
 
-       
-        if (currentDistance > _minDistance)
-            _currentRotateSpeed = Mathf.Lerp(_rotateMaxSpeed, _rotateMinSpeed, currentDistance / _maxDistance);
-        else
-            _currentRotateSpeed = _rotateMaxSpeed;
-
-
+        _currentRotateSpeed += _rotateIncrement * Time.deltaTime;
+        _currentRotateSpeed = Mathf.Min(_currentRotateSpeed, _rotateMaxSpeed);
         RotateProjectile();
     }
 
     private void RotateProjectile()
     {
         var direction = Target.transform.position - transform.position;
-        
         var rotation = Quaternion.LookRotation(direction);
+        Debug.DrawRay(transform.position, direction, Color.blue);
+
+        //if (_currentDistance < _minDistance)
+        //    _rb.rotation = rotation;
+        //else
         _rb.MoveRotation(Quaternion.RotateTowards(transform.rotation, rotation, _currentRotateSpeed * Time.deltaTime));
+
     }
 
     private void OnTriggerEnter(Collider other)
