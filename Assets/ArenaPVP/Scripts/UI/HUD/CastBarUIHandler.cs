@@ -15,7 +15,7 @@ public class CastBarUIHandler : MonoBehaviour
     public TextMeshProUGUI AbilityNameText;
     public Color CastbarColor;
 
-    public AbilityInfo _ability;
+    public AbilityBase _ability;
     public Player player;
 
     private bool _isCasting;
@@ -27,8 +27,6 @@ public class CastBarUIHandler : MonoBehaviour
         GameEvents.OnCastStarted.AddListener(OnCastStarted);
         GameEvents.OnCastInterrupted.AddListener(OnCastInterrupted);
         GameEvents.OnCastCompleted.AddListener(OnCastCompleted);
-
-
     }
     private void OnDisable()
     {
@@ -38,15 +36,15 @@ public class CastBarUIHandler : MonoBehaviour
         GameEvents.OnCastCompleted.RemoveListener(OnCastCompleted);
     }
 
-    public void OnCastStarted(AbilityInfo Ability)
+    public void OnCastStarted(AbilityBase ability)
     {
-        this._ability = Ability;
+        this._ability = ability;
         Fill.fillAmount = 0;
         Fill.color = CastbarColor;
-        Icon.sprite = Ability.Icon;
-        AbilityNameText.text = Ability.Name;
+        Icon.sprite = _ability.AbilityInfo.Icon;
+        AbilityNameText.text = _ability.AbilityInfo.Name;
         CurrentCastTime.text = "0";
-        MaxCastTime.text = "/ " + Ability.CastTime.ToString();
+        MaxCastTime.text = "/ " + _ability.AbilityInfo.CastTime.ToString();
         _isCasting = true;
         CastBarParent.SetActive(true);
     }
@@ -63,7 +61,7 @@ public class CastBarUIHandler : MonoBehaviour
         Fill.fillAmount = 1;
         Fill.color = Color.green;
         AbilityNameText.text = "Complete";
-        CurrentCastTime.text = _ability.CastTime.ToString("0.0");
+        CurrentCastTime.text = _ability.AbilityInfo.CastTime.ToString("0.0");
         StartCoroutine(SetInvisibleAfterTime(0.3f));
     }
 
@@ -81,10 +79,10 @@ public class CastBarUIHandler : MonoBehaviour
         {
             if (_isCasting)
             {
-                float timeSinceCastStart = CastManager.Instance.TimeSinceCastStarted(player.transform.GetInstanceID(), _ability.Name);
+                float timeSinceCastStart = CastManager.Instance.TimeSinceCastStarted(player.transform.GetInstanceID(), _ability.AbilityInfo.Name);
                 if (timeSinceCastStart > 0)
                 {
-                    var percentage = timeSinceCastStart / _ability.CastTime;
+                    var percentage = timeSinceCastStart / _ability.AbilityInfo.CastTime;
                     Fill.fillAmount = percentage;
                     CurrentCastTime.text = timeSinceCastStart.ToString("0.0");
                 }

@@ -31,7 +31,7 @@ public abstract class AbilityBase : ScriptableObject
         {
             if (AbilityInfo.CastTime > 0)
             {
-                GameEvents.OnCastStarted.Invoke(AbilityInfo);
+                GameEvents.OnCastStarted.Invoke(this);
                 CastManager.Instance.AddOrUpdate(owner.GetInstanceID(), AbilityInfo.Name);
                 CastManager.Instance.StartCastCoroutine(CastTimer(owner, target,AbilityInfo.CastTime));
             }
