@@ -51,13 +51,18 @@ public class ActionBarUIHandler : MonoBehaviour
         foreach (var keybind in playerSettings.Settings.Controls.AbilityKeybinds)
         {
             var parentTransform = i < 5 ? Actionbar1.transform : Actionbar2.transform;
-            var gO = Instantiate(ActionSlotPrefab, parentTransform);
-            var slot = gO.GetComponent<ActionSlot>();
+
+            var gO = new GameObject();
+            gO.SetActive(false);
+
+            var actionSlotGo = Instantiate(ActionSlotPrefab, gO.transform);
+            var slot = actionSlotGo.GetComponent<ActionSlot>();
             slot.Id = i;
             slot.KeyBind = keybind;
             slot.Ability = GetAbilityForSlot(i);
             slot.OnAbilityChanged = OnAbilityChanged; //register event
-            gO.SetActive(true);
+            actionSlotGo.transform.SetParent(parentTransform, false);
+            actionSlotGo.SetActive(true);
             i++;
         }
     }

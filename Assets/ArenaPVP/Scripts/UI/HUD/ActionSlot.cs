@@ -21,14 +21,14 @@ public class ActionSlot : MonoBehaviour, IDropHandler
     public AbilityBase Ability;
     public KeyBind KeyBind;
     public PlayerConfiguration playerSettings;
-    private Color DefaultBorderColor;
-    private Color DefaultIconColor;
+    private Color _defaultBorderColor;
+    private Color _defaultIconColor;
 
-    private float FlashTime = 0.05f;
-    private float TimePassed = 0f;
-    private bool timerStarted = false;
+    private float _flashTime = 0.05f;
+    private float _timePassed = 0f;
+    private bool _timerStarted = false;
 
-    private AbilityUIDisplay abilityDisplay;
+    private AbilityUIDisplay _abilityDisplay;
 
     public Action<int, AbilityBase> OnAbilityChanged;
 
@@ -89,7 +89,7 @@ public class ActionSlot : MonoBehaviour, IDropHandler
         var droppedAbility = eventData.pointerDrag.GetComponent<AbilityUIDisplay>();
 
         Ability = droppedAbility.Ability;
-        abilityDisplay.Ability = Ability;
+        _abilityDisplay.Ability = Ability;
         SetIcon();
         SetBarLock();
         OnAbilityChanged.Invoke(Id, Ability);
@@ -116,7 +116,7 @@ public class ActionSlot : MonoBehaviour, IDropHandler
         if (Ability == null)
         {
             Icon.sprite = null;
-            Icon.color = DefaultIconColor;
+            Icon.color = _defaultIconColor;
         }
         else 
         {
@@ -132,38 +132,36 @@ public class ActionSlot : MonoBehaviour, IDropHandler
     private void FlashActionSlot()
     {
             Border.color = Color.yellow;
-            TimePassed = 0;
-            timerStarted = true;
+            _timePassed = 0;
+            _timerStarted = true;
     }
     private void ResetActionSlotFlash()
     {
-        if (timerStarted)
+        if (_timerStarted)
         {
-            TimePassed += Time.deltaTime;
-            if (TimePassed >= FlashTime)
+            _timePassed += Time.deltaTime;
+            if (_timePassed >= _flashTime)
             {
-                Border.color = DefaultBorderColor;
-                timerStarted = false;
+                Border.color = _defaultBorderColor;
+                _timerStarted = false;
             }
         }
     }
 
-    private void Awake()
+    private void OnEnable()
     {
         playerSettings = FindObjectOfType<PlayerConfiguration>();
-        abilityDisplay = GetComponent<AbilityUIDisplay>();
+        _abilityDisplay = GetComponent<AbilityUIDisplay>();
         if (Ability != null)
         {
-            abilityDisplay.Ability = Ability;
+            _abilityDisplay.Ability = Ability;
         }
-            
         KeyBindText.text = HelperMethods.GetKeyBindNameShort(KeyBind.primary);
-        DefaultBorderColor = Border.color;
-        DefaultIconColor = Icon.color;
+        _defaultBorderColor = Border.color;
+        _defaultIconColor = Icon.color;
         SetBarLock();
         SetIcon();
         Swipe.fillAmount = 0;
-
     }
 
     public void OnMouseUp(PointerEventData eventData)

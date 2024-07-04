@@ -5,8 +5,8 @@ using Unity.VisualScripting;
 using UnityEngine;
 
 
-[CreateAssetMenu(menuName = "Abilities/Blademaster/MortalStrike", fileName = "Mortal Strike")]
-public class MortalStrikeAbility : AbilityBase
+[CreateAssetMenu(menuName = "Abilities/Blademaster/MeleeAbility", fileName = "Melee Ability")]
+public class MeleeAbility : AbilityBase
 {
     [Range(1,100)]
     public float weaponDamagePercentage;

@@ -8,6 +8,8 @@ using Unity.VisualScripting;
 using Assets.ArenaPVP.Scripts.Helpers;
 using GameKit.Dependencies.Utilities;
 using FishNet.Editing;
+using static UnityEngine.GraphicsBuffer;
+using static UnityEngine.UI.GridLayoutGroup;
 
 [Serializable]
 public abstract class AbilityBase : ScriptableObject
@@ -18,18 +20,52 @@ public abstract class AbilityBase : ScriptableObject
     public bool NeedLineOfSight;
     public bool NeedTargetInFront;
 
+    private bool _wasInterrupted;
+
 
     //TODO: make ServerCharacter owner and target
     public void TryUseAbility(Transform owner, Transform target)
     {
+        _wasInterrupted = false;
+        GameEvents.OnCastStopped.AddListener(WasInterrupted);
         if (CanBeUsed(owner, target))
         {
-            CooldownManager.Instance.AddOrUpdate(new AbilityWithOwner(owner.GetInstanceID(), AbilityInfo.Name));
-            Use(owner, target);
+            
+            if (AbilityInfo.CastTime > 0)
+            {
+                StartCastTimerCoroutine(owner, target,AbilityInfo.CastTime);
+            }
+            {
+                Use(owner, target);
+            }
+
         }
     }
 
-    public bool CanBeUsed(Transform owner, Transform target)
+    IEnumerator StartCastTimerCoroutine(Transform owner, Transform target, float castTime)
+    { 
+        yield return new WaitForSeconds(castTime);
+        if (!_wasInterrupted)
+        {
+            GameEvents.OnCastStarted.Invoke(AbilityInfo);
+            Use(owner, target);
+            CooldownManager.Instance.AddOrUpdate(new AbilityWithOwner(owner.GetInstanceID(), AbilityInfo.Name));
+        }
+        else 
+        {
+            //reset
+            _wasInterrupted = false;
+            GameEvents.OnCastStopped.RemoveListener(WasInterrupted);
+            Logger.Log($"Ability {AbilityInfo.Name} was Interrupted while casting.");
+        }
+    }
+
+    private void WasInterrupted()
+    {
+        _wasInterrupted = true;
+    }
+
+    private bool CanBeUsed(Transform owner, Transform target)
     {
         bool canbeUse = true;
         if (!IsInRange(owner, target))
@@ -126,7 +162,10 @@ public abstract class AbilityBase : ScriptableObject
         return false;
     }
 
-    protected abstract void Use(Transform owner, Transform target);
+    protected virtual void Use(Transform owner, Transform target) 
+    {
+    
+    }
 }
 
 [Serializable]

@@ -8,17 +8,14 @@ public class CooldownManager : MonoBehaviour
 {
     private static CooldownManager _instance;
     public static CooldownManager Instance => _instance;
-
-    private Dictionary<string, float> abilityLastUsedDictionary;
+    private Dictionary<string, float> abilityLastUsedDictionary = new Dictionary<string, float>();
     // Start is called before the first frame update
     void Awake()
     {
-        if(_instance == null)
+        if (_instance == null)
             _instance = this;
         else
             Destroy(this.gameObject);
-
-        abilityLastUsedDictionary = new Dictionary<string, float>();
     }
 
     public void AddOrUpdate(AbilityWithOwner ability)
@@ -37,9 +34,9 @@ public class CooldownManager : MonoBehaviour
             var timeSinceLastUse = Time.time - lastUsedTime;
             return timeSinceLastUse;
         }
-        else 
+        else
         {
-            return  0f;
+            return 0f;
         }
     }
     public void Remove(AbilityWithOwner ability)
@@ -57,14 +54,4 @@ public class CooldownManager : MonoBehaviour
     }
 }
 
-public struct AbilityWithOwner
-{
-    public AbilityWithOwner(int ownerId, string name)
-    { 
-        this.ownerId = ownerId;
-        this.abilityName = name;
-    }
-    public string Identifier => ownerId + "_" + abilityName;
-    public int ownerId;
-    public string abilityName;
-}
+

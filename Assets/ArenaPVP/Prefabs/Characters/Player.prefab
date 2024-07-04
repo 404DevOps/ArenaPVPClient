@@ -313,7 +313,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Kevin
   IsOwnedByMe: 1
-  ClassType: 1
+  ClassType: 2
 --- !u!114 &4112767005670447131
 MonoBehaviour:
   m_ObjectHideFlags: 0
