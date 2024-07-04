@@ -16,23 +16,26 @@ public class CastBarUIHandler : MonoBehaviour
     public Color CastbarColor;
 
     public AbilityInfo _ability;
+    public Player player;
 
     private bool _isCasting;
 
     // Start is called before the first frame update
     private void OnEnable()
     {
+        player = FindObjectOfType<Player>();
         GameEvents.OnCastStarted.AddListener(OnCastStarted);
-        GameEvents.OnCastStopped.AddListener(OnCastStopped);
+        GameEvents.OnCastInterrupted.AddListener(OnCastInterrupted);
+        GameEvents.OnCastCompleted.AddListener(OnCastCompleted);
 
-        Fill = GetComponent<Image>();
-        _isCasting = true;
+
     }
     private void OnDisable()
     {
         _isCasting = false;
         GameEvents.OnCastStarted.RemoveListener(OnCastStarted);
-        GameEvents.OnCastStopped.RemoveListener(OnCastStopped);
+        GameEvents.OnCastInterrupted.RemoveListener(OnCastInterrupted);
+        GameEvents.OnCastCompleted.RemoveListener(OnCastCompleted);
     }
 
     public void OnCastStarted(AbilityInfo Ability)
@@ -43,22 +46,33 @@ public class CastBarUIHandler : MonoBehaviour
         Icon.sprite = Ability.Icon;
         AbilityNameText.text = Ability.Name;
         CurrentCastTime.text = "0";
-        MaxCastTime.text = Ability.CastTime.ToString();
+        MaxCastTime.text = "/ " + Ability.CastTime.ToString();
+        _isCasting = true;
         CastBarParent.SetActive(true);
     }
-    public void OnCastStopped()
+    public void OnCastInterrupted()
     {
         Fill.fillAmount = 1;
         Fill.color = Color.red;
-        CurrentCastTime.text = "Interrupted";
+        AbilityNameText.text = "Interrupted";
+        CurrentCastTime.text = "0";
+        StartCoroutine(SetInvisibleAfterTime(0.3f));
+    }
+    public void OnCastCompleted()
+    {
+        Fill.fillAmount = 1;
+        Fill.color = Color.green;
+        AbilityNameText.text = "Complete";
+        CurrentCastTime.text = _ability.CastTime.ToString("0.0");
         StartCoroutine(SetInvisibleAfterTime(0.3f));
     }
 
     IEnumerator SetInvisibleAfterTime(float seconds)
     {
         yield return new WaitForSeconds(seconds);
-        CastBarParent.SetActive(false);
+        _isCasting = false;
         _ability = null;
+        CastBarParent.SetActive(false);
     }
 
     void Update()
@@ -67,19 +81,14 @@ public class CastBarUIHandler : MonoBehaviour
         {
             if (_isCasting)
             {
-                float timeSinceCastStart = 0;// CastManager.getStart
-                var percentage = timeSinceCastStart / _ability.CastTime;
-                if (percentage > 1)
+                float timeSinceCastStart = CastManager.Instance.TimeSinceCastStarted(player.transform.GetInstanceID(), _ability.Name);
+                if (timeSinceCastStart > 0)
                 {
-                    Fill.color = Color.green;
-                    StartCoroutine(SetInvisibleAfterTime(0.3f));
-                }
-                else
-                {
+                    var percentage = timeSinceCastStart / _ability.CastTime;
                     Fill.fillAmount = percentage;
+                    CurrentCastTime.text = timeSinceCastStart.ToString("0.0");
                 }
             }
-
         }
     }
 }

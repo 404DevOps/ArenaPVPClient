@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.PlasticSCM.Editor.WebApi;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -25,8 +26,11 @@ public class ActionSlot : MonoBehaviour, IDropHandler
     private Color _defaultIconColor;
 
     private float _flashTime = 0.05f;
-    private float _timePassed = 0f;
-    private bool _timerStarted = false;
+    private float _flashTimePassed = 0f;
+    private bool _flashTimerStarted = false;
+    private bool _isOnCooldown = false;
+
+    private Transform _playerTransform;
 
     private AbilityUIDisplay _abilityDisplay;
 
@@ -35,7 +39,6 @@ public class ActionSlot : MonoBehaviour, IDropHandler
     private void Update()
     {
         var target = FindObjectOfType<TargetingSystem>().CurrentTarget;
-        var player = FindObjectOfType<Player>().transform;
 
         if (KeyBind.IsPressed())
         {
@@ -44,13 +47,29 @@ public class ActionSlot : MonoBehaviour, IDropHandler
             if (Ability != null)
             {
                 if (target != null)
-                    Ability.TryUseAbility(player, target.transform);
+                {
+
+                    if (Ability.TryUseAbility(_playerTransform, target.transform))
+                    {
+                        _flashTime = Ability.AbilityInfo.CastTime - _flashTimePassed;
+                    }
+                }
                 else
                     Logger.Log("No Target selected.");
             }
         }
         ResetActionSlotFlash();
-        ShowCooldown(player.GetInstanceID());
+        ShowCooldown(_playerTransform.GetInstanceID());
+    }
+
+    private void StartCooldown(int owner, string abilityName)
+    {
+        if (_playerTransform.GetInstanceID() == owner && Ability.AbilityInfo.Name == abilityName)
+        {
+            _isOnCooldown = true;
+            Swipe.gameObject.SetActive(true);
+            CooldownText.gameObject.SetActive(true);
+        }
     }
 
     private void ShowCooldown(int ownerId)
@@ -59,28 +78,32 @@ public class ActionSlot : MonoBehaviour, IDropHandler
         {
             Swipe.gameObject.SetActive(false);
             CooldownText.gameObject.SetActive(false);
-            return;
         }
 
-            Swipe.gameObject.SetActive(true);
-            CooldownText.gameObject.SetActive(true);
+        if (_isOnCooldown)
+        {
             var identifier = new AbilityWithOwner(ownerId, Ability.AbilityInfo.Name);
             var timeSinceLastUse = CooldownManager.Instance.TimeSinceLastUse(identifier);
             var remainingCooldown = timeSinceLastUse - Ability.AbilityInfo.Cooldown;
+
             if (CooldownManager.Instance.Contains(identifier) && remainingCooldown < 0)
             {
                 var absCd = Mathf.Abs(remainingCooldown);
                 CooldownText.text = (Mathf.Ceil(absCd)).ToString();
                 var cdPercentage = (absCd / Ability.AbilityInfo.Cooldown);
-                Logger.Log("CD Percentage: " + cdPercentage);
                 Swipe.fillAmount = cdPercentage;
             }
             else
             {
-                Swipe.fillAmount = 0;
-                CooldownText.gameObject.SetActive(false);
+                _isOnCooldown = false;
             }
-        
+        }
+        if (!_isOnCooldown)
+        {
+            Swipe.fillAmount = 0;
+            Swipe.gameObject.SetActive(false);
+            CooldownText.gameObject.SetActive(false);
+        }
     }
 
     public void OnDrop(PointerEventData eventData)
@@ -132,29 +155,31 @@ public class ActionSlot : MonoBehaviour, IDropHandler
     private void FlashActionSlot()
     {
             Border.color = Color.yellow;
-            _timePassed = 0;
-            _timerStarted = true;
+            _flashTimePassed = 0;
+            _flashTimerStarted = true;
     }
     private void ResetActionSlotFlash()
     {
-        if (_timerStarted)
+        if (_flashTimerStarted)
         {
-            _timePassed += Time.deltaTime;
-            if (_timePassed >= _flashTime)
+            _flashTimePassed += Time.deltaTime;
+            if (_flashTimePassed >= _flashTime)
             {
                 Border.color = _defaultBorderColor;
-                _timerStarted = false;
+                _flashTimerStarted = false;
             }
         }
     }
 
     private void OnEnable()
     {
+        _playerTransform = FindObjectOfType<Player>().transform;
         playerSettings = FindObjectOfType<PlayerConfiguration>();
         _abilityDisplay = GetComponent<AbilityUIDisplay>();
         if (Ability != null)
         {
             _abilityDisplay.Ability = Ability;
+            GameEvents.OnCooldownStarted.AddListener(StartCooldown);
         }
         KeyBindText.text = HelperMethods.GetKeyBindNameShort(KeyBind.primary);
         _defaultBorderColor = Border.color;

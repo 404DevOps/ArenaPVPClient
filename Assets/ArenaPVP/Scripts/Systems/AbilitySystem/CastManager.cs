@@ -8,7 +8,7 @@ public class CastManager : MonoBehaviour
     private static CastManager _instance;
     public static CastManager Instance => _instance;
 
-    private Dictionary<string, AbilityCastInfo> castStartedDict = new Dictionary<string, AbilityCastInfo>();
+    [SerializeField] private Dictionary<int, AbilityCastInfo> castStartedDict = new Dictionary<int, AbilityCastInfo>();
     // Start is called before the first frame update
     void Awake()
     {
@@ -18,8 +18,9 @@ public class CastManager : MonoBehaviour
             Destroy(this.gameObject);
     }
 
-    public void AddOrUpdate(string owner, AbilityCastInfo castInfo)
+    public void AddOrUpdate(int owner, string abilityName)
     {
+        var castInfo = new AbilityCastInfo(abilityName);
         if (castStartedDict.ContainsKey(owner))
         {
             castStartedDict[owner] = castInfo;
@@ -29,7 +30,7 @@ public class CastManager : MonoBehaviour
             castStartedDict.Add(owner, castInfo);
         }
     }
-    public AbilityCastInfo? GetCastInfo(string owner)
+    public AbilityCastInfo? GetCastInfo(int owner)
     {
         if (castStartedDict.ContainsKey(owner))
         {
@@ -37,21 +38,33 @@ public class CastManager : MonoBehaviour
         }
         return null;
     }
-    public float TimeSinceCastStarted(string owner, string abilityname)
+    public bool Contains(int owner, string abilityName)
     {
-        var result = 0f;
+        if (castStartedDict.ContainsKey(owner))
+        {
+            return castStartedDict[owner].AbilityName == abilityName;
+        }
+        return false;
+    }
+    public float TimeSinceCastStarted(int owner, string abilityname)
+    {
         if (castStartedDict.ContainsKey(owner))
         {
             if (castStartedDict[owner].AbilityName == abilityname)
-                return castStartedDict[owner].CastStarted;
+                return Time.time - castStartedDict[owner].CastStarted;
         }
         return -1f;
     }
-    public void Remove(string owner)
+    public void Remove(int owner)
     {
         if (castStartedDict.ContainsKey(owner))
         {
             castStartedDict.Remove(owner);
         }
+    }
+
+    public void StartCastCoroutine(IEnumerator coroutine)
+    {
+        StartCoroutine(coroutine);
     }
 }

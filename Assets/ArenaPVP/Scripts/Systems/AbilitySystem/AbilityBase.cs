@@ -4,12 +4,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Unity.VisualScripting;
 using Assets.ArenaPVP.Scripts.Helpers;
 using GameKit.Dependencies.Utilities;
 using FishNet.Editing;
 using static UnityEngine.GraphicsBuffer;
 using static UnityEngine.UI.GridLayoutGroup;
+using System.Threading;
 
 [Serializable]
 public abstract class AbilityBase : ScriptableObject
@@ -22,40 +22,50 @@ public abstract class AbilityBase : ScriptableObject
 
     private bool _wasInterrupted;
 
-
     //TODO: make ServerCharacter owner and target
-    public void TryUseAbility(Transform owner, Transform target)
+    public bool TryUseAbility(Transform owner, Transform target)
     {
         _wasInterrupted = false;
-        GameEvents.OnCastStopped.AddListener(WasInterrupted);
+        GameEvents.OnCastInterrupted.AddListener(WasInterrupted);
         if (CanBeUsed(owner, target))
         {
-            
             if (AbilityInfo.CastTime > 0)
             {
-                StartCastTimerCoroutine(owner, target,AbilityInfo.CastTime);
+                GameEvents.OnCastStarted.Invoke(AbilityInfo);
+                CastManager.Instance.AddOrUpdate(owner.GetInstanceID(), AbilityInfo.Name);
+                CastManager.Instance.StartCastCoroutine(CastTimer(owner, target,AbilityInfo.CastTime));
             }
-            {
+            else{
                 Use(owner, target);
             }
-
+            return true;
         }
+        return false;
     }
 
-    IEnumerator StartCastTimerCoroutine(Transform owner, Transform target, float castTime)
-    { 
+    IEnumerator CastTimer(Transform owner, Transform target, float castTime)
+    {
         yield return new WaitForSeconds(castTime);
+
+        CastManager.Instance.Remove(owner.GetInstanceID());
+        //check line of sight again
+        if (!IsInFront(owner,target) || !IsLineOfSight(owner,target))
+        {
+            _wasInterrupted = true;
+        }
         if (!_wasInterrupted)
         {
-            GameEvents.OnCastStarted.Invoke(AbilityInfo);
-            Use(owner, target);
+            GameEvents.OnCastCompleted.Invoke();
             CooldownManager.Instance.AddOrUpdate(new AbilityWithOwner(owner.GetInstanceID(), AbilityInfo.Name));
+            GameEvents.OnCooldownStarted.Invoke(owner.GetInstanceID(), AbilityInfo.Name);
+
+            Use(owner, target);
         }
         else 
         {
-            //reset
             _wasInterrupted = false;
-            GameEvents.OnCastStopped.RemoveListener(WasInterrupted);
+            GameEvents.OnCastInterrupted.Invoke();
+            GameEvents.OnCastInterrupted.RemoveListener(WasInterrupted);
             Logger.Log($"Ability {AbilityInfo.Name} was Interrupted while casting.");
         }
     }
@@ -87,8 +97,22 @@ public abstract class AbilityBase : ScriptableObject
             Logger.Log("Cooldown is not ready.");
             return false;
         }
+        if (IsAlreadyCasting(owner.GetInstanceID()))
+        {
+            Logger.Log("Already Casting that Spell.");
+            return false;
+        }
 
         return canbeUse;
+    }
+
+    private bool IsAlreadyCasting(int ownerId)
+    {
+        if (CastManager.Instance.Contains(ownerId, AbilityInfo.Name))
+        {
+            return true;
+        }
+        return false;
     }
 
     private bool IsCooldownReady(int ownerId)
@@ -111,18 +135,20 @@ public abstract class AbilityBase : ScriptableObject
 
     private bool IsInFront(Transform owner, Transform target)
     {
+        if (!NeedTargetInFront)
+            return true;
         return PositionHelper.IsInFront(owner, target);
     }
 
     private bool IsLineOfSight(Transform owner, Transform target)
     {
+        if (!NeedLineOfSight)
+            return true;
+
         var dir = target.position - owner.position;
         var ray = new Ray(owner.position, dir);
         if (Physics.Raycast(ray, out RaycastHit hit, AbilityInfo.Range))
         {
-            Logger.Log("Owner: " + owner);
-            Logger.Log("TargetPos: " + target);
-
             if (hit.collider.CompareTag("Wall"))
             {
                 Debug.DrawRay(owner.position, dir, Color.red);
@@ -131,9 +157,6 @@ public abstract class AbilityBase : ScriptableObject
         }
         else 
         {
-            Logger.Log("Owner: " + owner);
-            Logger.Log("TargetPos: " + target);
-            
             Debug.DrawRay(owner.position, target.GetPosition(false), Color.green);
         }
 
@@ -149,7 +172,6 @@ public abstract class AbilityBase : ScriptableObject
             case AbilityTargetType.TargetFriendly:
             case AbilityTargetType.TargetEnemy:
                 return Vector3.Distance(self.position, target.position) <= AbilityInfo.Range;
-                break;
             case AbilityTargetType.AllEnemy:
             case AbilityTargetType.AllFriendly:
                 //if(transform.Any(t => Vector3.Distance(self, t) <= Range))
@@ -162,10 +184,7 @@ public abstract class AbilityBase : ScriptableObject
         return false;
     }
 
-    protected virtual void Use(Transform owner, Transform target) 
-    {
-    
-    }
+    protected abstract void Use(Transform owner, Transform target);
 }
 
 [Serializable]

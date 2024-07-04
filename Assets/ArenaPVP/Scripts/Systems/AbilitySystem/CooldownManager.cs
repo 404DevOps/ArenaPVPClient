@@ -18,13 +18,13 @@ public class CooldownManager : MonoBehaviour
             Destroy(this.gameObject);
     }
 
-    public void AddOrUpdate(AbilityWithOwner ability)
+    public void AddOrUpdate(AbilityWithOwner abilityWithOwner)
     {
         //store identifier and lastTime used.
-        if (Contains(ability.Identifier))
-            abilityLastUsedDictionary[ability.Identifier] = Time.time;
+        if (Contains(abilityWithOwner.Identifier))
+            abilityLastUsedDictionary[abilityWithOwner.Identifier] = Time.time;
         else
-            abilityLastUsedDictionary.Add(ability.Identifier, Time.time);
+            abilityLastUsedDictionary.Add(abilityWithOwner.Identifier, Time.time);
     }
     public float TimeSinceLastUse(AbilityWithOwner ability)
     {
