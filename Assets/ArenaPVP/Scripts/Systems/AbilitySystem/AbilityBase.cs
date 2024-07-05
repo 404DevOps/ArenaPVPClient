@@ -200,5 +200,5 @@ public class AbilityInfo
     public float Range;
     public Sprite Icon;
 
-    public AbilityClassType ClassType;
+    public CharacterClassType ClassType;
 }

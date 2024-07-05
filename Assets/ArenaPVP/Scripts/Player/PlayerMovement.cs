@@ -1,126 +1,101 @@
+using System;
 using UnityEditorInternal;
+using Logger = Assets.Scripts.Helpers.Logger;
 using UnityEngine;
 
 public class PlayerMovement: MonoBehaviour
 {
+    #region MovementVariables
+
     [SerializeField]
-    public float walkSpeed = 2f;
+    private float _walkSpeed = 2f;
     [SerializeField]
-    public float rotationSpeed = 0.1f;
+    private float _rotationSpeed = 0.1f;
 
-    public bool isJumping = false;
-    public bool isFalling = false;
-    public bool isGrounded = true;
+    #endregion
+    #region JumpVariables
+    [SerializeField] bool _isGrounded => _characterController.isGrounded;
+    [SerializeField] private float _jumpForce = 15;
+    [SerializeField] private float _velocityY;
+    [SerializeField] private float _gravityModifier = 5;
+    #endregion
+    #region References
 
-    public float jumpSpeed = 3f;
-    public float jumpDirectionalSpeed = 3f;
-    public float currentFallSpeed = 4f;
-    public float startFallSpeed = 0.01f;
-    public float jumpHeight = 2f;
-    public float groundLevel = 1f;
+    private Player _player;
+    private float _rotation;
+    private Vector3 _currentDirection;
+    private CharacterController _characterController;
+    private Controls _controls;
+    private PlayerConfiguration _settings;
+    [HideInInspector] public CameraController mainCam;
 
-    public Vector3 currentDirection;
-    private float rotation;
-    public float gravity = 0.18f;
+    #endregion
 
-    Rigidbody rb;
-    CharacterController characterController;
-
-    Player player;
-
-    //[HideInInspector]
+    //set by camera
     public bool steer;
 
-    public Controls controls;
-    private PlayerConfiguration settings;
-
-    [HideInInspector]
-    public CameraController mainCam;
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-        characterController = GetComponent<CharacterController>();
-        player = GetComponent<Player>();
-        rb = GetComponent<Rigidbody>();
-        if (!player.IsOwnedByMe)
-            return;
+        _player = GetComponent<Player>();
+        if (!_player.IsOwnedByMe)
+            this.enabled = false;
 
-        settings = FindObjectOfType<PlayerConfiguration>();
-
+        _characterController = GetComponent<CharacterController>();
+        _settings = FindObjectOfType<PlayerConfiguration>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!player.IsOwnedByMe)
+        Logger.Log("Grounded:" + _isGrounded);
+        if (!_player.IsOwnedByMe)
             return;
 
+        HandleCameraSteer();
+       
+        if (_isGrounded)
+            _currentDirection = GetDirection();
+
+        ApplyGravity();
+        HandleJump();
+    }
+
+    private void HandleCameraSteer()
+    {
         if (steer)
         {
-            rotation = Input.GetAxis("Mouse X") * mainCam.CameraSpeed;
-            transform.eulerAngles += new Vector3(0, rotation, 0);
+            _rotation = Input.GetAxis("Mouse X") * mainCam.CameraSpeed * 100;
+            transform.eulerAngles += new Vector3(0, _rotation, 0) * Time.deltaTime;
         }
-
-        //todo. use character controller isGrounded
-        if (isGrounded)
-            currentDirection = GetDirection();
     }
+
+    private void ApplyGravity()
+    {
+        if (!_isGrounded)
+        {
+            _velocityY += Physics.gravity.y * _gravityModifier * Time.deltaTime;
+        }
+        else if (_isGrounded && _velocityY < 0) //dont reset if jump has started
+        {
+            _velocityY = -1;
+        }
+    }
+
     private void FixedUpdate()
     {
-        if (!player.IsOwnedByMe)
-            return;
-
-        characterController.Move(currentDirection * walkSpeed * Time.deltaTime);
-
-        HandleJump();
+      _characterController.Move(new Vector3(_currentDirection.x * _walkSpeed, _velocityY, _currentDirection.z * _walkSpeed) * Time.deltaTime);  
     }
 
     private void HandleJump()
     {
-        if (controls.jump.IsPressed() && isGrounded)
-        {
-            isJumping = true;
-            isGrounded = false;
-        }
+        if (!_isGrounded)
+            return;
 
-        if (isJumping)
+        if (_controls.jump.IsKeyDown())
         {
-           
-            transform.Translate(Vector3.up * jumpSpeed * Time.deltaTime);
-            transform.Translate(currentDirection * Time.deltaTime);
-        }
-        if (transform.position.y >= jumpHeight)
-        {
-            isJumping = false;
-            isFalling = true;
-        }
-        if (isFalling)
-        {
-            currentFallSpeed += gravity * Time.deltaTime;
-            transform.Translate(-Vector3.up * currentFallSpeed);
-            transform.Translate(currentDirection * Time.deltaTime);
-        }
-    }
-
-    public void OnCollisionEnter(Collision collision)
-    {
-        if (collision.transform.tag == "Floor" && isGrounded == false)
-        {
-            isFalling = false;
-            isGrounded = true;
-            transform.position = new Vector3(transform.position.x, groundLevel, transform.position.z);
-            currentFallSpeed = startFallSpeed;
-        }
-    }
-    public void OnCollisionExit(Collision collision)
-    {
-        if (collision.transform.tag == "Floor")
-        {
-            //if left by walking off a cliff, set falling state
-            if(!isJumping)
-                isFalling = true;
-
-            isGrounded = false;
+            Logger.Log("Jump Pressed");
+            _velocityY += _jumpForce;
         }
     }
 
@@ -138,29 +113,22 @@ public class PlayerMovement: MonoBehaviour
     private Vector3 GetDirection() 
     {
         var direction = new Vector3();
-        //if (Input.GetKey(KeyCode.Mouse0) && Input.GetKey(KeyCode.Mouse1))
-        //{
-        //    direction.z = 1f;
-        //}
-        if (controls.forwards.IsPressed() || Input.GetKey(KeyCode.Mouse0) && steer)
+
+        if (_controls.forwards.IsPressed() || Input.GetKey(KeyCode.Mouse0) && steer)
             direction += transform.forward;
-        if (controls.backwards.IsPressed())
+        if (_controls.backwards.IsPressed())
             direction += -transform.forward;
-        if (controls.strafeLeft.IsPressed())
+        if (_controls.strafeLeft.IsPressed())
             direction += -transform.right;
-        if (controls.strafeRight.IsPressed())
+        if (_controls.strafeRight.IsPressed())
             direction += transform.right;
 
-        //direction.z = Axis(controls.forwards.IsPressed() || (Input.GetKey(KeyCode.Mouse0) && steer), controls.backwards.IsPressed());
-        //direction.x = Axis(controls.strafeRight.IsPressed(), controls.strafeLeft.IsPressed());
-
         return direction;
-
     }
 
     public void ReloadControlSettings() 
     {
-        controls = settings.Settings.Controls;
+        _controls = _settings.Settings.Controls;
     }
 
     private void OnEnable()

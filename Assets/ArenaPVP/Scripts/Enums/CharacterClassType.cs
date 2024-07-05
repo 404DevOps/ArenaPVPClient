@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Assets.Scripts.Enums
 {
-    public enum AbilityClassType
+    public enum CharacterClassType
     {
         Blademaster = 1, 
         Spellslinger = 2,

@@ -39,12 +39,12 @@ public class AbilityTooltipUIDisplay : MonoBehaviour
     {
         switch (abilityInfo.ClassType)
         {
-            case Assets.Scripts.Enums.AbilityClassType.Blademaster:
+            case Assets.Scripts.Enums.CharacterClassType.Blademaster:
                 return "Rage";
-            case Assets.Scripts.Enums.AbilityClassType.Spellslinger:
-            case Assets.Scripts.Enums.AbilityClassType.Soulmender:
+            case Assets.Scripts.Enums.CharacterClassType.Spellslinger:
+            case Assets.Scripts.Enums.CharacterClassType.Soulmender:
                 return "Mana";
-            case Assets.Scripts.Enums.AbilityClassType.Hawkeye:
+            case Assets.Scripts.Enums.CharacterClassType.Hawkeye:
                 return "Focus";
             default: return "";
         }

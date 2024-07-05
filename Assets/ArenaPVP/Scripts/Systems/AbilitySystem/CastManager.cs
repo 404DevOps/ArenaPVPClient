@@ -8,8 +8,8 @@ public class CastManager : MonoBehaviour
     private static CastManager _instance;
     public static CastManager Instance => _instance;
 
-    [SerializeField] private Dictionary<int, AbilityCastInfo> castStartedDict = new Dictionary<int, AbilityCastInfo>();
-    // Start is called before the first frame update
+    private Dictionary<int, AbilityCastInfo> _castStartedDict = new Dictionary<int, AbilityCastInfo>();
+
     void Awake()
     {
         if (_instance == null)
@@ -21,45 +21,45 @@ public class CastManager : MonoBehaviour
     public void AddOrUpdate(int owner, string abilityName)
     {
         var castInfo = new AbilityCastInfo(abilityName);
-        if (castStartedDict.ContainsKey(owner))
+        if (_castStartedDict.ContainsKey(owner))
         {
-            castStartedDict[owner] = castInfo;
+            _castStartedDict[owner] = castInfo;
         }
         else 
         {
-            castStartedDict.Add(owner, castInfo);
+            _castStartedDict.Add(owner, castInfo);
         }
     }
     public AbilityCastInfo? GetCastInfo(int owner)
     {
-        if (castStartedDict.ContainsKey(owner))
+        if (_castStartedDict.ContainsKey(owner))
         {
-            return castStartedDict[owner];
+            return _castStartedDict[owner];
         }
         return null;
     }
     public bool Contains(int owner, string abilityName)
     {
-        if (castStartedDict.ContainsKey(owner))
+        if (_castStartedDict.ContainsKey(owner))
         {
-            return castStartedDict[owner].AbilityName == abilityName;
+            return _castStartedDict[owner].AbilityName == abilityName;
         }
         return false;
     }
     public float TimeSinceCastStarted(int owner, string abilityname)
     {
-        if (castStartedDict.ContainsKey(owner))
+        if (_castStartedDict.ContainsKey(owner))
         {
-            if (castStartedDict[owner].AbilityName == abilityname)
-                return Time.time - castStartedDict[owner].CastStarted;
+            if (_castStartedDict[owner].AbilityName == abilityname)
+                return Time.time - _castStartedDict[owner].CastStarted;
         }
         return -1f;
     }
     public void Remove(int owner)
     {
-        if (castStartedDict.ContainsKey(owner))
+        if (_castStartedDict.ContainsKey(owner))
         {
-            castStartedDict.Remove(owner);
+            _castStartedDict.Remove(owner);
         }
     }
 

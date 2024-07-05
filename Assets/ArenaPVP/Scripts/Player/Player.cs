@@ -7,6 +7,6 @@ public class Player : MonoBehaviour
 {
     public string Name;
     public bool IsOwnedByMe;
-    public AbilityClassType ClassType;
+    public CharacterClassType ClassType;
     // Start is called before the first frame update
 }
