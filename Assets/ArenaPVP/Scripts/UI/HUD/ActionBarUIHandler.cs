@@ -11,30 +11,26 @@ public class ActionBarUIHandler : MonoBehaviour
     public GameObject Actionbar2;
     public GameObject ActionSlotPrefab;
 
-    private PlayerConfiguration playerSettings;
     private string actionBarMappingPath;
     private ActionBarMapping actionBarMapping;
     private Player player;
 
-    private void OnEnable()
+    public void OnEnable()
     {
-        GameEvents.onSettingsLoaded.AddListener(InitializeActionBars);
-        UIEvents.OnSettingsSaved.AddListener(RebuildActionBars);
+        UIEvents.OnSettingsLoaded.AddListener(InitializeActionBars);
         UIEvents.OnKeyBindsChanged.AddListener(RebuildActionBars);
     }
-    private void OnDisable()
+    public void OnDisable()
     {
-        GameEvents.onSettingsLoaded.RemoveListener(InitializeActionBars);
-        UIEvents.OnSettingsSaved.RemoveListener(RebuildActionBars);
+        UIEvents.OnSettingsLoaded.RemoveListener(RebuildActionBars);
         UIEvents.OnKeyBindsChanged.RemoveListener(RebuildActionBars);
     }
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         player = FindObjectsOfType<Player>().FirstOrDefault(p => p.IsOwnedByMe);
         actionBarMappingPath = Application.persistentDataPath + "/ActionBarMapping_" + player.ClassType.ToString() + ".json";
-        playerSettings = FindObjectOfType<PlayerConfiguration>();
     }
 
     public void InitializeActionBars() 
@@ -42,13 +38,12 @@ public class ActionBarUIHandler : MonoBehaviour
         LoadActionBarMapping();
         RebuildActionBars();
     }
-
     public void RebuildActionBars()
     { 
         ClearBars();
 
         int i = 0;
-        foreach (var keybind in playerSettings.Settings.Controls.AbilityKeybinds)
+        foreach (var keybind in PlayerConfiguration.Instance.Settings.Controls.AbilityKeybinds)
         {
             var parentTransform = i < 5 ? Actionbar1.transform : Actionbar2.transform;
 
@@ -67,7 +62,6 @@ public class ActionBarUIHandler : MonoBehaviour
             Destroy(gO);
         }
     }
-
     private void ClearBars()
     {
         for (int i = 0; i < Actionbar1.transform.childCount; i++)
@@ -79,7 +73,6 @@ public class ActionBarUIHandler : MonoBehaviour
             Destroy(Actionbar2.transform.GetChild(i).gameObject);
         }
     }
-
     private AbilityBase GetAbilityForSlot(int slot)
     {
         //TODO: add default mapping per class.

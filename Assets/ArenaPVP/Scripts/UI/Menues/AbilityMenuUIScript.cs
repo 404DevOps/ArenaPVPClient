@@ -12,7 +12,7 @@ public class AbilityMenuUIScript : MonoBehaviour
 
 
     // Start is called before the first frame update
-    void Start()
+    void OnEnable()
     {
         CloseButton.onClick.AddListener(CloseMenu);
 

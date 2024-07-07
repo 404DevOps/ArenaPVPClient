@@ -11,6 +11,7 @@ public class GeneralSettings
     public Controls Controls;
     public bool LockActionBars;
     public bool ShowHealthAsPercentage;
+    public bool ShowPlayerNameplate;
 
     public void SetControls(Controls controls)
     {

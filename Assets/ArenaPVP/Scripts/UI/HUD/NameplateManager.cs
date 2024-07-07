@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using Logger = Assets.Scripts.Helpers.Logger;
 
@@ -20,13 +22,22 @@ public class NameplateManager : MonoBehaviour
     [SerializeField] private float _minScale = 0.5f;
     [SerializeField] private float _maxDistance = 50f;
     [SerializeField] private float _currentScale = 0.8f;
-    // Start is called before the first frame update
+
+    private bool _firstLoad = true;
+
     void Awake()
     {
-        var players = FindObjectsOfType<Player>();
         _camController = Camera.main.GetComponentInParent<CameraController>();
+    }
+
+    private void InitializeNameplates()
+    {
+        var players = FindObjectsOfType<Player>();
         foreach (Player player in players)
         {
+            if (!PlayerConfiguration.Instance.Settings.ShowPlayerNameplate && player.IsOwnedByMe)
+                continue;
+
             InstatiateNameplate(player);
         }
     }
@@ -46,8 +57,11 @@ public class NameplateManager : MonoBehaviour
     {
         float newScale = 0f;
         float elapsed = 0f;
-        while (elapsed < smoothMoveSpeed) 
+        while (elapsed < smoothMoveSpeed)
         {
+            if (nameplate == null)
+                yield break;
+
             elapsed += Time.deltaTime;
             nameplate.position = Vector3.Lerp(nameplate.position, targetPos, elapsed / smoothMoveSpeed);
 
@@ -60,10 +74,12 @@ public class NameplateManager : MonoBehaviour
             yield return null;
         }
 
-        nameplate.position = targetPos;
-        nameplate.localScale = new Vector3(newScale, newScale);
+        if (nameplate != null)
+        {
+            nameplate.position = targetPos;
+            nameplate.localScale = new Vector3(newScale, newScale);
+        }
     }
-
     private float GetDistancePercentage()
     {
         var distancePercentage = _camController.currentDistance / _maxDistance;
@@ -74,7 +90,6 @@ public class NameplateManager : MonoBehaviour
 
         return distancePercentage;
     }
-
     private void InstatiateNameplate(Player player)
     {
         var go = new GameObject();
@@ -89,5 +104,43 @@ public class NameplateManager : MonoBehaviour
         Destroy(go);
 
         _playerNameplates.Add(player, nameplate.transform);
+    }
+    public void OnSettingsLoaded()
+    {
+        if (!_firstLoad)
+        {
+            //adjust to current settings
+            if (PlayerConfiguration.Instance.Settings.ShowPlayerNameplate)
+            {
+                if (!_playerNameplates.Any(np => np.Key.IsOwnedByMe))
+                {
+                    var player = FindObjectsOfType<Player>().First(p => p.IsOwnedByMe);
+                    InstatiateNameplate(player);
+                }
+            }
+            else
+            {
+                if (_playerNameplates.Any(np => np.Key.IsOwnedByMe))
+                {
+                    var playerNameplate = _playerNameplates.First(np => np.Key.IsOwnedByMe);
+                    Destroy(playerNameplate.Value.gameObject);
+                    _playerNameplates.Remove(playerNameplate.Key);
+                } 
+            }
+        }
+        else 
+        {
+            InitializeNameplates();
+            _firstLoad = false;
+        }
+    }
+
+    public void OnEnable()
+    {
+        UIEvents.OnSettingsLoaded.AddListener(OnSettingsLoaded);
+    }
+    public void OnDisable()
+    {
+        UIEvents.OnSettingsLoaded.RemoveListener(OnSettingsLoaded);
     }
 }

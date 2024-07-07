@@ -7,11 +7,16 @@ public class AbilityManager : MonoBehaviour
 {
     public static List<AbilityBase> AllAbilities;
 
-    void Awake()
+    public void Awake()
+    {
+        LoadAbilities();
+    }
+
+    public void LoadAbilities()
     {
         AllAbilities = new List<AbilityBase>();
         var abilities = Resources.LoadAll("ScriptableObjects/Abilities/", typeof(AbilityBase));
-        foreach (var ability in abilities) 
+        foreach (var ability in abilities)
         {
             AllAbilities.Add((AbilityBase)ability);
         }

@@ -14,6 +14,7 @@ public class SettingsMenuUIScript : MonoBehaviour
 
     public Toggle LockActionBars;
     public Toggle ShowHealthAsPercentage;
+    public Toggle ShowPlayerNameplate;
 
     // Start is called before the first frame update
     void Start()
@@ -29,6 +30,7 @@ public class SettingsMenuUIScript : MonoBehaviour
     {
         LockActionBars.isOn = settings.LockActionBars;
         ShowHealthAsPercentage.isOn = settings.ShowHealthAsPercentage;
+        ShowPlayerNameplate.isOn = settings.ShowPlayerNameplate;
     }
 
     public void CloseMenu()
@@ -39,6 +41,7 @@ public class SettingsMenuUIScript : MonoBehaviour
     {
         settings.LockActionBars = LockActionBars.isOn;
         settings.ShowHealthAsPercentage = ShowHealthAsPercentage.isOn;
+        settings.ShowPlayerNameplate = ShowPlayerNameplate.isOn;
         settings.SaveSettingsToFile();
         UIEvents.OnSettingsSaved.Invoke();
     }

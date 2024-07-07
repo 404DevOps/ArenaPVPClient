@@ -10,10 +10,24 @@ public class PlayerConfiguration : MonoBehaviour
     public GeneralSettings Settings;
     public static string settingsPath;
 
-    public void Start()
+
+    private static PlayerConfiguration _instance;
+    public static PlayerConfiguration Instance => _instance;
+
+    void Awake()
     {
+        if (_instance == null)
+            _instance = this;
+        else
+            Destroy(this.gameObject);
+
+        UIEvents.OnSettingsSaved.AddListener(LoadSettings);
         settingsPath = Application.persistentDataPath + "/GeneralSettings.json";
         LoadSettings();
+    }
+    public void OnDisable()
+    {
+        UIEvents.OnSettingsSaved.RemoveListener(LoadSettings);
     }
 
     public void ResetKeybinds()
@@ -35,6 +49,6 @@ public class PlayerConfiguration : MonoBehaviour
         {
             Settings = JsonUtility.FromJson<GeneralSettings>(File.ReadAllText(settingsPath));
         }
-        GameEvents.onSettingsLoaded.Invoke();
+        UIEvents.OnSettingsLoaded.Invoke();
     }
 }

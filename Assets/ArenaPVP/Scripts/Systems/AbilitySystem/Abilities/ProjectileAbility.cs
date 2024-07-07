@@ -12,7 +12,6 @@ public class ProjectileAbility : AbilityBase
     public float damageAmount;
     public GameObject projectilePrefab;
     public AuraBase[] ApplyAuras;
-
     private Transform _target; 
 
     protected override void Use(Transform owner, Transform target)
@@ -20,7 +19,6 @@ public class ProjectileAbility : AbilityBase
         _target = target;
         InstantiateProjectile(owner);
     }
-
     private void InstantiateProjectile(Transform owner)
     {
         var gO = new GameObject();
@@ -35,7 +33,6 @@ public class ProjectileAbility : AbilityBase
         bolt.SetActive(true);
         Destroy(gO);
     }
-
     public void OnCollision()
     {
         GameEvents.OnPlayerHealthChanged.Invoke(_target.GetInstanceID(), -damageAmount);

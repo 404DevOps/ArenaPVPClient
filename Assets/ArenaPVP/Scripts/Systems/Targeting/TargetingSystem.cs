@@ -37,7 +37,7 @@ public class TargetingSystem : MonoBehaviour
     }
     public void ReloadControls()
     {
-        playerSettings = GameObject.FindGameObjectsWithTag("PlayerSettings")?[0]?.GetComponent<PlayerConfiguration>();
+        playerSettings = PlayerConfiguration.Instance;
         controls = playerSettings.Settings.Controls;
     }
 
@@ -157,8 +157,6 @@ public class TargetingSystem : MonoBehaviour
         return null;
     }
 
-   
-
     private Targetable GetClosestTarget(List<Targetable> possibleTargets)
     {
         var orderedTargets = possibleTargets.OrderBy(t => GetDistance(t.transform));
@@ -180,13 +178,13 @@ public class TargetingSystem : MonoBehaviour
 
     private void OnEnable()
     {
-        GameEvents.onSettingsLoaded.AddListener(ReloadControls);
+        UIEvents.OnSettingsLoaded.AddListener(ReloadControls);
         UIEvents.OnAbilityDrag.AddListener(SetTargetLock);
         UIEvents.OnMainMenuOpen.AddListener(SetMenuOpen);
     }
     private void OnDisable()
     {
-        GameEvents.onSettingsLoaded.RemoveListener(ReloadControls);
+        UIEvents.OnSettingsLoaded.RemoveListener(ReloadControls);
         UIEvents.OnAbilityDrag.RemoveListener(SetTargetLock);
         UIEvents.OnMainMenuOpen.AddListener(SetMenuOpen);
     }

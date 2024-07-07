@@ -22,7 +22,6 @@ public class ActionSlot : MonoBehaviour, IDropHandler
     public TextMeshProUGUI KeyBindText;
     public AbilityBase Ability;
     public KeyBind KeyBind;
-    public PlayerConfiguration playerSettings;
     private Color _defaultBorderColor;
     private Color _defaultIconColor;
 
@@ -43,7 +42,6 @@ public class ActionSlot : MonoBehaviour, IDropHandler
 
         if (KeyBind.IsPressed())
         {
-
             FlashActionSlot();
             if (Ability != null)
             {
@@ -72,7 +70,6 @@ public class ActionSlot : MonoBehaviour, IDropHandler
             CooldownText.gameObject.SetActive(true);
         }
     }
-
     private void ShowCooldown(int ownerId)
     {
         if (Ability == null)
@@ -106,7 +103,6 @@ public class ActionSlot : MonoBehaviour, IDropHandler
             CooldownText.gameObject.SetActive(false);
         }
     }
-
     public void OnDrop(PointerEventData eventData)
     {
         var dragHandler = eventData.pointerDrag.GetComponent<AbilityUIDragHandler>();
@@ -151,7 +147,7 @@ public class ActionSlot : MonoBehaviour, IDropHandler
     public void SetBarLock() 
     {
         //if no ability, no dragging, if has ability, set according to bar lock.
-        GetComponent<AbilityUIDragHandler>().enabled = Ability != null ? !playerSettings.Settings.LockActionBars : false;
+        GetComponent<AbilityUIDragHandler>().enabled = Ability != null ? !PlayerConfiguration.Instance.Settings.LockActionBars : false;
     }
     private void FlashActionSlot()
     {
@@ -175,7 +171,6 @@ public class ActionSlot : MonoBehaviour, IDropHandler
     private void OnEnable()
     {
         _playerTransform = FindObjectsOfType<Player>().First(p => p.IsOwnedByMe).transform;
-        playerSettings = FindObjectOfType<PlayerConfiguration>();
         _abilityDisplay = GetComponent<AbilityUIDisplay>();
         if (Ability != null)
         {
@@ -188,6 +183,10 @@ public class ActionSlot : MonoBehaviour, IDropHandler
         SetBarLock();
         SetIcon();
         Swipe.fillAmount = 0;
+    }
+    public void OnDisable()
+    {
+        GameEvents.OnCooldownStarted.RemoveListener(StartCooldown);
     }
 
     public void OnMouseUp(PointerEventData eventData)

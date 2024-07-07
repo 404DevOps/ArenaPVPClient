@@ -132,12 +132,12 @@ public class PlayerMovement: MonoBehaviour
 
     private void OnEnable()
     {
-        GameEvents.onSettingsLoaded.AddListener(ReloadControlSettings);
+        UIEvents.OnSettingsLoaded.AddListener(ReloadControlSettings);
         UIEvents.OnControlsChanged.AddListener(ReloadControlSettings);
     }
     private void OnDisable()
     {
-        GameEvents.onSettingsLoaded.RemoveListener(ReloadControlSettings);
+        UIEvents.OnSettingsLoaded.RemoveListener(ReloadControlSettings);
         UIEvents.OnControlsChanged.RemoveListener(ReloadControlSettings);
     }
 }

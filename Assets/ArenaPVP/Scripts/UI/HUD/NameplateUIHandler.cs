@@ -21,6 +21,8 @@ public class NameplateUIHandler : MonoBehaviour
         GameEvents.OnPlayerHealthChanged.AddListener(OnHealthChanged);
 
         HealthbarImage.color = ClassAppearanceData.Instance().GetColor(Player.ClassType);
+        if(Player.IsOwnedByMe)
+            Destroy(CastbarParent.gameObject);
     }
     void OnDisable()
     {

@@ -86,12 +86,12 @@ public abstract class AbilityBase : ScriptableObject
         {
             return false;
         }
-        if (NeedLineOfSight && !IsLineOfSight(owner, target))
+        if (!IsLineOfSight(owner, target))
         {
             Logger.Log("Target not Line of Sight");
             return false;
         }
-        if (NeedTargetInFront && !IsInFront(owner, target))
+        if (!IsInFront(owner, target))
         {
             Logger.Log("Target not in Front");
             return false;

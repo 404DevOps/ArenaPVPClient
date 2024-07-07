@@ -11,9 +11,12 @@ public static class UIEvents
     public static readonly Event<Object> OnOpenSubMenu = new Event<Object>();
     public static readonly Event OnCloseMainMenu = new Event();
     public static readonly Event OnNewKeyBindInputSelected = new Event();
-    public static readonly Event OnSettingsSaved = new Event();
     public static readonly Event OnKeyBindsChanged = new Event();
     public static readonly Event OnControlsChanged = new Event();
 
     public static readonly Event<Player> OnTargetChanged = new Event<Player>();
+
+    //LoadEvents
+    public static readonly Event OnSettingsSaved = new Event();
+    public static readonly Event OnSettingsLoaded = new Event();   
 }
