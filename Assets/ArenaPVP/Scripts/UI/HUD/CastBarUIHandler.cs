@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,12 +19,20 @@ public class CastBarUIHandler : MonoBehaviour
     public AbilityBase _ability;
     public Player player;
 
+    private int _ownerId;
     private bool _isCasting;
+    [SerializeField] private bool _isMainCastBar;
 
     // Start is called before the first frame update
     private void OnEnable()
     {
-        player = FindObjectOfType<Player>();
+        if (_isMainCastBar)
+            player = FindObjectsOfType<Player>().First(p => p.IsOwnedByMe);
+        else 
+        {
+            player = GetComponentInParent<NameplateUIHandler>().Player;
+        }
+        _ownerId = player.transform.GetInstanceID();
         GameEvents.OnCastStarted.AddListener(OnCastStarted);
         GameEvents.OnCastInterrupted.AddListener(OnCastInterrupted);
         GameEvents.OnCastCompleted.AddListener(OnCastCompleted);
@@ -36,8 +45,11 @@ public class CastBarUIHandler : MonoBehaviour
         GameEvents.OnCastCompleted.RemoveListener(OnCastCompleted);
     }
 
-    public void OnCastStarted(AbilityBase ability)
+    public void OnCastStarted(int ownerId, AbilityBase ability)
     {
+        if (ownerId != _ownerId)
+            return;
+
         this._ability = ability;
         Fill.fillAmount = 0;
         Fill.color = CastbarColor;
@@ -48,16 +60,22 @@ public class CastBarUIHandler : MonoBehaviour
         _isCasting = true;
         CastBarParent.SetActive(true);
     }
-    public void OnCastInterrupted()
+    public void OnCastInterrupted(int ownerId)
     {
+        if (ownerId != _ownerId)
+            return;
+
         Fill.fillAmount = 1;
         Fill.color = Color.red;
         AbilityNameText.text = "Interrupted";
         CurrentCastTime.text = "0";
         StartCoroutine(SetInvisibleAfterTime(0.3f));
     }
-    public void OnCastCompleted()
+    public void OnCastCompleted(int ownerId)
     {
+        if (ownerId != _ownerId)
+            return;
+
         Fill.fillAmount = 1;
         Fill.color = Color.green;
         AbilityNameText.text = "Complete";

@@ -149,13 +149,13 @@ public class CameraController: MonoBehaviour
 
     private void OnEnable()
     {
-        UIEvents.onAbilityDrag.AddListener(SetCamLock);
-        UIEvents.onMainMenuOpen.AddListener(SetCamLock);
+        UIEvents.OnAbilityDrag.AddListener(SetCamLock);
+        UIEvents.OnMainMenuOpen.AddListener(SetCamLock);
     }
     private void OnDisable()
     {
-        UIEvents.onAbilityDrag.RemoveListener(SetCamLock);
-        UIEvents.onMainMenuOpen.RemoveListener(SetCamLock);
+        UIEvents.OnAbilityDrag.RemoveListener(SetCamLock);
+        UIEvents.OnMainMenuOpen.RemoveListener(SetCamLock);
     }
 
     void SetCamLock(bool isLock)

@@ -21,18 +21,21 @@ public abstract class AbilityBase : ScriptableObject
     public bool NeedTargetInFront;
 
     private bool _wasInterrupted;
+    private int _ownerId;
 
     //TODO: make ServerCharacter owner and target
     public bool TryUseAbility(Transform owner, Transform target)
     {
         _wasInterrupted = false;
+        _ownerId = owner.GetInstanceID();
+
         GameEvents.OnCastInterrupted.AddListener(WasInterrupted);
         if (CanBeUsed(owner, target))
         {
             if (AbilityInfo.CastTime > 0)
             {
-                GameEvents.OnCastStarted.Invoke(this);
-                CastManager.Instance.AddOrUpdate(owner.GetInstanceID(), AbilityInfo.Name);
+                GameEvents.OnCastStarted.Invoke(_ownerId, this);
+                CastManager.Instance.AddOrUpdate(_ownerId, AbilityInfo.Name);
                 CastManager.Instance.StartCastCoroutine(CastTimer(owner, target,AbilityInfo.CastTime));
             }
             else{
@@ -47,7 +50,7 @@ public abstract class AbilityBase : ScriptableObject
     {
         yield return new WaitForSeconds(castTime);
 
-        CastManager.Instance.Remove(owner.GetInstanceID());
+        CastManager.Instance.Remove(_ownerId);
         //check line of sight again
         if (!IsInFront(owner,target) || !IsLineOfSight(owner,target))
         {
@@ -55,23 +58,24 @@ public abstract class AbilityBase : ScriptableObject
         }
         if (!_wasInterrupted)
         {
-            GameEvents.OnCastCompleted.Invoke();
-            CooldownManager.Instance.AddOrUpdate(new AbilityWithOwner(owner.GetInstanceID(), AbilityInfo.Name));
-            GameEvents.OnCooldownStarted.Invoke(owner.GetInstanceID(), AbilityInfo.Name);
+            GameEvents.OnCastCompleted.Invoke(_ownerId);
+            CooldownManager.Instance.AddOrUpdate(new AbilityWithOwner(_ownerId, AbilityInfo.Name));
+            GameEvents.OnCooldownStarted.Invoke(_ownerId, AbilityInfo.Name);
 
             Use(owner, target);
         }
         else 
         {
             _wasInterrupted = false;
-            GameEvents.OnCastInterrupted.Invoke();
+            GameEvents.OnCastInterrupted.Invoke(_ownerId);
             GameEvents.OnCastInterrupted.RemoveListener(WasInterrupted);
             Logger.Log($"Ability {AbilityInfo.Name} was Interrupted while casting.");
         }
     }
 
-    private void WasInterrupted()
+    private void WasInterrupted(int ownerId)
     {
+        if (_ownerId != ownerId) return;
         _wasInterrupted = true;
     }
 

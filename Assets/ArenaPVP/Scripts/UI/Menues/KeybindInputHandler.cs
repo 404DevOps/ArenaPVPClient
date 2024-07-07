@@ -130,7 +130,7 @@ public class KeybindInputHandler : MonoBehaviour, IPointerClickHandler
                 settings.Controls.AbilityKeybinds[slot].secondary = keys;
 
             SetPrimarySecondaryText(settings.Controls.AbilityKeybinds[slot]);
-            UIEvents.onKeyBindsChanged.Invoke();
+            UIEvents.OnKeyBindsChanged.Invoke();
         }
         else { 
             var fieldInfo = typeof(Controls).GetField(actionToRebind);
@@ -144,7 +144,7 @@ public class KeybindInputHandler : MonoBehaviour, IPointerClickHandler
 
                 fieldInfo.SetValueOptimized(settings.Controls, kb);
                 SetPrimarySecondaryText(kb);
-                UIEvents.onControlsChanged.Invoke();
+                UIEvents.OnControlsChanged.Invoke();
             }
         }
         settings.SaveSettingsToFile();
@@ -152,7 +152,7 @@ public class KeybindInputHandler : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        UIEvents.onNewKeyBindInputSelected.Invoke();
+        UIEvents.OnNewKeyBindInputSelected.Invoke();
         IsInputListenerActive = true;
         Timer = 0;
         box.color = Color.yellow;

@@ -2,6 +2,7 @@ using Assets.Scripts.Helpers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using Unity.PlasticSCM.Editor.WebApi;
 using Unity.VisualScripting;
@@ -173,7 +174,7 @@ public class ActionSlot : MonoBehaviour, IDropHandler
 
     private void OnEnable()
     {
-        _playerTransform = FindObjectOfType<Player>().transform;
+        _playerTransform = FindObjectsOfType<Player>().First(p => p.IsOwnedByMe).transform;
         playerSettings = FindObjectOfType<PlayerConfiguration>();
         _abilityDisplay = GetComponent<AbilityUIDisplay>();
         if (Ability != null)

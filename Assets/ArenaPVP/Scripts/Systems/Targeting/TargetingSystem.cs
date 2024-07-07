@@ -77,6 +77,7 @@ public class TargetingSystem : MonoBehaviour
                 CurrentTarget = null;
                 targetClosedList.Clear();
             }
+            UIEvents.OnTargetChanged.Invoke(null);
         }
     }
 
@@ -85,7 +86,7 @@ public class TargetingSystem : MonoBehaviour
         var ray = mainCam.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hitInfo))
         {
-            var tar = hitInfo.collider.gameObject.GetComponent<Targetable>();
+            var tar = hitInfo.collider.gameObject.GetComponentInParent<Targetable>();
             if (tar != null)
             {
                 DoSelectTarget(tar, true);
@@ -113,6 +114,8 @@ public class TargetingSystem : MonoBehaviour
             targetClosedList.Add(target);
             CurrentTarget = target;
             target.Select();
+            var player = target.GetComponent<Player>();
+            UIEvents.OnTargetChanged.Invoke(player);
 
         }
         if (CurrentTarget != previousTarget && previousTarget != null)
@@ -178,14 +181,14 @@ public class TargetingSystem : MonoBehaviour
     private void OnEnable()
     {
         GameEvents.onSettingsLoaded.AddListener(ReloadControls);
-        UIEvents.onAbilityDrag.AddListener(SetTargetLock);
-        UIEvents.onMainMenuOpen.AddListener(SetMenuOpen);
+        UIEvents.OnAbilityDrag.AddListener(SetTargetLock);
+        UIEvents.OnMainMenuOpen.AddListener(SetMenuOpen);
     }
     private void OnDisable()
     {
         GameEvents.onSettingsLoaded.RemoveListener(ReloadControls);
-        UIEvents.onAbilityDrag.RemoveListener(SetTargetLock);
-        UIEvents.onMainMenuOpen.AddListener(SetMenuOpen);
+        UIEvents.OnAbilityDrag.RemoveListener(SetTargetLock);
+        UIEvents.OnMainMenuOpen.AddListener(SetMenuOpen);
     }
     private void SetTargetLock(bool isLock)
     {

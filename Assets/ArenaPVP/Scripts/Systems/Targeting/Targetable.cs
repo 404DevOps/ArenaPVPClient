@@ -11,15 +11,15 @@ public class Targetable : MonoBehaviour
     public bool isSelf = false;
     public void Start()
     {
-        isSelf = GetComponent<PlayerMovement>() != null;
+        isSelf = GetComponent<Player>().IsOwnedByMe;
     }
 
     public void Select()
     {
-        this.gameObject.GetComponent<MeshRenderer>().material.color = Color.red;
+        this.gameObject.GetComponentInChildren<MeshRenderer>().material.color = Color.red;
     }
     public void Unselect()
     {
-        this.gameObject.GetComponent<MeshRenderer>().material.color = Color.white;
+        this.gameObject.GetComponentInChildren<MeshRenderer>().material.color = Color.white;
     }
 }

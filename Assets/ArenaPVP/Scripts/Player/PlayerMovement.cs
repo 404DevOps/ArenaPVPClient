@@ -48,7 +48,6 @@ public class PlayerMovement: MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Logger.Log("Grounded:" + _isGrounded);
         if (!_player.IsOwnedByMe)
             return;
 
@@ -134,11 +133,11 @@ public class PlayerMovement: MonoBehaviour
     private void OnEnable()
     {
         GameEvents.onSettingsLoaded.AddListener(ReloadControlSettings);
-        UIEvents.onControlsChanged.AddListener(ReloadControlSettings);
+        UIEvents.OnControlsChanged.AddListener(ReloadControlSettings);
     }
     private void OnDisable()
     {
         GameEvents.onSettingsLoaded.RemoveListener(ReloadControlSettings);
-        UIEvents.onControlsChanged.RemoveListener(ReloadControlSettings);
+        UIEvents.OnControlsChanged.RemoveListener(ReloadControlSettings);
     }
 }

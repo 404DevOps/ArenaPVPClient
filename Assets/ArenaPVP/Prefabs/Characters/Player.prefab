@@ -204,7 +204,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -261,44 +261,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 114b9c466ccfd8c488cab731c472df31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  walkSpeed: 6
-  rotationSpeed: 0.1
-  isJumping: 0
-  isFalling: 0
-  isGrounded: 1
-  jumpSpeed: 6.5
-  jumpDirectionalSpeed: 0
-  currentFallSpeed: 0.01
-  startFallSpeed: 0.01
-  jumpHeight: 3.2
-  groundLevel: 1
-  currentDirection: {x: 0, y: 0, z: 0}
-  gravity: 0.02
-  steer: 1
-  controls:
-    forwards:
-      primary: 77000000
-      secondary: 
-    backwards:
-      primary: 73000000
-      secondary: 
-    strafeLeft:
-      primary: 61000000
-      secondary: 
-    strafeRight:
-      primary: 64000000
-      secondary: 
-    jump:
-      primary: 20000000
-      secondary: 
-    targetNext:
-      primary: 09000000
-      secondary: 
-    targetSelf:
-      primary: 45010000
-      secondary: 
-    AbilityKeybinds: []
+  _walkSpeed: 2
+  _rotationSpeed: 0.1
+  _jumpForce: 15
+  _velocityY: 0
+  _gravityModifier: 5
   mainCam: {fileID: 0}
+  steer: 1
 --- !u!114 &1556117145722747551
 MonoBehaviour:
   m_ObjectHideFlags: 0

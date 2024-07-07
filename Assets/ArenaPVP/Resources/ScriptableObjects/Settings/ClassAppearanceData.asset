@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad217e143a1d13d41872f8a9c6f56cac, type: 3}
+  m_Name: ClassAppearanceData
+  m_EditorClassIdentifier: 
+  _classIcons:
+  - ClassType: 1
+    Icon: {fileID: 21300000, guid: 1f13f9ce181c15148a8a7f8f029934d3, type: 3}
+  - ClassType: 2
+    Icon: {fileID: 21300000, guid: 417d1f8e56902d842b7744f0f0501e91, type: 3}
+  - ClassType: 3
+    Icon: {fileID: 21300000, guid: cfecb15f7d9244144bd9cbe1fbea4d35, type: 3}
+  - ClassType: 4
+    Icon: {fileID: 21300000, guid: a96e4c3deb84a194a86375379740947a, type: 3}
+  _classColors:
+  - ClassType: 1
+    Color: {r: 0.5283019, g: 0.30367014, b: 0.042363837, a: 1}
+  - ClassType: 2
+    Color: {r: 0.09518514, g: 0.7864836, b: 0.8773585, a: 1}
+  - ClassType: 3
+    Color: {r: 0.8207547, g: 0.8207547, b: 0.8207547, a: 1}
+  - ClassType: 4
+    Color: {r: 0.25591847, g: 0.6698113, b: 0.28765565, a: 1}

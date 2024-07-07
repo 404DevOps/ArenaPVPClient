@@ -19,14 +19,14 @@ public class ActionBarUIHandler : MonoBehaviour
     private void OnEnable()
     {
         GameEvents.onSettingsLoaded.AddListener(InitializeActionBars);
-        UIEvents.onSettingsSaved.AddListener(RebuildActionBars);
-        UIEvents.onKeyBindsChanged.AddListener(RebuildActionBars);
+        UIEvents.OnSettingsSaved.AddListener(RebuildActionBars);
+        UIEvents.OnKeyBindsChanged.AddListener(RebuildActionBars);
     }
     private void OnDisable()
     {
         GameEvents.onSettingsLoaded.RemoveListener(InitializeActionBars);
-        UIEvents.onSettingsSaved.RemoveListener(RebuildActionBars);
-        UIEvents.onKeyBindsChanged.RemoveListener(RebuildActionBars);
+        UIEvents.OnSettingsSaved.RemoveListener(RebuildActionBars);
+        UIEvents.OnKeyBindsChanged.RemoveListener(RebuildActionBars);
     }
 
     // Start is called before the first frame update
@@ -64,6 +64,7 @@ public class ActionBarUIHandler : MonoBehaviour
             actionSlotGo.transform.SetParent(parentTransform, false);
             actionSlotGo.SetActive(true);
             i++;
+            Destroy(gO);
         }
     }
 

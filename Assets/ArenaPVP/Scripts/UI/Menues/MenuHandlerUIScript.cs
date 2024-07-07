@@ -21,15 +21,15 @@ public class MenuHandlerUIScript : MonoBehaviour
 
     private void OnEnable()
     {
-        UIEvents.onCloseMainMenu.AddListener(CloseMenu);
-        UIEvents.onOpenSubMenu.AddListener(OpenSubMenu);
-        UIEvents.onCloseSubMenu.AddListener(CloseSubMenu);
+        UIEvents.OnCloseMainMenu.AddListener(CloseMenu);
+        UIEvents.OnOpenSubMenu.AddListener(OpenSubMenu);
+        UIEvents.OnCloseSubMenu.AddListener(CloseSubMenu);
     }
     private void OnDisable()
     {
-        UIEvents.onCloseMainMenu.RemoveListener(CloseMenu);
-        UIEvents.onOpenSubMenu.RemoveListener(OpenSubMenu);
-        UIEvents.onCloseSubMenu.RemoveListener(CloseSubMenu);
+        UIEvents.OnCloseMainMenu.RemoveListener(CloseMenu);
+        UIEvents.OnOpenSubMenu.RemoveListener(OpenSubMenu);
+        UIEvents.OnCloseSubMenu.RemoveListener(CloseSubMenu);
     }
 
     private void CloseSubMenu()
@@ -56,7 +56,7 @@ public class MenuHandlerUIScript : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.Escape) && targetingSystem.CurrentTarget == null && !isMenuOpen)
         {
-            UIEvents.onMainMenuOpen.Invoke(true);
+            UIEvents.OnMainMenuOpen.Invoke(true);
             menuContainer = Instantiate(MenuContainerPrefab, canvasTransform);
             Instantiate(MainMenuPrefab, menuContainer.transform);
             isMenuOpen = true;
@@ -66,7 +66,7 @@ public class MenuHandlerUIScript : MonoBehaviour
     public void CloseMenu()
     {
         Destroy(menuContainer);
-        UIEvents.onMainMenuOpen.InvokeDelayed(false, 5);
+        UIEvents.OnMainMenuOpen.InvokeDelayed(false, 5);
         isMenuOpen = false;
     }
 }

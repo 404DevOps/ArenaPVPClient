@@ -589,7 +589,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 789c756cbb688d34e811bbf2eb49bc5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IconInverted: 0
-  FrameParent: {fileID: 0}
-  BarHolder: {fileID: 0}
+  IconRightSide: 0
+  FrameParent: {fileID: 8434463278213749878}
+  BarHolder: {fileID: 6233880070878478348}
   IconHolder: {fileID: 8869336606797474928}
+  IconImage: {fileID: 7133116118106741506}
+  HealthbarImage: {fileID: 5929889713240053636}
+  ManabarImage: {fileID: 3930865068790673272}
+  Player: {fileID: 0}
+  _isPlayerFrame: 0

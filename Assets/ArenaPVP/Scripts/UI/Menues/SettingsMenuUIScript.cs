@@ -33,13 +33,13 @@ public class SettingsMenuUIScript : MonoBehaviour
 
     public void CloseMenu()
     {
-        UIEvents.onCloseSubMenu.Invoke();
+        UIEvents.OnCloseSubMenu.Invoke();
     }
     public void SaveSettings()
     {
         settings.LockActionBars = LockActionBars.isOn;
         settings.ShowHealthAsPercentage = ShowHealthAsPercentage.isOn;
         settings.SaveSettingsToFile();
-        UIEvents.onSettingsSaved.Invoke();
+        UIEvents.OnSettingsSaved.Invoke();
     }
 }

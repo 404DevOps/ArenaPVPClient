@@ -30,7 +30,7 @@ public class AbilityMenuUIScript : MonoBehaviour
 
     public void CloseMenu()
     {
-        UIEvents.onCloseSubMenu.Invoke();
+        UIEvents.OnCloseSubMenu.Invoke();
     }
 
     public void ClearGrid() 

@@ -70,11 +70,11 @@ public class AbilityUIDragHandler : MonoBehaviour, IDragHandler, IBeginDragHandl
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        UIEvents.onAbilityDrag.Invoke(true);
+        UIEvents.OnAbilityDrag.Invoke(true);
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        UIEvents.onAbilityDrag.InvokeDelayed(false, 5);
+        UIEvents.OnAbilityDrag.InvokeDelayed(false, 5);
     }
 }

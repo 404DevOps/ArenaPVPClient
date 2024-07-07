@@ -50,7 +50,7 @@ public class MainMenuUIScript : MonoBehaviour
     }
     private void OpenSubMenu(Object subMenuPrefab)
     {
-        UIEvents.onOpenSubMenu.Invoke(subMenuPrefab);
+        UIEvents.OnOpenSubMenu.Invoke(subMenuPrefab);
     }
 
 
@@ -61,6 +61,6 @@ public class MainMenuUIScript : MonoBehaviour
 
     public void CloseEscapeMenu()
     {
-        UIEvents.onCloseMainMenu.Invoke();
+        UIEvents.OnCloseMainMenu.Invoke();
     }
 }

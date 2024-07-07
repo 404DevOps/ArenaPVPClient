@@ -1161,3 +1161,6 @@ MonoBehaviour:
   MaxCastTime: {fileID: 6559653366906744672}
   AbilityNameText: {fileID: 7312917582158994278}
   CastbarColor: {r: 0.9137255, g: 0.61960787, b: 0.047058824, a: 0}
+  _ability: {fileID: 0}
+  player: {fileID: 0}
+  _isMainCastBar: 1

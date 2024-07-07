@@ -23,9 +23,9 @@ public class ProjectileAbility : AbilityBase
 
     private void InstantiateProjectile(Transform owner)
     {
-        var go = new GameObject();
-        go.SetActive(false);
-        var bolt = Instantiate(projectilePrefab, go.transform);
+        var gO = new GameObject();
+        gO.SetActive(false);
+        var bolt = Instantiate(projectilePrefab, gO.transform);
         bolt.transform.position = new Vector3(owner.position.x, 0.5f, owner.position.z);
         var projectileScript = bolt.GetComponent<ProjectileMove>();
         projectileScript.Origin = owner;
@@ -33,10 +33,12 @@ public class ProjectileAbility : AbilityBase
         projectileScript.OnCollision += OnCollision;
         bolt.transform.SetParent(null);
         bolt.SetActive(true);
+        Destroy(gO);
     }
 
     public void OnCollision()
     {
+        GameEvents.OnPlayerHealthChanged.Invoke(_target.GetInstanceID(), -damageAmount);
         Logger.Log(_target.gameObject.name + " hit, applyAura & damage");
 
     } 

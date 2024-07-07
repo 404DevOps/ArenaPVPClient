@@ -19,11 +19,11 @@ public class ControlsMenuUIScript : MonoBehaviour
 
     private void OnEnable()
     {
-        UIEvents.onNewKeyBindInputSelected.AddListener(OnNewBoxSelected);
+        UIEvents.OnNewKeyBindInputSelected.AddListener(OnNewBoxSelected);
     }
     private void OnDisable()
     {
-        UIEvents.onNewKeyBindInputSelected.RemoveListener(OnNewBoxSelected);
+        UIEvents.OnNewKeyBindInputSelected.RemoveListener(OnNewBoxSelected);
     }
     // Start is called before the first frame update
     void Start()
@@ -55,7 +55,7 @@ public class ControlsMenuUIScript : MonoBehaviour
 
     public void CloseMenu()
     {
-        UIEvents.onCloseSubMenu.Invoke();
+        UIEvents.OnCloseSubMenu.Invoke();
     }
     public void ResetDefaultControls()
     {
