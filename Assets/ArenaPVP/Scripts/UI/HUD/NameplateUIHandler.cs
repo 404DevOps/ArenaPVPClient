@@ -7,11 +7,11 @@ public class NameplateUIHandler : MonoBehaviour
     public Player Player;
     public Transform CastbarParent;
     public Transform HealthbarParent;
-    public Image HealthbarImage;
 
     public float updateHealthSpeed = 0.2f;
 
     private PlayerHealth _playerHealth;
+    private Healthbar _healthbar;
     private int _ownerId;
     // Start is called before the first frame update
     void OnEnable()
@@ -20,8 +20,10 @@ public class NameplateUIHandler : MonoBehaviour
         _ownerId = Player.transform.GetInstanceID();
         GameEvents.OnPlayerHealthChanged.AddListener(OnHealthChanged);
 
-        HealthbarImage.color = ClassAppearanceData.Instance().GetColor(Player.ClassType);
-        if(Player.IsOwnedByMe)
+        _healthbar = GetComponentInChildren<Healthbar>();
+        _healthbar.InitializeBar(Player.ClassType, _playerHealth.CurrentHealth, _playerHealth.MaxHealth);
+
+        if (Player.IsOwnedByMe)
             Destroy(CastbarParent.gameObject);
     }
     void OnDisable()
@@ -34,20 +36,6 @@ public class NameplateUIHandler : MonoBehaviour
         if (ownerId != _ownerId)
             return;
 
-        StartCoroutine(SmoothChangeHealth(_playerHealth.CurrentHealth / _playerHealth.MaxHealth));
-    }
-
-    private IEnumerator SmoothChangeHealth(float healthPercentage)
-    {
-        float preChangePercentage = HealthbarImage.fillAmount;
-        float elapsed = 0f;
-        while (elapsed < updateHealthSpeed)
-        {
-            elapsed += Time.deltaTime;
-            HealthbarImage.fillAmount = Mathf.Lerp(preChangePercentage, healthPercentage, elapsed / updateHealthSpeed);
-            yield return null;
-        }
-
-        HealthbarImage.fillAmount = healthPercentage;
+        _healthbar.SetNewHealth(_playerHealth.CurrentHealth, _playerHealth.MaxHealth);
     }
 }

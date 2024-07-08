@@ -14,16 +14,16 @@ public class UnitFrameUIHandler : MonoBehaviour
     public Transform IconHolder;
 
     public Image IconImage;
-
-    public Image HealthbarImage;
     public Image ManabarImage;
+    private Healthbar _healthbar;
 
     public Player Player;
 
     [SerializeField] private bool _isPlayerFrame;
     private int _ownerId;
     private PlayerHealth _playerHealth;
-    private float _updateHealthSpeed = 0.2f;
+
+
 
     // Start is called before the first frame update
     void OnEnable()
@@ -38,7 +38,7 @@ public class UnitFrameUIHandler : MonoBehaviour
         if (_isPlayerFrame)
         {
             Player = FindObjectsOfType<Player>().First(p => p.IsOwnedByMe);
-            SetUnitFrameAppearance();
+            SetUnitFrameIcon();
             _ownerId = Player.transform.GetInstanceID();
             _playerHealth = Player.GetComponent<PlayerHealth>();
         }
@@ -48,6 +48,7 @@ public class UnitFrameUIHandler : MonoBehaviour
             FrameParent.gameObject.SetActive(false);
         }
         GameEvents.OnPlayerHealthChanged.AddListener(OnHealthChanged);
+        _healthbar = GetComponentInChildren<Healthbar>(true);
     }
 
     private void OnHealthChanged(int ownerId, float healthChanged)
@@ -55,21 +56,7 @@ public class UnitFrameUIHandler : MonoBehaviour
         if (ownerId != _ownerId)
             return;
 
-        StartCoroutine(SmoothChangeHealth(_playerHealth.CurrentHealth / _playerHealth.MaxHealth));
-    }
-
-    private IEnumerator SmoothChangeHealth(float healthPercentage)
-    {
-        float preChangePercentage = HealthbarImage.fillAmount;
-        float elapsed = 0f;
-        while (elapsed < _updateHealthSpeed)
-        {
-            elapsed += Time.deltaTime;
-            HealthbarImage.fillAmount = Mathf.Lerp(preChangePercentage, healthPercentage, elapsed / _updateHealthSpeed);
-            yield return null;
-        }
-
-        HealthbarImage.fillAmount = healthPercentage;
+        _healthbar.SetNewHealth(_playerHealth.CurrentHealth, _playerHealth.MaxHealth);
     }
 
     private void OnDisable()
@@ -87,8 +74,8 @@ public class UnitFrameUIHandler : MonoBehaviour
             Player = player;
             _ownerId = Player.transform.GetInstanceID();
             _playerHealth = Player.GetComponent<PlayerHealth>();
-            SetUnitFrameAppearance();
-            SetHealthInstant();
+            SetUnitFrameIcon();
+            _healthbar.InitializeBar(Player.ClassType, _playerHealth.CurrentHealth, _playerHealth.MaxHealth);
             FrameParent.gameObject.SetActive(true);
         }
         else 
@@ -97,15 +84,8 @@ public class UnitFrameUIHandler : MonoBehaviour
         }
     }
 
-    public void SetHealthInstant()
+    private void SetUnitFrameIcon()
     {
-        var percentage = _playerHealth.CurrentHealth / _playerHealth.MaxHealth;
-        HealthbarImage.fillAmount = percentage;
-    }
-
-    private void SetUnitFrameAppearance()
-    {
-        HealthbarImage.color = ClassAppearanceData.Instance().GetColor(Player.ClassType);
         IconImage.sprite = ClassAppearanceData.Instance().GetIcon(Player.ClassType);
     }
 }
