@@ -182,7 +182,7 @@ GameObject:
   - component: {fileID: 5289716632596296180}
   - component: {fileID: 6419239342875444484}
   m_Layer: 5
-  m_Name: Background
+  m_Name: FrameParent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -350,6 +350,7 @@ GameObject:
   - component: {fileID: 2927952630505073796}
   - component: {fileID: 2720034847014708145}
   - component: {fileID: 7985306184869820754}
+  - component: {fileID: 4460452272225228736}
   m_Layer: 0
   m_Name: UnitFrame
   m_TagString: Untagged
@@ -397,14 +398,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 789c756cbb688d34e811bbf2eb49bc5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IconRightSide: 0
+  IconRightSide: 1
   FrameParent: {fileID: 8434463278213749878}
   BarHolder: {fileID: 6233880070878478348}
   IconHolder: {fileID: 8869336606797474928}
+  AuraContainer: {fileID: 0}
   IconImage: {fileID: 7133116118106741506}
   ManabarImage: {fileID: 3930865068790673272}
   Player: {fileID: 0}
   _isPlayerFrame: 0
+--- !u!114 &4460452272225228736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9112196126814005199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreLayout: 0
+  m_MinWidth: 350
+  m_MinHeight: 100
+  m_PreferredWidth: 350
+  m_PreferredHeight: 100
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!1001 &2758394866209182823
 PrefabInstance:
   m_ObjectHideFlags: 0

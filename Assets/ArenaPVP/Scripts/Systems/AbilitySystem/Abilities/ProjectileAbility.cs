@@ -1,10 +1,5 @@
-using Logger = Assets.Scripts.Helpers.Logger;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using System;
-using System.Net.NetworkInformation;
-using static UnityEngine.UI.GridLayoutGroup;
+using Logger = Assets.Scripts.Helpers.Logger;
 
 [CreateAssetMenu(menuName = "Abilities/ProjectileAbility", fileName = "ProjectileAbility")]
 public class ProjectileAbility : AbilityBase
@@ -12,11 +7,14 @@ public class ProjectileAbility : AbilityBase
     public float damageAmount;
     public GameObject projectilePrefab;
     public AuraBase[] ApplyAuras;
-    private Transform _target; 
+
+    private Transform _target;
+    private Transform _owner;
 
     protected override void Use(Transform owner, Transform target)
     {
         _target = target;
+        _owner = owner;
         InstantiateProjectile(owner);
     }
     private void InstantiateProjectile(Transform owner)
@@ -36,7 +34,12 @@ public class ProjectileAbility : AbilityBase
     public void OnCollision()
     {
         GameEvents.OnPlayerHealthChanged.Invoke(_target.GetInstanceID(), -damageAmount);
-        Logger.Log(_target.gameObject.name + " hit, applyAura & damage");
 
+        foreach (var aura in ApplyAuras)
+        {
+            aura.Apply(_owner, _target);
+        }
+
+        Logger.Log(_target.gameObject.name + " hit, applyAura & damage");
     } 
 }

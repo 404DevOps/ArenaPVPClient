@@ -12,10 +12,10 @@ namespace Assets.Scripts.Enums
         Stun,
         Fear,
         Incapacitate,
+        MovementSpeedModifier,
         DamageDoneModifier,
         DamageReceivedModifier,
         HealingDoneModifier,
-        HealingReceivedModifier,
-
+        HealingReceivedModifier
     }
 }

@@ -12,6 +12,7 @@ public class UnitFrameUIHandler : MonoBehaviour
     public Transform FrameParent;
     public Transform BarHolder;
     public Transform IconHolder;
+    public AuraContainerUIHandler AuraContainer;
 
     public Image IconImage;
     public Image ManabarImage;
@@ -41,11 +42,13 @@ public class UnitFrameUIHandler : MonoBehaviour
             SetUnitFrameIcon();
             _ownerId = Player.transform.GetInstanceID();
             _playerHealth = Player.GetComponent<PlayerHealth>();
+            ActivateAuraGrid();
         }
         else 
         {
             UIEvents.OnTargetChanged.AddListener(OnTargetChanged);
             FrameParent.gameObject.SetActive(false);
+            AuraContainer.gameObject.SetActive(false);
         }
         GameEvents.OnPlayerHealthChanged.AddListener(OnHealthChanged);
         _healthbar = GetComponentInChildren<Healthbar>(true);
@@ -77,11 +80,19 @@ public class UnitFrameUIHandler : MonoBehaviour
             SetUnitFrameIcon();
             _healthbar.InitializeBar(Player.ClassType, _playerHealth.CurrentHealth, _playerHealth.MaxHealth);
             FrameParent.gameObject.SetActive(true);
+            ActivateAuraGrid();
+            
         }
         else 
         {
+            AuraContainer.gameObject.SetActive(false);
             FrameParent.gameObject.SetActive(false);
         }
+    }
+    private void ActivateAuraGrid()
+    {
+        AuraContainer.InitializeGrid(_ownerId, AuraManager.Instance.GetAuraInfosForPlayer(Player.transform.GetInstanceID()));
+        AuraContainer.gameObject.SetActive(true);
     }
 
     private void SetUnitFrameIcon()
