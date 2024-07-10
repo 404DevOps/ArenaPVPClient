@@ -1,9 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
+using Assets.ArenaPVP.Scripts.Enums;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using Logger = Assets.Scripts.Helpers.Logger;
 
 public class AuraDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
@@ -11,19 +9,42 @@ public class AuraDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public Image AuraIcon;
     public Image AuraBorder;
 
+    private bool _showTooltip = false;
+    private float _timer = 0f;
+    private float _delay = 0.2f;
+
     public void OnEnable()
     {
         AuraIcon.sprite = AuraInfo.Aura.Icon;
         AuraBorder.color = AuraInfo.Aura.isDebuff ? Color.red : Color.green;
     }
 
-    public void OnPointerEnter(PointerEventData eventData)
+    public void Update()
     {
-        Logger.Log("Show Aura Tooltip");
+        if (_showTooltip)
+        {
+            _timer += Time.deltaTime;
+
+            if (_timer >= _delay)
+            {
+                UIEvents.OnShowTooltip.Invoke(TooltipType.Aura, AuraInfo);
+                _showTooltip = false;
+            }
+        }
     }
 
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (AuraInfo == null)
+            return;
+
+        _showTooltip = true;
+        _timer = 0;
+    }
     public void OnPointerExit(PointerEventData eventData)
     {
-        Logger.Log("Hide Aura Tooltip");
+        _showTooltip = false;
+        UIEvents.OnHideTooltip.Invoke();
     }
 }

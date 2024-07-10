@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class AbilityTooltipUIDisplay : MonoBehaviour
+public class AbilityTooltipUIDisplay : TooltipBaseUIDisplay
 {
     public AbilityInfo abilityInfo;
     public TextMeshProUGUI Name;
@@ -14,10 +14,7 @@ public class AbilityTooltipUIDisplay : MonoBehaviour
     public TextMeshProUGUI Range;
     public TextMeshProUGUI Cost;
 
-    public Action OnTooltipInstantiated;
-    private bool firstFramePassed;
-
-    void OnEnable()
+    public void OnEnable()
     {
         Name.text = abilityInfo.Name;
         Description.text = abilityInfo.Description;
@@ -26,13 +23,6 @@ public class AbilityTooltipUIDisplay : MonoBehaviour
         Range.text = abilityInfo.Range >= 5 ? "Melee Range" : abilityInfo.Range.ToString() + "yd Range";
         Cost.text = abilityInfo.ResourceCost == 0 ? "" : abilityInfo.ResourceCost.ToString() + " " + GetResourceName();
         StartCoroutine(WaitForFrame());
-    }
-
-    IEnumerator WaitForFrame()
-    {
-        yield return 0;
-        OnTooltipInstantiated?.Invoke();
-
     }
 
     private string GetResourceName()

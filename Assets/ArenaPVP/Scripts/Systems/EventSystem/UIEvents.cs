@@ -1,3 +1,4 @@
+using Assets.ArenaPVP.Scripts.Enums;
 using UnityEngine;
 
 public static class UIEvents
@@ -18,5 +19,7 @@ public static class UIEvents
 
     //LoadEvents
     public static readonly Event OnSettingsSaved = new Event();
-    public static readonly Event OnSettingsLoaded = new Event();   
+    public static readonly Event OnSettingsLoaded = new Event();
+    public static readonly Event OnHideTooltip = new Event();
+    public static readonly Event<TooltipType, object> OnShowTooltip = new Event<TooltipType, object>(); //object = tooltip info
 }

@@ -32,10 +32,14 @@ public class AuraManager : MonoBehaviour
             for (int i = 0; i < entry.Value.Count; i++)
             {
                 var auraInfo = entry.Value[i];
-                if(auraInfo.AppliedTime + auraInfo.Aura.Duration <= + Time.time)
+                if (auraInfo.AppliedTime + auraInfo.Aura.Duration <= +Time.time)
                 {
                     RemoveAura(entry.Key, i);
                     i--; //avoid skipping indexes when removing an item.
+                }
+                else 
+                {
+                    auraInfo.ExpiresInSec = Mathf.CeilToInt(auraInfo.AppliedTime + auraInfo.Aura.Duration);
                 }
             }
         }
@@ -49,7 +53,7 @@ public class AuraManager : MonoBehaviour
     }
     public void AddAura(int ownerId, int targetId, AuraBase aura)
     {
-        var auraInfo = new AuraInfo(GetNextId(), ownerId, aura);
+        var auraInfo = new AuraInfo(GetNextId(), ownerId, targetId, aura);
 
         if (_playerAurasDict.ContainsKey(targetId))
         {
@@ -71,6 +75,7 @@ public class AuraManager : MonoBehaviour
             _playerAurasDict.Add(targetId, new List<AuraInfo> { auraInfo });
         }
     }
+
     public List<AuraInfo> GetAuraInfosForPlayer(int playerId)
     {
         if (_playerAurasDict.ContainsKey(playerId))
@@ -132,17 +137,23 @@ public class AuraManager : MonoBehaviour
 [Serializable]
 public class AuraInfo
 {
-    public AuraInfo(int id, int appliedById, AuraBase aura) 
+    public AuraInfo(int id, int appliedById, int appliedToId, AuraBase aura) 
     {
         AuraId = id;
         Aura = aura;
         AppliedById = appliedById;
         AppliedTime = Time.time;
+        ExpiresInSec = Mathf.CeilToInt(aura.Duration);
+        AppliedToId = appliedToId;
     }
     public int AuraId;
     public AuraBase Aura;
     public float AppliedTime;
     public int AppliedById;
+    public int AppliedToId;
+    public int ExpiresInSec;
 
     public static AuraInfo Null = null;
+
+
 }
