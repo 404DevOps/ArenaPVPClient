@@ -58,7 +58,9 @@ public class ProjectileMove : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         Logger.Log($"Collider ({other.transform.name}): " + other.transform.GetInstanceID() + ", Target.Transform: " + Target.GetInstanceID());
-        if (other.transform.GetInstanceID() == Target.GetInstanceID())
+        var targetPlayer = Target.GetComponent<Player>();
+
+        if (other.GetComponent<Player>()?.Id == targetPlayer.Id)
         {
             OnCollision?.Invoke();  
             Destroy(gameObject);

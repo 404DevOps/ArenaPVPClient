@@ -54,9 +54,9 @@ public class UnitFrameUIHandler : MonoBehaviour
         _healthbar = GetComponentInChildren<Healthbar>(true);
     }
 
-    private void OnHealthChanged(int ownerId, float healthChanged)
+    private void OnHealthChanged(Player player, float healthChanged)
     {
-        if (ownerId != _ownerId)
+        if (Player.Id != player.Id)
             return;
 
         _healthbar.SetNewHealth(_playerHealth.CurrentHealth, _playerHealth.MaxHealth);

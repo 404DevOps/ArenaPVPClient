@@ -33,7 +33,8 @@ public class ProjectileAbility : AbilityBase
     }
     public void OnCollision()
     {
-        GameEvents.OnPlayerHealthChanged.Invoke(_target.GetInstanceID(), -damageAmount);
+        var player = _target.GetComponent<Player>();
+        GameEvents.OnPlayerHealthChanged.Invoke(player, -damageAmount);
 
         foreach (var aura in ApplyAuras)
         {

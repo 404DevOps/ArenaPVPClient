@@ -1,4 +1,5 @@
 using Assets.ArenaPVP.Scripts.Enums;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -7,15 +8,18 @@ public class AuraDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 {
     public AuraInfo AuraInfo;
     public Image AuraIcon;
+    public Image AuraIconDark;
     public Image AuraBorder;
+    public TextMeshProUGUI ExpiresInText;
 
     private bool _showTooltip = false;
     private float _timer = 0f;
     private float _delay = 0.2f;
-
+    private float _expiresIn;
     public void OnEnable()
     {
         AuraIcon.sprite = AuraInfo.Aura.Icon;
+        AuraIconDark.sprite = AuraInfo.Aura.Icon;
         AuraBorder.color = AuraInfo.Aura.isDebuff ? Color.red : Color.green;
     }
 
@@ -31,8 +35,33 @@ public class AuraDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
                 _showTooltip = false;
             }
         }
+
+        _expiresIn = AuraManager.Instance.GetRemainingAuraDuration(AuraInfo.AppliedToId, AuraInfo.AuraId);
     }
 
+    public void LateUpdate()
+    {
+        if (_expiresIn >= 0)
+        {
+            var percentage = _expiresIn / AuraInfo.Aura.Duration;
+            AuraIcon.fillAmount = percentage;
+        }
+        if (_expiresIn <= 3)
+        {
+            ExpiresInText.text = Mathf.CeilToInt(_expiresIn).ToString();
+            ExpiresInText.color = Color.red;
+        }
+        else if (_expiresIn <= 5)
+        {
+            ExpiresInText.gameObject.SetActive(true);
+            ExpiresInText.text = Mathf.CeilToInt(_expiresIn).ToString();
+        }
+        else 
+        {
+            ExpiresInText.gameObject.SetActive(false);
+            ExpiresInText.color = Color.yellow;
+        }
+    }
 
     public void OnPointerEnter(PointerEventData eventData)
     {

@@ -9,9 +9,9 @@ public class PlayerHealth : MonoBehaviour
 
     public Player Player;
 
-    public void OnHealthChanged(int playerId, float healthChange)
+    public void OnHealthChanged(Player player, float healthChange)
     {
-        if (playerId != Player.transform.GetInstanceID())
+        if (player.Id != Player.Id)
             return;
 
         CurrentHealth += healthChange;

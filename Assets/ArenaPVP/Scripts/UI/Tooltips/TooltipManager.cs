@@ -104,6 +104,7 @@ public class TooltipManager : MonoBehaviour
         tooltipComponent.AuraInfo = tooltipInfo;
         _tooltip.transform.SetParent(_canvas);
         tooltipComponent.OnTooltipInstantiated += SetTooltipPosition;
+        tooltipComponent.OnAuraExpired += DestroyTooltip;
         Destroy(go);
     }
 }

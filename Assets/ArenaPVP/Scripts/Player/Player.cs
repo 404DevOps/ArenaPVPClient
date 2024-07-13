@@ -8,5 +8,12 @@ public class Player : MonoBehaviour
     public string Name;
     public bool IsOwnedByMe;
     public CharacterClassType ClassType;
+
+    public int Id = 0;
     // Start is called before the first frame update
+
+    private void OnEnable()
+    {
+        Id = transform.GetInstanceID();
+    }
 }

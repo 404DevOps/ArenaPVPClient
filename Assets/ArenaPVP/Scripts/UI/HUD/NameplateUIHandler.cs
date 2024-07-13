@@ -12,12 +12,10 @@ public class NameplateUIHandler : MonoBehaviour
 
     private PlayerHealth _playerHealth;
     private Healthbar _healthbar;
-    private int _ownerId;
     // Start is called before the first frame update
     void OnEnable()
     {
         _playerHealth = Player.GetComponent<PlayerHealth>();
-        _ownerId = Player.transform.GetInstanceID();
         GameEvents.OnPlayerHealthChanged.AddListener(OnHealthChanged);
 
         _healthbar = GetComponentInChildren<Healthbar>();
@@ -31,9 +29,9 @@ public class NameplateUIHandler : MonoBehaviour
         GameEvents.OnPlayerHealthChanged.RemoveListener(OnHealthChanged);
     }
 
-    private void OnHealthChanged(int ownerId, float healthChanged)
+    private void OnHealthChanged(Player player, float healthChanged)
     {
-        if (ownerId != _ownerId)
+        if (Player.Id != player.Id)
             return;
 
         _healthbar.SetNewHealth(_playerHealth.CurrentHealth, _playerHealth.MaxHealth);

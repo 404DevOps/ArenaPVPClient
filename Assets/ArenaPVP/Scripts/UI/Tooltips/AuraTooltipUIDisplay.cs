@@ -11,6 +11,8 @@ public class AuraTooltipUIDisplay : TooltipBaseUIDisplay
     public TextMeshProUGUI Description;
     public TextMeshProUGUI TimeRemaining;
 
+    public Action OnAuraExpired;
+
     public void OnEnable()
     {
         Name.text = AuraInfo.Aura.Name;
@@ -23,5 +25,8 @@ public class AuraTooltipUIDisplay : TooltipBaseUIDisplay
     {
         AuraInfo.ExpiresInSec = Mathf.CeilToInt(AuraManager.Instance.GetRemainingAuraDuration(AuraInfo.AppliedToId, AuraInfo.AuraId));
         TimeRemaining.text = AuraInfo.ExpiresInSec.ToString() + "sec remaining";
+
+        if (AuraInfo.ExpiresInSec <= 0)
+            OnAuraExpired.Invoke();
     }
 }
