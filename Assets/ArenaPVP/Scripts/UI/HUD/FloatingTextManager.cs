@@ -6,6 +6,10 @@ using UnityEngine;
 public class FloatingTextManager : MonoBehaviour
 {
     [SerializeField] GameObject _floatingTextPrefab;
+    [SerializeField] Transform _floatingTextContainer;
+
+
+
 
     private void OnPlayerHealthChanged(Player player, float healthChanged)
     {
@@ -22,7 +26,8 @@ public class FloatingTextManager : MonoBehaviour
         var ftextComponent = floatTextGo.GetComponent<FloatingText>();
         ftextComponent.Color = isHeal ?  Color.green : Color.red;
         ftextComponent.Text = Mathf.CeilToInt(absAmountChanged).ToString();
-        floatTextGo.transform.SetParent(player.transform);
+        ftextComponent.StickToObject = player.transform;
+        floatTextGo.transform.SetParent(_floatingTextContainer);
         Destroy(gO);
     }
 
