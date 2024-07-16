@@ -9,8 +9,8 @@ using GameKit.Dependencies.Utilities;
 
 public class ProjectileMove : MonoBehaviour
 {
-    public Transform Origin;
-    public Transform Target;
+    public Player Origin;
+    public Player Target;
     public float MoveSpeed;
 
     public event Action OnCollision;
@@ -28,7 +28,7 @@ public class ProjectileMove : MonoBehaviour
     private void OnEnable()
     {
         _rb = GetComponent<Rigidbody>();
-        transform.SetRotation(false, Origin.rotation);
+        transform.SetRotation(false, Origin.transform.rotation);
         _currentRotateSpeed = _rotateMinSpeed;
     }
     // Update is called once per frame
@@ -38,7 +38,7 @@ public class ProjectileMove : MonoBehaviour
 
         _currentRotateSpeed += _rotateIncrement * Time.fixedDeltaTime;
         _currentRotateSpeed = Mathf.Min(_currentRotateSpeed, _rotateMaxSpeed);
-        if (Math.Abs(Vector3.Distance(transform.position, Target.position)) < _minDistance) 
+        if (Math.Abs(Vector3.Distance(transform.position, Target.transform.position)) < _minDistance) 
         {
             _currentRotateSpeed = _rotateMaxSpeed;
         }

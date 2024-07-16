@@ -4,25 +4,27 @@ using Logger = Assets.Scripts.Helpers.Logger;
 [CreateAssetMenu(menuName = "Abilities/ProjectileAbility", fileName = "ProjectileAbility")]
 public class ProjectileAbility : AbilityBase
 {
-    public float damageAmount;
-    public GameObject projectilePrefab;
+    public float DamageAmount;
+    public GameObject ProjectilePrefab;
     public AuraBase[] ApplyAuras;
 
-    private Transform _target;
-    private Transform _owner;
+    private Player _target;
+    private Player _owner;
 
-    protected override void Use(Transform owner, Transform target)
+    public DamageType DamageType;
+
+    protected override void Use(Player owner, Player target)
     {
         _target = target;
         _owner = owner;
         InstantiateProjectile(owner);
     }
-    private void InstantiateProjectile(Transform owner)
+    private void InstantiateProjectile(Player owner)
     {
         var gO = new GameObject();
         gO.SetActive(false);
-        var bolt = Instantiate(projectilePrefab, gO.transform);
-        bolt.transform.position = new Vector3(owner.position.x, 0.5f, owner.position.z);
+        var bolt = Instantiate(ProjectilePrefab, gO.transform);
+        bolt.transform.position = new Vector3(owner.transform.position.x, 0.5f, owner.transform.position.z);
         var projectileScript = bolt.GetComponent<ProjectileMove>();
         projectileScript.Origin = owner;
         projectileScript.Target = _target;
@@ -34,7 +36,16 @@ public class ProjectileAbility : AbilityBase
     public void OnCollision()
     {
         var player = _target.GetComponent<Player>();
-        GameEvents.OnPlayerHealthChanged.Invoke(player, -damageAmount);
+        var args = new HealthChangedEventArgs() 
+        { 
+            Player = _target.GetComponent<Player>(), 
+            Source = _owner.GetComponent<Player>(), 
+            HealthChangeAmount = -DamageAmount, 
+            HealthChangeType = HealthChangeType.Damage, 
+            DamageType = DamageType 
+        };
+
+        GameEvents.OnPlayerHealthChanged.Invoke(args);
 
         foreach (var aura in ApplyAuras)
         {
@@ -42,5 +53,5 @@ public class ProjectileAbility : AbilityBase
         }
 
         Logger.Log(_target.gameObject.name + " hit, applyAura & damage");
-    } 
+    }
 }

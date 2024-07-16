@@ -9,12 +9,12 @@ public class PlayerHealth : MonoBehaviour
 
     public Player Player;
 
-    public void OnHealthChanged(Player player, float healthChange)
+    public void OnHealthChanged(HealthChangedEventArgs args) //Player player, float healthChange)
     {
-        if (player.Id != Player.Id)
+        if (args.Player.Id != Player.Id)
             return;
 
-        CurrentHealth += healthChange;
+        CurrentHealth += args.HealthChangeAmount;
         if(CurrentHealth > MaxHealth)
             CurrentHealth = MaxHealth;
     }

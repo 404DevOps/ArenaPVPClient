@@ -30,25 +30,22 @@ public class ActionSlot : MonoBehaviour, IDropHandler
     private bool _flashTimerStarted = false;
     private bool _isOnCooldown = false;
 
-    private Transform _playerTransform;
-
+    private Player _player;
     private AbilityUIDisplay _abilityDisplay;
-
     public Action<int, AbilityBase> OnAbilityChanged;
 
     private void Update()
     {
-        var target = FindObjectOfType<TargetingSystem>().CurrentTarget;
-
         if (KeyBind.IsPressed())
         {
+            var target = FindObjectOfType<TargetingSystem>().CurrentTarget?.GetComponent<Player>();
+
             FlashActionSlot();
             if (Ability != null)
             {
                 if (target != null)
                 {
-
-                    if (Ability.TryUseAbility(_playerTransform, target.transform))
+                    if (Ability.TryUseAbility(_player, target))
                     {
                         _flashTime = Ability.AbilityInfo.CastTime - _flashTimePassed;
                     }
@@ -58,12 +55,12 @@ public class ActionSlot : MonoBehaviour, IDropHandler
             }
         }
         ResetActionSlotFlash();
-        ShowCooldown(_playerTransform.GetInstanceID());
+        ShowCooldown(_player.GetInstanceID());
     }
 
     private void StartCooldown(int owner, string abilityName)
     {
-        if (_playerTransform.GetInstanceID() == owner && Ability.AbilityInfo.Name == abilityName)
+        if (_player.GetInstanceID() == owner && Ability.AbilityInfo.Name == abilityName)
         {
             _isOnCooldown = true;
             Swipe.gameObject.SetActive(true);
@@ -170,7 +167,7 @@ public class ActionSlot : MonoBehaviour, IDropHandler
 
     private void OnEnable()
     {
-        _playerTransform = FindObjectsOfType<Player>().First(p => p.IsOwnedByMe).transform;
+        _player = FindObjectsOfType<Player>().First(p => p.IsOwnedByMe);
         _abilityDisplay = GetComponent<AbilityUIDisplay>();
         if (Ability != null)
         {

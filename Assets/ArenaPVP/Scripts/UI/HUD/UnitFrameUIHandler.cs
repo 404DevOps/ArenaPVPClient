@@ -21,7 +21,6 @@ public class UnitFrameUIHandler : MonoBehaviour
     public Player Player;
 
     [SerializeField] private bool _isPlayerFrame;
-    private int _ownerId;
     private PlayerHealth _playerHealth;
 
 
@@ -40,7 +39,6 @@ public class UnitFrameUIHandler : MonoBehaviour
         {
             Player = FindObjectsOfType<Player>().First(p => p.IsOwnedByMe);
             SetUnitFrameIcon();
-            _ownerId = Player.transform.GetInstanceID();
             _playerHealth = Player.GetComponent<PlayerHealth>();
             ActivateAuraGrid();
         }
@@ -54,9 +52,9 @@ public class UnitFrameUIHandler : MonoBehaviour
         _healthbar = GetComponentInChildren<Healthbar>(true);
     }
 
-    private void OnHealthChanged(Player player, float healthChanged)
+    private void OnHealthChanged(HealthChangedEventArgs args)
     {
-        if (Player.Id != player.Id)
+        if (Player.Id != args.Player.Id)
             return;
 
         _healthbar.SetNewHealth(_playerHealth.CurrentHealth, _playerHealth.MaxHealth);
@@ -75,7 +73,6 @@ public class UnitFrameUIHandler : MonoBehaviour
         if (player != null)
         {
             Player = player;
-            _ownerId = Player.transform.GetInstanceID();
             _playerHealth = Player.GetComponent<PlayerHealth>();
             SetUnitFrameIcon();
             _healthbar.InitializeBar(Player.ClassType, _playerHealth.CurrentHealth, _playerHealth.MaxHealth);
@@ -91,7 +88,7 @@ public class UnitFrameUIHandler : MonoBehaviour
     }
     private void ActivateAuraGrid()
     {
-        AuraContainer.InitializeGrid(_ownerId, AuraManager.Instance.GetAuraInfosForPlayer(Player.transform.GetInstanceID()));
+        AuraContainer.InitializeGrid(Player.Id, AuraManager.Instance.GetAuraInfosForPlayer(Player.Id));
         AuraContainer.gameObject.SetActive(true);
     }
 

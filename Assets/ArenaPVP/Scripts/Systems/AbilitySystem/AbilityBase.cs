@@ -24,13 +24,13 @@ public abstract class AbilityBase : ScriptableObject
     private int _ownerId;
 
     //TODO: make ServerCharacter owner and target
-    public bool TryUseAbility(Transform owner, Transform target)
+    public bool TryUseAbility(Player owner, Player target)
     {
         _wasInterrupted = false;
-        _ownerId = owner.GetInstanceID();
+        _ownerId = owner.Id;
 
         GameEvents.OnCastInterrupted.AddListener(WasInterrupted);
-        if (CanBeUsed(owner, target))
+        if (CanBeUsed(owner.transform, target.transform))
         {
             if (AbilityInfo.CastTime > 0)
             {
@@ -46,13 +46,13 @@ public abstract class AbilityBase : ScriptableObject
         return false;
     }
 
-    IEnumerator CastTimer(Transform owner, Transform target, float castTime)
+    IEnumerator CastTimer(Player owner, Player target, float castTime)
     {
         yield return new WaitForSeconds(castTime);
 
         CastManager.Instance.Remove(_ownerId);
         //check line of sight again
-        if (!IsInFront(owner,target) || !IsLineOfSight(owner,target))
+        if (!IsInFront(owner.transform,target.transform) || !IsLineOfSight(owner.transform,target.transform))
         {
             _wasInterrupted = true;
         }
@@ -188,7 +188,7 @@ public abstract class AbilityBase : ScriptableObject
         return false;
     }
 
-    protected abstract void Use(Transform owner, Transform target);
+    protected abstract void Use(Player owner, Player target);
 }
 
 [Serializable]

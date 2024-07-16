@@ -29,9 +29,9 @@ public class NameplateUIHandler : MonoBehaviour
         GameEvents.OnPlayerHealthChanged.RemoveListener(OnHealthChanged);
     }
 
-    private void OnHealthChanged(Player player, float healthChanged)
+    private void OnHealthChanged(HealthChangedEventArgs args)
     {
-        if (Player.Id != player.Id)
+        if (args.Player.Id != Player.Id)
             return;
 
         _healthbar.SetNewHealth(_playerHealth.CurrentHealth, _playerHealth.MaxHealth);

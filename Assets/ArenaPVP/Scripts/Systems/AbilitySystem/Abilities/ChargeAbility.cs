@@ -11,7 +11,7 @@ public class ChargeAbility : AbilityBase
     public float chargeSpeed;
     public float stunDuration;
 
-    protected override void Use(Transform owner, Transform target)
+    protected override void Use(Player owner, Player target)
     {
         //applyAura(AuraType.Stun, target)
         //get transform, move towards

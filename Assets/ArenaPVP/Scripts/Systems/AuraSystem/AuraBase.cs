@@ -20,9 +20,9 @@ public class AuraBase : ScriptableObject
     public float ModifierValue;
     public bool isDebuff;
 
-    public void Apply(Transform owner, Transform target) 
+    public void Apply(Player owner, Player target) 
     {
-        AuraManager.Instance.AddAura(owner.GetInstanceID(), target.GetInstanceID(), this);
+        AuraManager.Instance.AddAura(owner.Id, target.Id, this);
         Logger.Log($"Aura {Name} has been applied to Target {target.gameObject.name}");
     }
     public void Fade() 

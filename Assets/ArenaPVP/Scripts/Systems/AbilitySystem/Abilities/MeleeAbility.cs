@@ -12,7 +12,7 @@ public class MeleeAbility : AbilityBase
     public float weaponDamagePercentage;
     public AuraBase[] AurasToApply;
 
-    protected override void Use(Transform owner, Transform target)
+    protected override void Use(Player owner, Player target)
     {
         //applyAura(AuraType.Stun, target)
         //get transform, move towards

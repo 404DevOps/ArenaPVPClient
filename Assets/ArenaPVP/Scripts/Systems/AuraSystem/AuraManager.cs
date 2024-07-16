@@ -73,6 +73,7 @@ public class AuraManager : MonoBehaviour
         else 
         {
             _playerAurasDict.Add(targetId, new List<AuraInfo> { auraInfo });
+            GameEvents.OnAuraApplied.Invoke(targetId, auraInfo.AuraId);
         }
     }
 
