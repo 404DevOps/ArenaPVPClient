@@ -10,7 +10,7 @@ public class FloatingTextContainer : MonoBehaviour
     public float offsetY = 5f;
     public float moveSpeed = 0.5f;
 
-    private int _maxChildCount = 12;
+    private int _maxChildCount = 9;
     Camera cam;
     // Start is called before the first frame update
     void Start()
@@ -36,7 +36,7 @@ public class FloatingTextContainer : MonoBehaviour
 
             while (transform.childCount > _maxChildCount)
             {
-                Destroy(texts.First().gameObject);
+                DestroyImmediate(texts.First()?.transform?.parent?.gameObject);
             }
         }
     }

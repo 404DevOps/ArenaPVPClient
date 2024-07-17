@@ -76,7 +76,7 @@ public class CastBarUIHandler : MonoBehaviour
         Fill.fillAmount = 1;
         Fill.color = Color.green;
         AbilityNameText.text = "Complete";
-        CurrentCastTime.text = _ability.AbilityInfo.CastTime.ToString("0.0");
+        CurrentCastTime.text = _ability?.AbilityInfo?.CastTime.ToString("0.0");
         StartCoroutine(SetInvisibleAfterTime(0.3f));
     }
 

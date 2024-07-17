@@ -38,7 +38,9 @@ public class ProjectileAbility : AbilityBase
     }
     public void OnCollision()
     {
-        Destroy(_projectile);
+        var projectileScript = _projectile.GetComponent<ProjectileMove>();
+        projectileScript.OnCollision -= OnCollision;
+
         var args = new HealthChangedEventArgs() 
         { 
             Player = _target.GetComponent<Player>(), 
