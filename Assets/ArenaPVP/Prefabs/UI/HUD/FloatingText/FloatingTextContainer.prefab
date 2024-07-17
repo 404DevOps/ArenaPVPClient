@@ -76,7 +76,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Player: {fileID: 0}
   offsetY: 200
-  moveSpeed: 25
+  moveSpeed: 30
 --- !u!114 &8749366513732446689
 MonoBehaviour:
   m_ObjectHideFlags: 0

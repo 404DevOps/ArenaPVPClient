@@ -47,7 +47,8 @@ public class ProjectileAbility : AbilityBase
             Source = _owner.GetComponent<Player>(), 
             HealthChangeAmount = -DamageAmount, 
             HealthChangeType = HealthChangeType.Damage, 
-            DamageType = DamageType 
+            DamageType = DamageType,
+            Ability = this
         };
 
         foreach (var aura in ApplyAuras)
