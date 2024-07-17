@@ -7,19 +7,17 @@ using UnityEngine.UI;
 
 public class CastBarUIHandler : MonoBehaviour
 {
-
-    public GameObject CastBarParent;
-    public Image Fill;
-    public Image Icon;
-    public TextMeshProUGUI CurrentCastTime;
-    public TextMeshProUGUI MaxCastTime;
-    public TextMeshProUGUI AbilityNameText;
-    public Color CastbarColor;
+    [SerializeField] GameObject CastBarParent;
+    [SerializeField] Image Fill;
+    [SerializeField] Image Icon;
+    [SerializeField] TextMeshProUGUI CurrentCastTime;
+    [SerializeField] TextMeshProUGUI MaxCastTime;
+    [SerializeField] TextMeshProUGUI AbilityNameText;
+    [SerializeField] Color CastbarColor;
 
     public AbilityBase _ability;
     public Player player;
 
-    private int _ownerId;
     private bool _isCasting;
     [SerializeField] private bool _isMainCastBar;
 
@@ -32,7 +30,6 @@ public class CastBarUIHandler : MonoBehaviour
         {
             player = GetComponentInParent<NameplateUIHandler>().Player;
         }
-        _ownerId = player.transform.GetInstanceID();
         GameEvents.OnCastStarted.AddListener(OnCastStarted);
         GameEvents.OnCastInterrupted.AddListener(OnCastInterrupted);
         GameEvents.OnCastCompleted.AddListener(OnCastCompleted);
@@ -47,7 +44,7 @@ public class CastBarUIHandler : MonoBehaviour
 
     public void OnCastStarted(int ownerId, AbilityBase ability)
     {
-        if (ownerId != _ownerId)
+        if (ownerId != player.Id)
             return;
 
         this._ability = ability;
@@ -62,7 +59,7 @@ public class CastBarUIHandler : MonoBehaviour
     }
     public void OnCastInterrupted(int ownerId)
     {
-        if (ownerId != _ownerId)
+        if (ownerId != player.Id)
             return;
 
         Fill.fillAmount = 1;
@@ -73,7 +70,7 @@ public class CastBarUIHandler : MonoBehaviour
     }
     public void OnCastCompleted(int ownerId)
     {
-        if (ownerId != _ownerId)
+        if (ownerId != player.Id)
             return;
 
         Fill.fillAmount = 1;
@@ -97,7 +94,7 @@ public class CastBarUIHandler : MonoBehaviour
         {
             if (_isCasting)
             {
-                float timeSinceCastStart = CastManager.Instance.TimeSinceCastStarted(player.transform.GetInstanceID(), _ability.AbilityInfo.Name);
+                float timeSinceCastStart = CastManager.Instance.TimeSinceCastStarted(player.Id, _ability.AbilityInfo.Name);
                 if (timeSinceCastStart > 0)
                 {
                     var percentage = timeSinceCastStart / _ability.AbilityInfo.CastTime;

@@ -24,22 +24,22 @@ public abstract class AbilityBase : ScriptableObject
     private int _ownerId;
 
     //TODO: make ServerCharacter owner and target
-    public bool TryUseAbility(Player owner, Player target)
+    public bool TryUseAbility(Player origin, Player target)
     {
         _wasInterrupted = false;
-        _ownerId = owner.Id;
+        _ownerId = origin.Id;
 
         GameEvents.OnCastInterrupted.AddListener(WasInterrupted);
-        if (CanBeUsed(owner.transform, target.transform))
+        if (CanBeUsed(origin, target))
         {
             if (AbilityInfo.CastTime > 0)
             {
                 GameEvents.OnCastStarted.Invoke(_ownerId, this);
                 CastManager.Instance.AddOrUpdate(_ownerId, AbilityInfo.Name);
-                CastManager.Instance.StartCastCoroutine(CastTimer(owner, target,AbilityInfo.CastTime));
+                CastManager.Instance.StartCastCoroutine(CastTimer(origin, target,AbilityInfo.CastTime));
             }
             else{
-                Use(owner, target);
+                Use(origin, target);
             }
             return true;
         }
@@ -48,6 +48,14 @@ public abstract class AbilityBase : ScriptableObject
 
     IEnumerator CastTimer(Player owner, Player target, float castTime)
     {
+        if (_wasInterrupted)
+        {
+            _wasInterrupted = false;
+            GameEvents.OnCastInterrupted.Invoke(_ownerId);
+            GameEvents.OnCastInterrupted.RemoveListener(WasInterrupted);
+            Logger.Log($"Ability {AbilityInfo.Name} was Interrupted while casting.");
+        }
+
         yield return new WaitForSeconds(castTime);
 
         CastManager.Instance.Remove(_ownerId);
@@ -64,13 +72,7 @@ public abstract class AbilityBase : ScriptableObject
 
             Use(owner, target);
         }
-        else 
-        {
-            _wasInterrupted = false;
-            GameEvents.OnCastInterrupted.Invoke(_ownerId);
-            GameEvents.OnCastInterrupted.RemoveListener(WasInterrupted);
-            Logger.Log($"Ability {AbilityInfo.Name} was Interrupted while casting.");
-        }
+       
     }
 
     private void WasInterrupted(int ownerId)
@@ -79,29 +81,29 @@ public abstract class AbilityBase : ScriptableObject
         _wasInterrupted = true;
     }
 
-    private bool CanBeUsed(Transform owner, Transform target)
+    private bool CanBeUsed(Player owner, Player target)
     {
         bool canbeUse = true;
-        if (!IsInRange(owner, target))
+        if (!IsInRange(owner.transform, target.transform))
         {
             return false;
         }
-        if (!IsLineOfSight(owner, target))
+        if (!IsLineOfSight(owner.transform, target.transform))
         {
             Logger.Log("Target not Line of Sight");
             return false;
         }
-        if (!IsInFront(owner, target))
+        if (!IsInFront(owner.transform, target.transform))
         {
             Logger.Log("Target not in Front");
             return false;
         }
-        if (!IsCooldownReady(owner.GetInstanceID())) 
+        if (!IsCooldownReady(owner.Id)) 
         {
             Logger.Log("Cooldown is not ready.");
             return false;
         }
-        if (IsAlreadyCasting(owner.GetInstanceID()))
+        if (IsAlreadyCasting(owner.Id))
         {
             Logger.Log("Already Casting that Spell.");
             return false;

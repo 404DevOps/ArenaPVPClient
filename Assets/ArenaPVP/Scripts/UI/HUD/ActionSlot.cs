@@ -55,12 +55,12 @@ public class ActionSlot : MonoBehaviour, IDropHandler
             }
         }
         ResetActionSlotFlash();
-        ShowCooldown(_player.GetInstanceID());
+        ShowCooldown(_player.Id);
     }
 
     private void StartCooldown(int owner, string abilityName)
     {
-        if (_player.GetInstanceID() == owner && Ability.AbilityInfo.Name == abilityName)
+        if (_player.Id == owner && Ability.AbilityInfo.Name == abilityName)
         {
             _isOnCooldown = true;
             Swipe.gameObject.SetActive(true);

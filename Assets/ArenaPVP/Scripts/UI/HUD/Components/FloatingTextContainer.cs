@@ -29,12 +29,12 @@ public class FloatingTextContainer : MonoBehaviour
 
     private void RemoveExcessFloatingTexts()
     {
-        if (transform.GetChildCount() > _maxChildCount)
+        if (transform.childCount > _maxChildCount)
         {
             var texts = GetComponentsInChildren<FloatingText>().ToList();
             texts = texts.OrderByDescending(t => t._timer).ToList();
 
-            while (transform.GetChildCount() > _maxChildCount)
+            while (transform.childCount > _maxChildCount)
             {
                 Destroy(texts.First().gameObject);
             }

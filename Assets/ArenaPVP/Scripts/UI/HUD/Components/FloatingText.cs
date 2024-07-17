@@ -11,22 +11,23 @@ public class FloatingText : MonoBehaviour
     public string Text;
     //public Transform StickToObject;
 
-    private TextMeshPro _textDisplay;
+    private TextMeshProUGUI _textDisplay;
 
     //position
-    private float _startOffsetY = 100f;
-    private float _endOffsetY = 200f;
+    private float _startOffsetY = 5f;
+    private float _endOffsetY = 30f;
     //timing
     public float _timer { get; private set; }
     private float _duration = 2f;
     private float _durationSolidText = 0.3f;
-    private float _moveSpeed = 0.1f;
+    private float _flyUpSpeed = 0.1f;
+    private float _followSpeed = 5f;
     private float _currentOffset;
 
     // Start is called before the first frame update
     public void OnEnable()
     {
-        _textDisplay = GetComponent<TextMeshPro>();
+        _textDisplay = GetComponent<TextMeshProUGUI>();
         _textDisplay.color = Color.WithAlpha(1f);
         _textDisplay.text = Text;
         _timer = 0;
@@ -35,10 +36,10 @@ public class FloatingText : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         _timer += Time.deltaTime;
-        _currentOffset = Mathf.Lerp(_currentOffset, _endOffsetY, _moveSpeed * Time.deltaTime);
+        _currentOffset = Mathf.Lerp(_currentOffset, _endOffsetY, _flyUpSpeed * Time.deltaTime);
 
         if (_timer > _durationSolidText) 
         {
@@ -47,8 +48,9 @@ public class FloatingText : MonoBehaviour
         }
 
         if (_timer >= _duration)
-            Destroy(this.gameObject);
+            Destroy(transform.parent.gameObject);
 
-        this.transform.position = new Vector3(transform.position.x, transform.position.y + _currentOffset, transform.position.z);
+        var newPos = new Vector3(transform.position.x, transform.position.y + _currentOffset, transform.position.z);
+        transform.position = Vector3.Lerp(transform.position, newPos, _followSpeed * Time.deltaTime);
     }
 }

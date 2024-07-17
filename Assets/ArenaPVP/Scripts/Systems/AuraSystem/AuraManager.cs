@@ -14,7 +14,6 @@ public class AuraManager : MonoBehaviour
     public static AuraManager Instance => _instance;
 
     private Dictionary<int, List<AuraInfo>> _playerAurasDict = new Dictionary<int, List<AuraInfo>>();
-    private int nextAuraId = 0;
 
     void Awake()
     {
@@ -27,6 +26,11 @@ public class AuraManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        CheckAndUpdateAuraDurations();
+    }
+
+    private void CheckAndUpdateAuraDurations()
+    {
         foreach (var entry in _playerAurasDict)
         {
             for (int i = 0; i < entry.Value.Count; i++)
@@ -37,13 +41,14 @@ public class AuraManager : MonoBehaviour
                     RemoveAura(entry.Key, i);
                     i--; //avoid skipping indexes when removing an item.
                 }
-                else 
+                else
                 {
                     auraInfo.ExpiresInSec = Mathf.CeilToInt(auraInfo.AppliedTime + auraInfo.Aura.Duration);
                 }
             }
         }
     }
+
     private void RemoveAura(int playerId, int index)
     {
         var entry = _playerAurasDict[playerId];
@@ -53,7 +58,7 @@ public class AuraManager : MonoBehaviour
     }
     public void AddAura(int ownerId, int targetId, AuraBase aura)
     {
-        var auraInfo = new AuraInfo(GetNextId(), ownerId, targetId, aura);
+        var auraInfo = new AuraInfo(IdentifierService.GetAuraId(), ownerId, targetId, aura);
 
         if (_playerAurasDict.ContainsKey(targetId))
         {
@@ -128,11 +133,6 @@ public class AuraManager : MonoBehaviour
         }
         return 0;
     }
-    private int GetNextId()
-    {
-       nextAuraId++;
-       return nextAuraId;
-    }
 }
 
 [Serializable]
@@ -155,6 +155,4 @@ public class AuraInfo
     public int ExpiresInSec;
 
     public static AuraInfo Null = null;
-
-
 }

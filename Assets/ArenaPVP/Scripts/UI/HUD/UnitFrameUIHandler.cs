@@ -28,8 +28,16 @@ public class UnitFrameUIHandler : MonoBehaviour
     // Start is called before the first frame update
     void OnEnable()
     {
+        GameEvents.OnPlayerInitialized.AddListener(OnPlayerInitialized);
+        GameEvents.OnPlayerHealthChanged.AddListener(OnHealthChanged);
+        _healthbar = GetComponentInChildren<Healthbar>(true);
+    }
+
+    private void OnPlayerInitialized(Player player)
+    {
+        Player = player;
         if (IconRightSide)
-        { 
+        {
             IconHolder.SetAsLastSibling();
             var verticalLayoutGrp = BarHolder.GetComponent<VerticalLayoutGroup>();
             verticalLayoutGrp.padding.left = 5;
@@ -37,19 +45,19 @@ public class UnitFrameUIHandler : MonoBehaviour
         }
         if (_isPlayerFrame)
         {
-            Player = FindObjectsOfType<Player>().First(p => p.IsOwnedByMe);
-            SetUnitFrameIcon();
-            _playerHealth = Player.GetComponent<PlayerHealth>();
-            ActivateAuraGrid();
+            if (Player.IsOwnedByMe) {
+                SetUnitFrameIcon();
+                _playerHealth = Player.GetComponent<PlayerHealth>();
+                _healthbar.InitializeBar(Player.ClassType, _playerHealth.CurrentHealth, _playerHealth.MaxHealth);
+                ActivateAuraGrid(); 
+            }
         }
-        else 
+        else
         {
             UIEvents.OnTargetChanged.AddListener(OnTargetChanged);
             FrameParent.gameObject.SetActive(false);
             AuraContainer.gameObject.SetActive(false);
         }
-        GameEvents.OnPlayerHealthChanged.AddListener(OnHealthChanged);
-        _healthbar = GetComponentInChildren<Healthbar>(true);
     }
 
     private void OnHealthChanged(HealthChangedEventArgs args)
@@ -67,6 +75,7 @@ public class UnitFrameUIHandler : MonoBehaviour
             UIEvents.OnTargetChanged.RemoveListener(OnTargetChanged);
         }
         GameEvents.OnPlayerHealthChanged.RemoveListener(OnHealthChanged);
+        GameEvents.OnPlayerInitialized.RemoveListener(OnPlayerInitialized);
     }
     private void OnTargetChanged(Player player) 
     {

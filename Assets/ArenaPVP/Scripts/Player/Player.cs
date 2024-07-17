@@ -14,6 +14,7 @@ public class Player : MonoBehaviour
 
     private void OnEnable()
     {
-        Id = transform.GetInstanceID();
+        Id = IdentifierService.GetPlayerId();
+        GameEvents.OnPlayerInitialized.Invoke(this);
     }
 }

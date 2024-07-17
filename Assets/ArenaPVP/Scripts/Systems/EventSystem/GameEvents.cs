@@ -14,4 +14,6 @@ public static class GameEvents
 
     public static readonly Event<int, int> OnAuraExpired = new Event<int, int>(); //ownerId, auraId
     public static readonly Event<int, int> OnAuraApplied = new Event<int, int>(); //ownerId, auraId
+
+    public static readonly Event<Player> OnPlayerInitialized = new Event<Player>();
 }

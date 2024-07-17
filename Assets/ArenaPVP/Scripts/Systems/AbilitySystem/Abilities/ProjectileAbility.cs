@@ -1,3 +1,4 @@
+using GameKit.Dependencies.Utilities.ObjectPooling.Examples;
 using UnityEngine;
 using Logger = Assets.Scripts.Helpers.Logger;
 
@@ -13,6 +14,8 @@ public class ProjectileAbility : AbilityBase
 
     public DamageType DamageType;
 
+    private GameObject _projectile;
+
     protected override void Use(Player owner, Player target)
     {
         _target = target;
@@ -23,19 +26,19 @@ public class ProjectileAbility : AbilityBase
     {
         var gO = new GameObject();
         gO.SetActive(false);
-        var bolt = Instantiate(ProjectilePrefab, gO.transform);
-        bolt.transform.position = new Vector3(owner.transform.position.x, 0.5f, owner.transform.position.z);
-        var projectileScript = bolt.GetComponent<ProjectileMove>();
+        _projectile = Instantiate(ProjectilePrefab, gO.transform);
+        _projectile.transform.position = new Vector3(owner.transform.position.x, 0.5f, owner.transform.position.z);
+        var projectileScript = _projectile.GetComponent<ProjectileMove>();
         projectileScript.Origin = owner;
         projectileScript.Target = _target;
         projectileScript.OnCollision += OnCollision;
-        bolt.transform.SetParent(null);
-        bolt.SetActive(true);
+        _projectile.transform.SetParent(null);
+        _projectile.SetActive(true);
         Destroy(gO);
     }
     public void OnCollision()
     {
-        var player = _target.GetComponent<Player>();
+        Destroy(_projectile);
         var args = new HealthChangedEventArgs() 
         { 
             Player = _target.GetComponent<Player>(), 
@@ -45,13 +48,13 @@ public class ProjectileAbility : AbilityBase
             DamageType = DamageType 
         };
 
-        GameEvents.OnPlayerHealthChanged.Invoke(args);
-
         foreach (var aura in ApplyAuras)
         {
             aura.Apply(_owner, _target);
         }
 
-        Logger.Log(_target.gameObject.name + " hit, applyAura & damage");
+        GameEvents.OnPlayerHealthChanged.Invoke(args);
+
+
     }
 }
