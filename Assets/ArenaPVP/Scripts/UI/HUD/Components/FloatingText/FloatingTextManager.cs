@@ -15,18 +15,17 @@ public class FloatingTextManager : MonoBehaviour
         if (!args.Source.IsOwnedByMe) //if damage/healing wasnt done by me, dont show floating text.
             return;
         TryInitializePlayerTextContainers(args.Player);
-        var isHeal = args.HealthChangeType == HealthChangeType.Heal;
         var absAmountChanged = Mathf.Abs(args.HealthChangeAmount);
-        InstantiateText(args.Player, absAmountChanged, isHeal);
+        InstantiateText(args.Player, absAmountChanged, args.HealthChangeType);
     }
 
-    private void InstantiateText(Player player, float absAmountChanged, bool isHeal)
+    private void InstantiateText(Player player, float absAmountChanged, HealthChangeType healthChangeType)
     {
         var gO = new GameObject();
         gO.SetActive(false);
         var floatTextGo = Instantiate(_floatingTextPrefab, gO.transform);
         var ftextComponent = floatTextGo.GetComponentInChildren<FloatingText>();
-        ftextComponent.Color = isHeal ?  Color.green : Color.red;
+        ftextComponent.Color = AppearanceData.Instance().GetFloatingTextColor(healthChangeType);
         ftextComponent.Text = Mathf.CeilToInt(absAmountChanged).ToString();
         var playerTransform = _playerTextContainers[player.Id];
         floatTextGo.transform.SetParent(playerTransform, false); //, false);
