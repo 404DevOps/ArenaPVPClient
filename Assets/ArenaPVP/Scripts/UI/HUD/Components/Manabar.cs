@@ -26,7 +26,7 @@ public class Manabar : MonoBehaviour
 
     private void SetBarClassColor(CharacterClassType classType)
     {
-        _manabarImage.color = ClassAppearanceData.Instance().GetColor(classType);
+        _manabarImage.color = AppearanceData.Instance().GetClassColor(classType);
     }
     private void UpdateBar(bool updateInstant = false)
     {

@@ -1,11 +1,7 @@
-using FishNet.Editing;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using static UnityEngine.EventSystems.EventTrigger;
 
 public class AuraManager : MonoBehaviour
 {
@@ -52,18 +48,18 @@ public class AuraManager : MonoBehaviour
     private void RemoveAura(int playerId, int index)
     {
         var entry = _playerAurasDict[playerId];
-        GameEvents.OnAuraExpired.Invoke(playerId, entry[index].AuraId);
+        GameEvents.OnAuraExpired.Invoke(playerId, entry[index]);
         entry[index].Aura.Fade();
         entry.RemoveAt(index);
     }
-    public void AddAura(int ownerId, int targetId, AuraBase aura)
+    public void AddAura(Player source, Player target, AuraBase aura)
     {
-        var auraInfo = new AuraInfo(IdentifierService.GetAuraId(), ownerId, targetId, aura);
+        var auraInfo = new AuraInfo(IdentifierService.GetAuraId(), source, target, aura);
 
-        if (_playerAurasDict.ContainsKey(targetId))
+        if (_playerAurasDict.ContainsKey(target.Id))
         {
-            var entry = _playerAurasDict[targetId];
-            var auraIndex = entry.FindIndex(a => a.Aura.Name == aura.Name && a.AppliedById == ownerId);
+            var entry = _playerAurasDict[target.Id];
+            var auraIndex = entry.FindIndex(a => a.Aura.Name == aura.Name && a.AppliedBy == source);
             //aura already applied by this owner, refresh duration
             if (auraIndex >= 0)
             {
@@ -72,13 +68,13 @@ public class AuraManager : MonoBehaviour
             else 
             {
                 entry.Add(auraInfo);
-                GameEvents.OnAuraApplied.Invoke(targetId, auraInfo.AuraId);
+                GameEvents.OnAuraApplied.Invoke(target.Id, auraInfo);
             }
         }
         else 
         {
-            _playerAurasDict.Add(targetId, new List<AuraInfo> { auraInfo });
-            GameEvents.OnAuraApplied.Invoke(targetId, auraInfo.AuraId);
+            _playerAurasDict.Add(target.Id, new List<AuraInfo> { auraInfo });
+            GameEvents.OnAuraApplied.Invoke(target.Id, auraInfo);
         }
     }
 
@@ -138,20 +134,20 @@ public class AuraManager : MonoBehaviour
 [Serializable]
 public class AuraInfo
 {
-    public AuraInfo(int id, int appliedById, int appliedToId, AuraBase aura) 
+    public AuraInfo(int id, Player appliedById, Player appliedToId, AuraBase aura) 
     {
         AuraId = id;
         Aura = aura;
-        AppliedById = appliedById;
+        AppliedBy = appliedById;
         AppliedTime = Time.time;
         ExpiresInSec = Mathf.CeilToInt(aura.Duration);
-        AppliedToId = appliedToId;
+        AppliedTo = appliedToId;
     }
     public int AuraId;
     public AuraBase Aura;
     public float AppliedTime;
-    public int AppliedById;
-    public int AppliedToId;
+    public Player AppliedBy;
+    public Player AppliedTo;
     public int ExpiresInSec;
 
     public static AuraInfo Null = null;

@@ -26,7 +26,7 @@ public class Healthbar : MonoBehaviour
 
     private void SetBarClassColor(CharacterClassType classType)
     {
-        _healthbarImage.color = ClassAppearanceData.Instance().GetColor(classType);
+        _healthbarImage.color = AppearanceData.Instance().GetClassColor(classType);
     }
     private void UpdateBar(bool updateInstant = false)
     {

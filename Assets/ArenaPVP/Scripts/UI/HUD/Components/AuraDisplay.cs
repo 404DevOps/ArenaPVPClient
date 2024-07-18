@@ -36,7 +36,7 @@ public class AuraDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             }
         }
 
-        _expiresIn = AuraManager.Instance.GetRemainingAuraDuration(AuraInfo.AppliedToId, AuraInfo.AuraId);
+        _expiresIn = AuraManager.Instance.GetRemainingAuraDuration(AuraInfo.AppliedTo.Id, AuraInfo.AuraId);
     }
 
     public void LateUpdate()

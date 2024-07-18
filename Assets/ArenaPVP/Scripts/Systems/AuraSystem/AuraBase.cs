@@ -22,7 +22,7 @@ public class AuraBase : ScriptableObject
 
     public void Apply(Player owner, Player target) 
     {
-        AuraManager.Instance.AddAura(owner.Id, target.Id, this);
+        AuraManager.Instance.AddAura(owner, target, this);
         Logger.Log($"Aura {Name} has been applied to Target {target.Name}");
     }
     public void Fade() 

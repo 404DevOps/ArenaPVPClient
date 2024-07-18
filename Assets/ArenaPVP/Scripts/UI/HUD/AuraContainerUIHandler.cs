@@ -39,20 +39,19 @@ public class AuraContainerUIHandler : MonoBehaviour
         GameEvents.OnAuraExpired.AddListener(OnAuraExpired);
     }
 
-    private void OnAuraExpired(int ownerId, int auraId)
+    private void OnAuraExpired(int ownerId, AuraInfo aura)
     {
         if (ownerId != OwnerId)
             return;
 
-        RemoveAura(auraId);
+        RemoveAura(aura.AuraId);
     }
 
-    private void OnAuraApplied(int ownerId, int auraId)
+    private void OnAuraApplied(int ownerId, AuraInfo aura)
     {
         if (ownerId != OwnerId)
             return;
 
-        var aura = AuraManager.Instance.GetAuraInfo(ownerId, auraId);
         AddAura(aura);
     }
 

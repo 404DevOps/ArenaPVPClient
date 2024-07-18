@@ -1,3 +1,4 @@
+using Assets.ArenaPVP.Scripts.Models.Enums;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,13 +25,19 @@ public class CombatLogUIHandler : MonoBehaviour
         GameEvents.OnAuraExpired.RemoveListener(OnAuraExpired);
     }
 
-    private void OnAuraExpired(int arg1, int arg2)
+    private void OnAuraExpired(int target, AuraInfo aura)
     {
+        var str = $"{aura.AppliedBy.Name}'s {aura.Aura.Name} Aura has expired on {aura.AppliedTo.Name}.";
+        var color = GetAuraTextColor(aura);
+        InstantiateText(str, color);
         //throw new NotImplementedException();
     }
 
-    private void OnAuraApplied(int arg1, int arg2)
+    private void OnAuraApplied(int target, AuraInfo aura)
     {
+        var str = $"{aura.AppliedBy.Name}'s {aura.Aura.Name} Aura has been applied to {aura.AppliedTo.Name}.";
+        var color = GetAuraTextColor(aura);
+        InstantiateText(str, color);
         //throw new NotImplementedException();
     }
 
@@ -42,16 +49,27 @@ public class CombatLogUIHandler : MonoBehaviour
         InstantiateText(str, color);
     }
 
+    private Color GetAuraTextColor(AuraInfo aura)
+    {
+        if (aura.AppliedBy.IsOwnedByMe)
+            return AppearanceData.Instance().GetCombatLogColor(CombatLogType.AuraAppliedToOthers);
+        if (aura.AppliedTo.IsOwnedByMe)
+            return AppearanceData.Instance().GetCombatLogColor(CombatLogType.AuraAppliedToPlayer);
+       
+        return Color.white;
+    }
+
+
     private Color GetCombatLogTextColor(HealthChangedEventArgs args)
     {
         if (args.Player.IsOwnedByMe && args.HealthChangeType == HealthChangeType.Damage)
-            return Color.red;
+            return AppearanceData.Instance().GetCombatLogColor(CombatLogType.DamageAppliedToPlayer);
         if (args.Player.IsOwnedByMe && args.HealthChangeType == HealthChangeType.Heal)
-            return Color.green;
+            return AppearanceData.Instance().GetCombatLogColor(CombatLogType.HealingAppliedToPlayer);
         if (args.Source.IsOwnedByMe && args.HealthChangeType == HealthChangeType.Heal)
-            return Color.cyan;
+            return AppearanceData.Instance().GetCombatLogColor(CombatLogType.HealingAppliedToOthers);
         if (args.Source.IsOwnedByMe && args.HealthChangeType == HealthChangeType.Damage)
-            return Color.white;
+            return AppearanceData.Instance().GetCombatLogColor(CombatLogType.DamageAppliedToOthers);
 
         return Color.white;
     }

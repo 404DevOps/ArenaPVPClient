@@ -103,6 +103,6 @@ public class UnitFrameUIHandler : MonoBehaviour
 
     private void SetUnitFrameIcon()
     {
-        IconImage.sprite = ClassAppearanceData.Instance().GetIcon(Player.ClassType);
+        IconImage.sprite = AppearanceData.Instance().GetClassIcon(Player.ClassType);
     }
 }

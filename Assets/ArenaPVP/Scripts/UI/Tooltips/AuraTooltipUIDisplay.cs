@@ -23,7 +23,7 @@ public class AuraTooltipUIDisplay : TooltipBaseUIDisplay
 
     public void FixedUpdate()
     {
-        AuraInfo.ExpiresInSec = Mathf.CeilToInt(AuraManager.Instance.GetRemainingAuraDuration(AuraInfo.AppliedToId, AuraInfo.AuraId));
+        AuraInfo.ExpiresInSec = Mathf.CeilToInt(AuraManager.Instance.GetRemainingAuraDuration(AuraInfo.AppliedTo.Id, AuraInfo.AuraId));
         TimeRemaining.text = AuraInfo.ExpiresInSec.ToString() + "sec remaining";
 
         if (AuraInfo.ExpiresInSec <= 0)

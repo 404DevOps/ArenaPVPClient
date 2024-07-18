@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ad217e143a1d13d41872f8a9c6f56cac, type: 3}
-  m_Name: ClassAppearanceData
+  m_Name: AppearanceData
   m_EditorClassIdentifier: 
   _classIcons:
   - ClassType: 1
@@ -30,3 +30,21 @@ MonoBehaviour:
     Color: {r: 0.8207547, g: 0.8207547, b: 0.8207547, a: 1}
   - ClassType: 4
     Color: {r: 0.25591847, g: 0.6698113, b: 0.28765565, a: 1}
+  _combatLogColors:
+  - LogType: 0
+    Color: {r: 0.031149892, g: 0.8887376, b: 0.9433962, a: 1}
+  - LogType: 1
+    Color: {r: 0.012904947, g: 0.4751662, b: 0.5471698, a: 1}
+  - LogType: 2
+    Color: {r: 0.6415094, g: 0.033373676, b: 0.027233878, a: 1}
+  - LogType: 4
+    Color: {r: 0.21377735, g: 0.6431373, b: 0.027450994, a: 1}
+  - LogType: 5
+    Color: {r: 1, g: 1, b: 1, a: 1}
+  - LogType: 3
+    Color: {r: 1, g: 1, b: 1, a: 1}
+  _floatingTextColors:
+  - HealthChangedType: 0
+    Color: {r: 0.9716981, g: 0.6844457, b: 0.05958529, a: 0}
+  - HealthChangedType: 1
+    Color: {r: 0.036131967, g: 0.6792453, b: 0, a: 0}
