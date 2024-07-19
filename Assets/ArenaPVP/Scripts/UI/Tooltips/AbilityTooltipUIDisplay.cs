@@ -1,3 +1,4 @@
+using Assets.Scripts.Enums;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -29,13 +30,16 @@ public class AbilityTooltipUIDisplay : TooltipBaseUIDisplay
     {
         switch (abilityInfo.ClassType)
         {
-            case Assets.Scripts.Enums.CharacterClassType.Blademaster:
+            case CharacterClassType.Trooper:
                 return "Rage";
-            case Assets.Scripts.Enums.CharacterClassType.Spellslinger:
-            case Assets.Scripts.Enums.CharacterClassType.Soulmender:
+            case CharacterClassType.Medic:
+            case CharacterClassType.Cryomancer:
+            case CharacterClassType.Voidweaver:
                 return "Mana";
-            case Assets.Scripts.Enums.CharacterClassType.Hawkeye:
+            case CharacterClassType.Tracker:
                 return "Focus";
+            case CharacterClassType.Spectre:
+                return "Energy";
             default: return "";
         }
     }

@@ -225,6 +225,8 @@ GameObject:
   - component: {fileID: 1556117145722747551}
   - component: {fileID: 4112767005670447131}
   - component: {fileID: 8512672299725450243}
+  - component: {fileID: 3695227242969832241}
+  - component: {fileID: 6427213859635927307}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -261,8 +263,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 114b9c466ccfd8c488cab731c472df31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _walkSpeed: 2
-  _rotationSpeed: 0.1
+  _walkSpeed: 10
+  _rotationSpeed: 20
   _jumpForce: 15
   _velocityY: 0
   _gravityModifier: 5
@@ -283,6 +285,7 @@ MonoBehaviour:
   Name: Kevin
   IsOwnedByMe: 1
   ClassType: 2
+  Id: 0
 --- !u!114 &4112767005670447131
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -295,7 +298,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d10b662442aef7748b139137674614aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isSelf: 0
+  isSelf: 1
 --- !u!143 &8512672299725450243
 CharacterController:
   m_ObjectHideFlags: 0
@@ -306,7 +309,7 @@ CharacterController:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 64
@@ -322,3 +325,33 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &3695227242969832241
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8063676432945403057}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7df72023543efa4478d21294eb85ed07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MaxHealth: 100
+  CurrentHealth: 100
+  Player: {fileID: 0}
+--- !u!114 &6427213859635927307
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8063676432945403057}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35173bb4648bd254883cc3a423ec406a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MaxResource: 100
+  CurrentResource: 100
+  Player: {fileID: 0}

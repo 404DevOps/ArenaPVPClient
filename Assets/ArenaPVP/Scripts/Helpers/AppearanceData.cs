@@ -33,15 +33,16 @@ public class AppearanceData : ScriptableObject
         return _instance;
     }
 
-    public Color GetClassColor(CharacterClassType classType)
+    public ClassColorPair GetClassColors(CharacterClassType classType)
     {
         if (_classColors.Any(entry => entry.ClassType == classType))
-        { 
-            return _classColors.FirstOrDefault(entry => entry.ClassType == classType).Color;
+        {
+            return _classColors.FirstOrDefault(entry => entry.ClassType == classType);
         }
 
         throw new KeyNotFoundException(classType.ToString() + "does not exist in ClassColors.");
     }
+
     public Sprite GetClassIcon(CharacterClassType classType)
     {
         if (_classIcons.Any(entry => entry.ClassType == classType))
@@ -76,7 +77,8 @@ public class AppearanceData : ScriptableObject
 public class ClassColorPair
 { 
     public CharacterClassType ClassType;
-    public Color Color;
+    public Color MainColor;
+    public Color ResourceColor;
 }
 
 [Serializable]

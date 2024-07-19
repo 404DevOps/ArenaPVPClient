@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5201401720333626959}
   - component: {fileID: -913863405096024123}
   m_Layer: 5
-  m_Name: ManaBar
+  m_Name: ResourceBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -109,3 +109,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 240dd163b587dad40954ad48db0c2ad7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _resourcebarImage: {fileID: 7454884828612924}
+  _updateManaSpeed: 0.2

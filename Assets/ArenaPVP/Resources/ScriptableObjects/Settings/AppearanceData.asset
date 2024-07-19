@@ -23,13 +23,23 @@ MonoBehaviour:
     Icon: {fileID: 21300000, guid: a96e4c3deb84a194a86375379740947a, type: 3}
   _classColors:
   - ClassType: 1
-    Color: {r: 0.5283019, g: 0.30367014, b: 0.042363837, a: 1}
+    MainColor: {r: 0.6320754, g: 0.47030473, b: 0.03875936, a: 1}
+    ResourceColor: {r: 0.7735849, g: 0.025542913, b: 0.025542913, a: 1}
   - ClassType: 2
-    Color: {r: 0.09518514, g: 0.7864836, b: 0.8773585, a: 1}
+    MainColor: {r: 0.027100407, g: 0.8048847, b: 0.8207547, a: 1}
+    ResourceColor: {r: 0.086507656, g: 0.11903577, b: 0.6792453, a: 1}
   - ClassType: 3
-    Color: {r: 0.8207547, g: 0.8207547, b: 0.8207547, a: 1}
+    MainColor: {r: 1, g: 1, b: 1, a: 1}
+    ResourceColor: {r: 0.09019608, g: 0.12156863, b: 0.68235296, a: 1}
   - ClassType: 4
-    Color: {r: 0.25591847, g: 0.6698113, b: 0.28765565, a: 1}
+    MainColor: {r: 0.27211446, g: 0.6792453, b: 0.14417945, a: 1}
+    ResourceColor: {r: 0.509434, g: 0.27371323, b: 0.040850844, a: 1}
+  - ClassType: 5
+    MainColor: {r: 0.54131705, g: 0.017354928, b: 0.735849, a: 1}
+    ResourceColor: {r: 0.09019608, g: 0.12156863, b: 0.68235296, a: 1}
+  - ClassType: 6
+    MainColor: {r: 0.8962264, g: 0.7409632, b: 0.063412234, a: 1}
+    ResourceColor: {r: 0.8396226, g: 0.011881431, b: 0.573725, a: 1}
   _combatLogColors:
   - LogType: 0
     Color: {r: 0.031149892, g: 0.8887376, b: 0.9433962, a: 1}

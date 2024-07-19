@@ -15,27 +15,38 @@ public class UnitFrameUIHandler : MonoBehaviour
     public AuraContainerUIHandler AuraContainer;
 
     public Image IconImage;
-    public Image ManabarImage;
     private Healthbar _healthbar;
+    private Resourcebar _resourcebar;
 
     public Player Player;
 
     [SerializeField] private bool _isPlayerFrame;
     private PlayerHealth _playerHealth;
-
-
+    private PlayerResource _playerResource;
 
     // Start is called before the first frame update
     void OnEnable()
     {
+        _healthbar = GetComponentInChildren<Healthbar>(true);
+        _resourcebar = GetComponentInChildren<Resourcebar>(true);
+
         GameEvents.OnPlayerInitialized.AddListener(OnPlayerInitialized);
         GameEvents.OnPlayerHealthChanged.AddListener(OnHealthChanged);
-        _healthbar = GetComponentInChildren<Healthbar>(true);
+        GameEvents.OnPlayerResourceChanged.AddListener(OnResourceChanged);
+    }
+    private void OnDisable()
+    {
+        if (!_isPlayerFrame)
+        {
+            UIEvents.OnTargetChanged.RemoveListener(OnTargetChanged);
+        }
+        GameEvents.OnPlayerHealthChanged.RemoveListener(OnHealthChanged);
+        GameEvents.OnPlayerInitialized.RemoveListener(OnPlayerInitialized);
     }
 
     private void OnPlayerInitialized(Player player)
     {
-        Player = player;
+        
         if (IconRightSide)
         {
             IconHolder.SetAsLastSibling();
@@ -45,10 +56,13 @@ public class UnitFrameUIHandler : MonoBehaviour
         }
         if (_isPlayerFrame)
         {
-            if (Player.IsOwnedByMe) {
+            if (player.IsOwnedByMe) {
+                Player = player;
                 SetUnitFrameIcon();
                 _playerHealth = Player.GetComponent<PlayerHealth>();
+                _playerResource = Player.GetComponent<PlayerResource>();
                 _healthbar.InitializeBar(Player.ClassType, _playerHealth.CurrentHealth, _playerHealth.MaxHealth);
+                _resourcebar.InitializeBar(Player.ClassType, _playerResource.CurrentResource, _playerResource.MaxResource);
                 ActivateAuraGrid(); 
             }
         }
@@ -59,23 +73,19 @@ public class UnitFrameUIHandler : MonoBehaviour
             AuraContainer.gameObject.SetActive(false);
         }
     }
-
     private void OnHealthChanged(HealthChangedEventArgs args)
     {
         if (Player.Id != args.Player.Id)
             return;
 
-        _healthbar.SetNewHealth(_playerHealth.CurrentHealth, _playerHealth.MaxHealth);
+        _healthbar.SetNewHealth(_playerHealth.CurrentHealth + args.HealthChangeAmount, _playerHealth.MaxHealth);
     }
-
-    private void OnDisable()
+    private void OnResourceChanged(ResourceChangedEventArgs args)
     {
-        if (!_isPlayerFrame)
-        {
-            UIEvents.OnTargetChanged.RemoveListener(OnTargetChanged);
-        }
-        GameEvents.OnPlayerHealthChanged.RemoveListener(OnHealthChanged);
-        GameEvents.OnPlayerInitialized.RemoveListener(OnPlayerInitialized);
+        if (Player.Id != args.Player.Id)
+            return;
+
+        _resourcebar.SetNewValue(_playerResource.CurrentResource + args.ResourceChangeAmount, _playerResource.MaxResource);
     }
     private void OnTargetChanged(Player player) 
     {
@@ -83,8 +93,10 @@ public class UnitFrameUIHandler : MonoBehaviour
         {
             Player = player;
             _playerHealth = Player.GetComponent<PlayerHealth>();
+            _playerResource = Player.GetComponent<PlayerResource>();
             SetUnitFrameIcon();
             _healthbar.InitializeBar(Player.ClassType, _playerHealth.CurrentHealth, _playerHealth.MaxHealth);
+            _resourcebar.InitializeBar(Player.ClassType, _playerResource.CurrentResource, _playerResource.MaxResource);
             FrameParent.gameObject.SetActive(true);
             ActivateAuraGrid();
             
@@ -100,7 +112,6 @@ public class UnitFrameUIHandler : MonoBehaviour
         AuraContainer.InitializeGrid(Player.Id, AuraManager.Instance.GetAuraInfosForPlayer(Player.Id));
         AuraContainer.gameObject.SetActive(true);
     }
-
     private void SetUnitFrameIcon()
     {
         IconImage.sprite = AppearanceData.Instance().GetClassIcon(Player.ClassType);

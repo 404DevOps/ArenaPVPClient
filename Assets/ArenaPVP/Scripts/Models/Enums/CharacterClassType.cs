@@ -8,9 +8,11 @@ namespace Assets.Scripts.Enums
 {
     public enum CharacterClassType
     {
-        Blademaster = 1, 
-        Spellslinger = 2,
-        Soulmender = 3, //Lightbearer
-        Hawkeye = 4
+        Trooper = 1,
+        Cryomancer = 2,
+        Medic = 3, //Lightbearer
+        Tracker = 4,
+        Voidweaver = 5,
+        Spectre = 6
     }
 }
