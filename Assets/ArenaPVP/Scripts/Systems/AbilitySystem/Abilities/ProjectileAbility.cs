@@ -20,6 +20,7 @@ public class ProjectileAbility : AbilityBase
     {
         _target = target;
         _owner = owner;
+        GameEvents.OnPlayerResourceChanged.Invoke(new ResourceChangedEventArgs() { Player = owner, ResourceChangeAmount = -AbilityInfo.ResourceCost });
         InstantiateProjectile(owner);
     }
     private void InstantiateProjectile(Player owner)

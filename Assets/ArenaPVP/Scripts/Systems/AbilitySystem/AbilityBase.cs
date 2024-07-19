@@ -108,8 +108,22 @@ public abstract class AbilityBase : ScriptableObject
             Logger.Log("Already Casting that Spell.");
             return false;
         }
+        if (!HasEnoughResource(owner))
+        {
+            Logger.Log("Not enough Mana to cast that Spell.");
+            return false;
+        }
 
         return canbeUse;
+    }
+
+    private bool HasEnoughResource(Player owner)
+    {
+        var resComp = owner.GetComponent<PlayerResource>();
+        if (resComp.CurrentResource >= this.AbilityInfo.ResourceCost)
+            return true;
+
+        return false;
     }
 
     private bool IsAlreadyCasting(int ownerId)
