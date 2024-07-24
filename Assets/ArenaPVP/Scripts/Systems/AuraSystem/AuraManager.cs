@@ -52,7 +52,7 @@ public class AuraManager : MonoBehaviour
         entry[index].Aura.Fade();
         entry.RemoveAt(index);
     }
-    public void AddAura(Player source, Player target, AuraBase aura)
+    public int AddAura(Player source, Player target, AuraBase aura)
     {
         var auraInfo = new AuraInfo(IdentifierService.GetAuraId(), source, target, aura);
 
@@ -64,17 +64,20 @@ public class AuraManager : MonoBehaviour
             if (auraIndex >= 0)
             {
                 entry[auraIndex].AppliedTime = Time.time;
+                return entry[auraIndex].AuraId;
             }
             else 
             {
                 entry.Add(auraInfo);
                 GameEvents.OnAuraApplied.Invoke(target.Id, auraInfo);
+                return auraInfo.AuraId;
             }
         }
         else 
         {
             _playerAurasDict.Add(target.Id, new List<AuraInfo> { auraInfo });
             GameEvents.OnAuraApplied.Invoke(target.Id, auraInfo);
+            return auraInfo.AuraId;
         }
     }
 

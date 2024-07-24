@@ -22,6 +22,8 @@ public class PlayerHealth : MonoBehaviour
     private void OnEnable()
     {
         Player = GetComponent<Player>();
+        MaxHealth = Player.Stats.Health;
+        CurrentHealth = Player.Stats.Health;
         GameEvents.OnPlayerHealthChanged.AddListener(OnHealthChanged);
     }
     private void OnDisable()

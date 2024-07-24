@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 336b5dc8ee8485643a5ebb92c0c765f2, type: 3}
+  m_Name: MedicStats
+  m_EditorClassIdentifier: 
+  AttackPower: 0.5
+  Spellpower: 500
+  Armor: 100
+  SpellResistance: 0.2
+  Manapool: 4000
+  ManaRegenerationPerFive: 20
+  Healthpool: 3000
+  MovementSpeed: 1

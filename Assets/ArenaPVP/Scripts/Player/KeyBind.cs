@@ -40,9 +40,43 @@ public class KeyBind
 
         return primaryPressed || secondaryPressed;
     }
+    public bool IsKeyUp()
+    {
+        bool primaryPressed = false, secondaryPressed = false;
 
+        foreach (KeyCode keyCode in primary)
+        {
+            if (!Input.GetKeyUp(keyCode) && keyCode != KeyCode.None)
+            {
+                primaryPressed = false;
+                break;
+            }
+            else if (keyCode != KeyCode.None)
+            {
+                primaryPressed = true;
+            }
+        }
+
+        foreach (KeyCode keyCode in secondary)
+        {
+            if (!Input.GetKeyUp(keyCode) && keyCode != KeyCode.None)
+            {
+                secondaryPressed = false;
+                break;
+            }
+            else if (keyCode != KeyCode.None)
+            {
+                secondaryPressed = true;
+            }
+        }
+
+        return primaryPressed || secondaryPressed;
+    }
     public bool IsKeyDown()
     {
+        if (!Input.anyKey)
+            return false;
+
         bool primaryPressed = false, secondaryPressed = false;
 
         foreach (KeyCode keyCode in primary)

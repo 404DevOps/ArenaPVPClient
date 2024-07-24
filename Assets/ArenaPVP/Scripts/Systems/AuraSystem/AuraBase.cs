@@ -4,6 +4,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
+using static UnityEngine.UI.GridLayoutGroup;
 using Logger = Assets.Scripts.Helpers.Logger;
 
 [Serializable]
@@ -15,19 +17,24 @@ public class AuraBase : ScriptableObject
     public float Duration;
     public Sprite Icon;
     public AuraType AuraType;
-
-    public ModifierType ModifierType;
-    public float ModifierValue;
+    public List<StatModifier> StatModifiers;
     public bool isDebuff;
+    private int _auraId;
+    private Player _target;
 
     public void Apply(Player owner, Player target) 
     {
-        AuraManager.Instance.AddAura(owner, target, this);
-        Logger.Log($"Aura {Name} has been applied to Target {target.Name}");
+        _auraId = AuraManager.Instance.AddAura(owner, target, this);
+
+        foreach (var statMod in StatModifiers)
+        {
+            statMod.SourceAuraId = _auraId;
+            owner.Stats.Mediator.AddModifier(statMod);
+        }
     }
     public void Fade() 
     {
-        Logger.Log($"Aura {Name} has faded.");
+        _target.Stats.Mediator.RemoveAuraModifiers(_auraId);  
     }
 }
 public enum ModifierType

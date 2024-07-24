@@ -83,7 +83,7 @@ public class PlayerMovement: MonoBehaviour
 
     private void FixedUpdate()
     {
-      _characterController.Move(new Vector3(_currentDirection.x * _walkSpeed, _velocityY, _currentDirection.z * _walkSpeed) * Time.deltaTime);  
+      _characterController.Move(new Vector3(_currentDirection.x * _walkSpeed, _velocityY, _currentDirection.z * _walkSpeed) * Time.deltaTime * _player.Stats.MovementSpeed);  
     }
 
     private void HandleJump()

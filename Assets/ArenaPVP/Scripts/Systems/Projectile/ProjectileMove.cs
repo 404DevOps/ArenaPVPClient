@@ -57,7 +57,7 @@ public class ProjectileMove : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Logger.Log($"Collider ({other.transform.name}): " + other.GetComponent<Player>()?.Id + ", Target.Transform: " + Target.Id);
+        //Logger.Log($"Collider ({other.transform.name}): " + other.GetComponent<Player>()?.Id + ", Target.Transform: " + Target.Id);
         if (other.GetComponent<Player>()?.Id == Target.Id)
         {
             OnCollision?.Invoke();  

@@ -11,18 +11,22 @@ using UnityEngine.UI;
 [CreateAssetMenu(fileName = "ClassAppearanceData", menuName = "Appearance/ClassAppearanceData")]
 public class AppearanceData : ScriptableObject
 {
-
     private static AppearanceData _instance;
+
+    #region Collections
 
     [SerializeField]
     private List<ClassIconPair> _classIcons = new List<ClassIconPair>();
     [SerializeField]
     private List<ClassColorPair> _classColors = new List<ClassColorPair>();
     [SerializeField]
-    private List<CombatLogColorPair> _combatLogColors= new List<CombatLogColorPair>();
+    private List<CombatLogColorPair> _combatLogColors = new List<CombatLogColorPair>();
     [SerializeField]
     private List<FloatingTextColorPair> _floatingTextColors = new List<FloatingTextColorPair>();
+    [SerializeField]
+    private List<ClassRessourceDescPair> _classRessourceDescriptor = new List<ClassRessourceDescPair>();
 
+    #endregion
 
     public static AppearanceData Instance()
     {
@@ -32,7 +36,6 @@ public class AppearanceData : ScriptableObject
         }
         return _instance;
     }
-
     public ClassColorPair GetClassColors(CharacterClassType classType)
     {
         if (_classColors.Any(entry => entry.ClassType == classType))
@@ -42,7 +45,6 @@ public class AppearanceData : ScriptableObject
 
         throw new KeyNotFoundException(classType.ToString() + "does not exist in ClassColors.");
     }
-
     public Sprite GetClassIcon(CharacterClassType classType)
     {
         if (_classIcons.Any(entry => entry.ClassType == classType))
@@ -69,25 +71,32 @@ public class AppearanceData : ScriptableObject
 
         throw new KeyNotFoundException(healthChangedType.ToString() + "does not exist in CombatLogColors.");
     }
+    public string GetRessourceDescriptor(CharacterClassType classType)
+    {
+        if (_classRessourceDescriptor.Any(entry => entry.ClassType == classType))
+        {
+            return _classRessourceDescriptor.FirstOrDefault(entry => entry.ClassType == classType).Descriptor;
+        }
 
+        throw new KeyNotFoundException(classType.ToString() + "does not exist in ClassRessourceDescriptors.");
+    }
 }
 
+    #region Collection Classes
 
 [Serializable]
 public class ClassColorPair
-{ 
+{
     public CharacterClassType ClassType;
     public Color MainColor;
     public Color ResourceColor;
 }
-
 [Serializable]
 public class ClassIconPair
 {
     public CharacterClassType ClassType;
     public Sprite Icon;
 }
-
 [Serializable]
 public class CombatLogColorPair
 {
@@ -100,5 +109,11 @@ public class FloatingTextColorPair
     public HealthChangeType HealthChangedType;
     public Color Color;
 }
+[Serializable]
+public class ClassRessourceDescPair
+{
+    public CharacterClassType ClassType;
+    public string Descriptor;
+}
 
-
+#endregion

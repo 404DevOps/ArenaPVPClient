@@ -86,31 +86,33 @@ public abstract class AbilityBase : ScriptableObject
         bool canbeUse = true;
         if (!IsInRange(owner.transform, target.transform))
         {
+            UIEvents.OnShowInformationPopup.Invoke("Out of range");
             return false;
         }
         if (!IsLineOfSight(owner.transform, target.transform))
         {
-            Logger.Log("Target not Line of Sight");
+            UIEvents.OnShowInformationPopup.Invoke("Target not line of sight");
             return false;
         }
         if (!IsInFront(owner.transform, target.transform))
         {
-            Logger.Log("Target not in Front");
+            UIEvents.OnShowInformationPopup.Invoke("Target is not in front of you");
             return false;
         }
         if (!IsCooldownReady(owner.Id)) 
         {
-            Logger.Log("Cooldown is not ready.");
+            UIEvents.OnShowInformationPopup.Invoke("This ability is not ready yet");
             return false;
         }
         if (IsAlreadyCasting(owner.Id))
         {
-            Logger.Log("Already Casting that Spell.");
+            Logger.Log("Already casting.");
             return false;
         }
         if (!HasEnoughResource(owner))
         {
-            Logger.Log("Not enough Mana to cast that Spell.");
+            var ressourceName = AppearanceData.Instance().GetRessourceDescriptor(owner.ClassType);
+            UIEvents.OnShowInformationPopup.Invoke($"Not enough {ressourceName}");
             return false;
         }
 

@@ -10,7 +10,16 @@ public class Player : MonoBehaviour
     public CharacterClassType ClassType;
 
     public int Id = 0;
-    // Start is called before the first frame update
+
+    BaseStats baseStats;
+    public Stats Stats { get; private set; }
+
+    void Awake()
+    {
+        baseStats = ClassStatMapping.Instance().GetBaseStats(ClassType);
+        Stats = new Stats(new StatsMediator(), baseStats);
+    }
+    
 
     private void OnEnable()
     {

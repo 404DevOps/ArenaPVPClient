@@ -36,7 +36,7 @@ public class ActionSlot : MonoBehaviour, IDropHandler
 
     private void Update()
     {
-        if (KeyBind.IsPressed())
+        if (KeyBind.IsKeyUp())
         {
             var target = FindObjectOfType<TargetingSystem>().CurrentTarget?.GetComponent<Player>();
 

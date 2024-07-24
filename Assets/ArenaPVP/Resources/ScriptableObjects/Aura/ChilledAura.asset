@@ -17,6 +17,9 @@ MonoBehaviour:
   Duration: 20
   Icon: {fileID: 21300000, guid: 9630d91883cce584fa74114783636a1d, type: 3}
   AuraType: 4
-  ModifierType: 0
-  ModifierValue: 0.8
+  StatModifiers:
+  - SourceAuraId: 0
+    _statType: 7
+    _operatorType: 1
+    _value: 0.2
   isDebuff: 1

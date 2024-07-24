@@ -59,7 +59,7 @@ public class FloatingTextManager : MonoBehaviour
         var containerGo = Instantiate(_textContainerPrefab, gO.transform);
         var containerComponent = containerGo.GetComponent<FloatingTextContainer>();
         containerComponent.Player = player;
-        containerGo.transform.parent = _textContainerParent;
+        containerGo.transform.SetParent(_textContainerParent, false);
         Destroy(gO);
 
         return containerGo.transform;

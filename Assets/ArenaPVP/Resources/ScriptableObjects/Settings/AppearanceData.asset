@@ -58,3 +58,16 @@ MonoBehaviour:
     Color: {r: 0.9716981, g: 0.6844457, b: 0.05958529, a: 0}
   - HealthChangedType: 1
     Color: {r: 0.036131967, g: 0.6792453, b: 0, a: 0}
+  _classRessourceDescriptor:
+  - ClassType: 1
+    Descriptor: Adrenaline
+  - ClassType: 2
+    Descriptor: Mana
+  - ClassType: 3
+    Descriptor: Mana
+  - ClassType: 5
+    Descriptor: Mana
+  - ClassType: 6
+    Descriptor: Energy
+  - ClassType: 4
+    Descriptor: Focus

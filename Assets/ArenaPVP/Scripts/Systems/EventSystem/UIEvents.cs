@@ -22,4 +22,6 @@ public static class UIEvents
     public static readonly Event OnSettingsLoaded = new Event();
     public static readonly Event OnHideTooltip = new Event();
     public static readonly Event<TooltipType, object> OnShowTooltip = new Event<TooltipType, object>(); //object = tooltip info
+
+    public static readonly Event<string> OnShowInformationPopup = new Event<string>();
 }
