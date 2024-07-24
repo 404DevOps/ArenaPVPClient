@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 336b5dc8ee8485643a5ebb92c0c765f2, type: 3}
   m_Name: TrooperStats
   m_EditorClassIdentifier: 
-  AttackPower: 0.5
-  Spellpower: 500
-  Armor: 100
-  SpellResistance: 0.2
-  Manapool: 4000
-  ManaRegenerationPerFive: 20
-  Healthpool: 3000
+  AttackPower: 200
+  Spellpower: 10
+  Armor: 200
+  SpellResistance: 20
+  RessourceRegenerationRate: 0
   MovementSpeed: 1
+  Health: 4000
+  Ressource: 1000

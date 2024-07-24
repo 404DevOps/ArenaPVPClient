@@ -220,7 +220,11 @@ public class AbilityInfo
     public float Cooldown;
     public float ResourceCost;
     public float Range;
+
     public Sprite Icon;
+
+    public DamageType DamageType;
+    public float Damage;
 
     public CharacterClassType ClassType;
 }

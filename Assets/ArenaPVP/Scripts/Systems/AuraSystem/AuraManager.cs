@@ -1,3 +1,4 @@
+using FishNet.Demo.AdditiveScenes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,11 +60,16 @@ public class AuraManager : MonoBehaviour
         if (_playerAurasDict.ContainsKey(target.Id))
         {
             var entry = _playerAurasDict[target.Id];
-            var auraIndex = entry.FindIndex(a => a.Aura.Name == aura.Name && a.AppliedBy == source);
-            //aura already applied by this owner, refresh duration
+            var auraIndex = entry.FindIndex(a => a.Aura.Name == aura.Name); // && a.AppliedBy == source);
+            //aura already applied, refresh duration and addStack if possible
             if (auraIndex >= 0)
             {
                 entry[auraIndex].AppliedTime = Time.time;
+                var newStacks = entry[auraIndex].Stacks + 1;
+                if (entry[auraIndex].Aura.MaxStacks >= newStacks)
+                {
+                    entry[auraIndex].Stacks = newStacks;
+                }
                 return entry[auraIndex].AuraId;
             }
             else 
@@ -132,6 +138,36 @@ public class AuraManager : MonoBehaviour
         }
         return 0;
     }
+    public int GetStackAmount(int playerId, int auraId)
+    {
+        if (_playerAurasDict.ContainsKey(playerId))
+        {
+            if (!_playerAurasDict[playerId].Any(a => a.AuraId == auraId))
+                return 0;
+            else
+            {
+                int index = _playerAurasDict[playerId].FindIndex(a => a.AuraId == auraId);
+                return _playerAurasDict[playerId][index].Stacks;
+            }
+        }
+        return 0;
+    }
+
+    //this currently implies all auras can only be applied once to a player, maybe in the future change to isUnique Property and apply it once per player.
+    public int GetStackAmount(int playerId, string auraName)
+    {
+        if (_playerAurasDict.ContainsKey(playerId))
+        {
+            if (!_playerAurasDict[playerId].Any(a => a.Aura.Name == auraName))
+                return 0;
+            else
+            {
+                int index = _playerAurasDict[playerId].FindIndex(a => a.Aura.Name == auraName);
+                return _playerAurasDict[playerId][index].Stacks;
+            }
+        }
+        return 0;
+    }
 }
 
 [Serializable]
@@ -145,6 +181,7 @@ public class AuraInfo
         AppliedTime = Time.time;
         ExpiresInSec = Mathf.CeilToInt(aura.Duration);
         AppliedTo = appliedToId;
+        Stacks = 1;
     }
     public int AuraId;
     public AuraBase Aura;
@@ -152,6 +189,7 @@ public class AuraInfo
     public Player AppliedBy;
     public Player AppliedTo;
     public int ExpiresInSec;
+    public int Stacks;
 
     public static AuraInfo Null = null;
 }

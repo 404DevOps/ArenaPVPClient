@@ -10,17 +10,21 @@ public class AuraDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public Image AuraIcon;
     public Image AuraIconDark;
     public Image AuraBorder;
+    public TextMeshProUGUI StackAmountText;
     public TextMeshProUGUI ExpiresInText;
 
     private bool _showTooltip = false;
     private float _timer = 0f;
     private float _delay = 0.2f;
     private float _expiresIn;
+    private int _stackAmount = 0;
+
     public void OnEnable()
     {
         AuraIcon.sprite = AuraInfo.Aura.Icon;
         AuraIconDark.sprite = AuraInfo.Aura.Icon;
         AuraBorder.color = AuraInfo.Aura.isDebuff ? Color.red : Color.green;
+        StackAmountText.gameObject.SetActive(false);
     }
 
     public void Update()
@@ -37,6 +41,7 @@ public class AuraDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         }
 
         _expiresIn = AuraManager.Instance.GetRemainingAuraDuration(AuraInfo.AppliedTo.Id, AuraInfo.AuraId);
+        _stackAmount = AuraManager.Instance.GetStackAmount(AuraInfo.AppliedTo.Id, AuraInfo.AuraId);
     }
 
     public void LateUpdate()
@@ -60,6 +65,12 @@ public class AuraDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         {
             ExpiresInText.gameObject.SetActive(false);
             ExpiresInText.color = Color.yellow;
+        }
+
+        if (_stackAmount > 1)
+        {
+            StackAmountText.gameObject.SetActive(true);
+            StackAmountText.text = _stackAmount.ToString();
         }
     }
 

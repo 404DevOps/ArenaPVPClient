@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 336b5dc8ee8485643a5ebb92c0c765f2, type: 3}
   m_Name: MedicStats
   m_EditorClassIdentifier: 
-  AttackPower: 0.5
-  Spellpower: 500
+  AttackPower: 10
+  Spellpower: 200
   Armor: 100
-  SpellResistance: 0.2
-  Manapool: 4000
-  ManaRegenerationPerFive: 20
-  Healthpool: 3000
+  SpellResistance: 10
+  RessourceRegenerationRate: 0
   MovementSpeed: 1
+  Health: 3000
+  Ressource: 3000

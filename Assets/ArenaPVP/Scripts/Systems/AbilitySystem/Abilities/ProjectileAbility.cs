@@ -5,14 +5,11 @@ using Logger = Assets.Scripts.Helpers.Logger;
 [CreateAssetMenu(menuName = "Abilities/ProjectileAbility", fileName = "ProjectileAbility")]
 public class ProjectileAbility : AbilityBase
 {
-    public float DamageAmount;
     public GameObject ProjectilePrefab;
     public AuraBase[] ApplyAuras;
-
     private Player _target;
     private Player _owner;
 
-    public DamageType DamageType;
 
     private GameObject _projectile;
 
@@ -42,13 +39,13 @@ public class ProjectileAbility : AbilityBase
         var projectileScript = _projectile.GetComponent<ProjectileMove>();
         projectileScript.OnCollision -= OnCollision;
 
-        var args = new HealthChangedEventArgs() 
-        { 
-            Player = _target.GetComponent<Player>(), 
-            Source = _owner.GetComponent<Player>(), 
-            HealthChangeAmount = -DamageAmount, 
+        var args = new HealthChangedEventArgs()
+        {
+            Player = _target.GetComponent<Player>(),
+            Source = _owner.GetComponent<Player>(),
+            HealthChangeAmount = -DamageCalculator.CalculateDamage(_owner, _target, this),
             HealthChangeType = HealthChangeType.Damage, 
-            DamageType = DamageType,
+            DamageType = AbilityInfo.DamageType,
             Ability = this
         };
 

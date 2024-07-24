@@ -90,7 +90,7 @@ public class TooltipManager : MonoBehaviour
         go.SetActive(false);
         _tooltip = Instantiate(abilityTooltipPrefab, go.transform);
         var tooltipComponent = _tooltip.GetComponent<AbilityTooltipUIDisplay>();
-        tooltipComponent.abilityInfo = tooltipInfo;
+        tooltipComponent.AbilityInfo = tooltipInfo;
         _tooltip.transform.SetParent(_canvas);
         tooltipComponent.OnTooltipInstantiated += SetTooltipPosition;
         Destroy(go);

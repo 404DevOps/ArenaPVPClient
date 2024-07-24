@@ -1,6 +1,7 @@
 using Assets.ArenaPVP.Scripts.Models.Enums;
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 
 public class StatsMediator
@@ -21,12 +22,14 @@ public class StatsMediator
         var node = modifiers.First;
         while (node != null)
         {
+            var nextNode = node.Next;
             if (node.Value.SourceAuraId == auraId)
             {
                 modifiers.Remove(node);
+                Queries -= node.Value.Handle;
                 node.Value.Dispose();
             }
-            node = node.Next;
+            node = nextNode;
         }
     }
 }
