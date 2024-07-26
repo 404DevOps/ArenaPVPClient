@@ -38,10 +38,12 @@ public class StatQuery
 {
     public readonly StatType StatType;
     public float Value;
+    public float BaseValue;
 
     public StatQuery(StatType statType, float value)
     {
         StatType = statType;
         Value = value;
+        BaseValue = value;
     }
 }

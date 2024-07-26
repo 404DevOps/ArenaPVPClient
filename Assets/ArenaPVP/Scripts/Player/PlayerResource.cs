@@ -22,8 +22,8 @@ public class PlayerResource : MonoBehaviour
     private void OnEnable()
     {
         Player = GetComponent<Player>();
-        MaxResource = Player.Stats.Ressource;
-        CurrentResource = Player.Stats.Ressource;
+        MaxResource = Player.Stats.Resource;
+        CurrentResource = Player.Stats.Resource;
         GameEvents.OnPlayerResourceChanged.AddListener(OnResourceChanged);
     }
     private void OnDisable()

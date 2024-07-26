@@ -19,9 +19,9 @@ MonoBehaviour:
   Icon: {fileID: 21300000, guid: eb5bc873b3a0d154f8fea04279ae69b4, type: 3}
   AuraType: 4
   StatModifiers:
-  - SourceAuraId: 2
+  - SourceAuraId: 34
     _statType: 1
     _operatorType: 1
-    _value: 1.2
+    _value: 0.2
   isDebuff: 1
   MaxStacks: 3

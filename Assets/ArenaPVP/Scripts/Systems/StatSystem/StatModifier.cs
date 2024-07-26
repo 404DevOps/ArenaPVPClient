@@ -20,9 +20,9 @@ public class StatModifier : IDisposable
         {
             switch (_operatorType)
             {
-                case OperatorType.Multiply: query.Value = query.Value * _value; break;
-                case OperatorType.Divide: query.Value = query.Value / _value; break;
-                case OperatorType.Add: query.Value = query.Value += _value; break;
+                case OperatorType.Multiply: query.Value += query.BaseValue * _value; break;
+                case OperatorType.Divide: query.Value += query.BaseValue / _value; break;
+                case OperatorType.Add: query.Value += (query.BaseValue += _value); break;
             }
         }
     }

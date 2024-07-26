@@ -7,9 +7,7 @@ public class Stats
 {
     readonly StatsMediator _mediator;
     readonly BaseStats _baseStats;
-
     public StatsMediator Mediator => _mediator;
-
     public Stats(StatsMediator mediator, BaseStats baseStats)
     { 
         _mediator = mediator;
@@ -45,7 +43,7 @@ public class Stats
         }
 
     }
-    public float RessourceRegenerationSpeed
+    public float ResourceRegenerationSpeed
     {
         get
         {
@@ -64,7 +62,7 @@ public class Stats
             return q.Value;
         }
 
-    }
+        }
     public float Armor
     {
         get
@@ -85,7 +83,7 @@ public class Stats
         }
 
     }
-    public float Ressource
+    public float Resource
     {
         get
         {
