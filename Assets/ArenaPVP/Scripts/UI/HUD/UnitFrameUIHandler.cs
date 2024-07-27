@@ -75,14 +75,14 @@ public class UnitFrameUIHandler : MonoBehaviour
     }
     private void OnHealthChanged(HealthChangedEventArgs args)
     {
-        if (Player.Id != args.Player.Id)
+        if (Player == null || Player.Id != args.Player.Id)
             return;
 
         _healthbar.SetNewHealth(_playerHealth.CurrentHealth + args.HealthChangeAmount, _playerHealth.MaxHealth);
     }
     private void OnResourceChanged(ResourceChangedEventArgs args)
     {
-        if (Player.Id != args.Player.Id)
+        if (Player == null || Player.Id != args.Player.Id)
             return;
 
         _resourcebar.SetNewValue(_playerResource.CurrentResource + args.ResourceChangeAmount, _playerResource.MaxResource);
@@ -103,6 +103,7 @@ public class UnitFrameUIHandler : MonoBehaviour
         }
         else 
         {
+            Player = null;
             AuraContainer.gameObject.SetActive(false);
             FrameParent.gameObject.SetActive(false);
         }

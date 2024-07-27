@@ -43,15 +43,10 @@ public class ActionSlot : MonoBehaviour, IDropHandler
             FlashActionSlot();
             if (Ability != null)
             {
-                if (target != null)
+                if (Ability.TryUseAbility(_player, target))
                 {
-                    if (Ability.TryUseAbility(_player, target))
-                    {
-                        _flashTime = Ability.AbilityInfo.CastTime - _flashTimePassed;
-                    }
+                    _flashTime = Ability.AbilityInfo.CastTime - _flashTimePassed;
                 }
-                else
-                    Logger.Log("No Target selected.");
             }
         }
         ResetActionSlotFlash();

@@ -22,8 +22,9 @@ MonoBehaviour:
     Range: 30
     Icon: {fileID: 21300000, guid: 9630d91883cce584fa74114783636a1d, type: 3}
     DamageType: 2
-    Damage: 20
+    Damage: 200
     ClassType: 2
+    AbilityType: 0
   TargetingType: 3
   NeedLineOfSight: 1
   NeedTargetInFront: 1

@@ -60,7 +60,7 @@ public abstract class AbilityBase : ScriptableObject
 
         CastManager.Instance.Remove(_ownerId);
         //check line of sight again
-        if (!IsInFront(owner.transform,target.transform) || !IsLineOfSight(owner.transform,target.transform))
+        if (AbilityInfo.AbilityType != AbilityType.AreaOfEffect  && (!IsInFront(owner.transform,target.transform) || !IsLineOfSight(owner.transform,target.transform)))
         {
             _wasInterrupted = true;
         }
@@ -72,7 +72,6 @@ public abstract class AbilityBase : ScriptableObject
 
             Use(owner, target);
         }
-       
     }
 
     private void WasInterrupted(int ownerId)
@@ -80,25 +79,10 @@ public abstract class AbilityBase : ScriptableObject
         if (_ownerId != ownerId) return;
         _wasInterrupted = true;
     }
-
     private bool CanBeUsed(Player owner, Player target)
     {
         bool canbeUse = true;
-        if (!IsInRange(owner.transform, target.transform))
-        {
-            UIEvents.OnShowInformationPopup.Invoke("Out of range");
-            return false;
-        }
-        if (!IsLineOfSight(owner.transform, target.transform))
-        {
-            UIEvents.OnShowInformationPopup.Invoke("Target not line of sight");
-            return false;
-        }
-        if (!IsInFront(owner.transform, target.transform))
-        {
-            UIEvents.OnShowInformationPopup.Invoke("Target is not in front of you");
-            return false;
-        }
+
         if (!IsCooldownReady(owner.Id)) 
         {
             UIEvents.OnShowInformationPopup.Invoke("This ability is not ready yet");
@@ -115,10 +99,36 @@ public abstract class AbilityBase : ScriptableObject
             UIEvents.OnShowInformationPopup.Invoke($"Not enough {ressourceName}");
             return false;
         }
+        //all checks for AoE abilities should be done at this point, so we can already return and use the ability which will select its own targets
+        //or none if none meets criteria, but it will go off anyways, similar to a frost nova in wow.
+        if (AbilityInfo.AbilityType == AbilityType.AreaOfEffect) 
+        {
+            return true;
+        }
+
+        if (target == null)
+        {
+            UIEvents.OnShowInformationPopup.Invoke("No valid Target selected");
+            return false;
+        }
+        if (!IsInRange(owner.transform, target.transform))
+        {
+            UIEvents.OnShowInformationPopup.Invoke("Out of range");
+            return false;
+        }
+        if (!IsLineOfSight(owner.transform, target.transform))
+        {
+            UIEvents.OnShowInformationPopup.Invoke("Target not line of sight");
+            return false;
+        }
+        if (!IsInFront(owner.transform, target.transform))
+        {
+            UIEvents.OnShowInformationPopup.Invoke("Target is not in front of you");
+            return false;
+        }
 
         return canbeUse;
     }
-
     private bool HasEnoughResource(Player owner)
     {
         var resComp = owner.GetComponent<PlayerResource>();
@@ -127,7 +137,6 @@ public abstract class AbilityBase : ScriptableObject
 
         return false;
     }
-
     private bool IsAlreadyCasting(int ownerId)
     {
         if (CastManager.Instance.Contains(ownerId, AbilityInfo.Name))
@@ -136,7 +145,6 @@ public abstract class AbilityBase : ScriptableObject
         }
         return false;
     }
-
     private bool IsCooldownReady(int ownerId)
     {
         var abilityWithOwner = new AbilityWithOwner(ownerId, AbilityInfo.Name);
@@ -154,15 +162,13 @@ public abstract class AbilityBase : ScriptableObject
             return false;
         }
     }
-
     private bool IsInFront(Transform owner, Transform target)
     {
         if (!NeedTargetInFront)
             return true;
         return PositionHelper.IsInFront(owner, target);
     }
-
-    private bool IsLineOfSight(Transform owner, Transform target)
+    internal bool IsLineOfSight(Transform owner, Transform target)
     {
         if (!NeedLineOfSight)
             return true;
@@ -184,7 +190,6 @@ public abstract class AbilityBase : ScriptableObject
 
         return true;
     }
-
     private bool IsInRange(Transform self, Transform target)
     {
         switch (TargetingType)
@@ -205,7 +210,6 @@ public abstract class AbilityBase : ScriptableObject
 
         return false;
     }
-
     protected abstract void Use(Player owner, Player target);
 }
 
@@ -227,4 +231,11 @@ public class AbilityInfo
     public float Damage;
 
     public CharacterClassType ClassType;
+    public AbilityType AbilityType;
+}
+
+public enum AbilityType
+{ 
+    Targeted,
+    AreaOfEffect
 }
