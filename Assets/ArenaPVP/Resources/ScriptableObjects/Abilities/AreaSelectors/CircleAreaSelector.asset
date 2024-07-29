@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fca151a8736743948891a9913987f4ca, type: 3}
   m_Name: CircleAreaSelector
   m_EditorClassIdentifier: 
-  _radius: 20
+  _radius: 10

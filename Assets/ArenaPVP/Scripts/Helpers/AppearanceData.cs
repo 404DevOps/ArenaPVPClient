@@ -1,12 +1,9 @@
 using Assets.ArenaPVP.Scripts.Models.Enums;
 using Assets.Scripts.Enums;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UI;
 
 [CreateAssetMenu(fileName = "ClassAppearanceData", menuName = "Appearance/ClassAppearanceData")]
 public class AppearanceData : ScriptableObject
@@ -80,6 +77,15 @@ public class AppearanceData : ScriptableObject
 
         throw new KeyNotFoundException(classType.ToString() + "does not exist in ClassRessourceDescriptors.");
     }
+    public ResourceType GetRessourceType(CharacterClassType classType)
+    {
+        if (_classRessourceDescriptor.Any(entry => entry.ClassType == classType))
+        {
+            return _classRessourceDescriptor.FirstOrDefault(entry => entry.ClassType == classType).ResourceType;
+        }
+
+        throw new KeyNotFoundException(classType.ToString() + "does not exist in ClassRessourceDescriptors.");
+    }
 }
 
     #region Collection Classes
@@ -113,6 +119,7 @@ public class FloatingTextColorPair
 public class ClassRessourceDescPair
 {
     public CharacterClassType ClassType;
+    public ResourceType ResourceType;
     public string Descriptor;
 }
 

@@ -60,14 +60,20 @@ MonoBehaviour:
     Color: {r: 0.036131967, g: 0.6792453, b: 0, a: 0}
   _classRessourceDescriptor:
   - ClassType: 1
+    ResourceType: 1
     Descriptor: Adrenaline
   - ClassType: 2
+    ResourceType: 0
     Descriptor: Mana
   - ClassType: 3
+    ResourceType: 0
     Descriptor: Mana
   - ClassType: 5
+    ResourceType: 0
     Descriptor: Mana
   - ClassType: 6
+    ResourceType: 3
     Descriptor: Energy
   - ClassType: 4
+    ResourceType: 2
     Descriptor: Focus

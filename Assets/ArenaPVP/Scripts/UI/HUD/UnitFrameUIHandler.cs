@@ -42,6 +42,7 @@ public class UnitFrameUIHandler : MonoBehaviour
         }
         GameEvents.OnPlayerHealthChanged.RemoveListener(OnHealthChanged);
         GameEvents.OnPlayerInitialized.RemoveListener(OnPlayerInitialized);
+        GameEvents.OnPlayerResourceChanged.RemoveListener(OnResourceChanged);
     }
 
     private void OnPlayerInitialized(Player player)

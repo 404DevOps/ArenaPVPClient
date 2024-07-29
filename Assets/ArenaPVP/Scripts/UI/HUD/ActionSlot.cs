@@ -53,9 +53,9 @@ public class ActionSlot : MonoBehaviour, IDropHandler
         ShowCooldown(_player.Id);
     }
 
-    private void StartCooldown(int owner, string abilityName)
+    private void StartCooldown(int ownerId, string abilityName)
     {
-        if (_player.Id == owner && Ability.AbilityInfo.Name == abilityName)
+        if (_player.Id == ownerId && Ability.AbilityInfo.Name == abilityName)
         {
             _isOnCooldown = true;
             Swipe.gameObject.SetActive(true);

@@ -16,7 +16,7 @@ MonoBehaviour:
     Name: Frost Nova
     Description: Conjures freezing Winds around the Player deals $DAMAGE$  magic
       Damage to Players struck and reduces their movement Speed by 20% for 10 seconds.
-    CastTime: 0
+    CastTime: 1
     Cooldown: 15
     ResourceCost: 20
     Range: 20
