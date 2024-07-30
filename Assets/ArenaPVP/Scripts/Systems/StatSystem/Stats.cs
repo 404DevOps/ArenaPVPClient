@@ -43,7 +43,7 @@ public class Stats
         }
 
     }
-    public float ResourceRegenerationSpeed
+    public float ResourceRegenerationRate
     {
         get
         {
@@ -51,7 +51,6 @@ public class Stats
             _mediator.PerformQuery(this, q);
             return q.Value;
         }
-
     }
     public float SpellResistance
     {
