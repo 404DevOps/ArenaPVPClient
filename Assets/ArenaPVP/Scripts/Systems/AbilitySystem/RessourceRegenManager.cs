@@ -33,7 +33,6 @@ public class RessourceRegenManager : MonoBehaviour
             {
                 GameEvents.OnPlayerResourceChanged.Invoke(new ResourceChangedEventArgs() { Player = entry.Key, ResourceChangeAmount = entry.Key.Stats.ResourceRegenerationRate });
             }
-            //Logger.Log("Resource Tick processed.");
             _timer = 0;
         }
     }

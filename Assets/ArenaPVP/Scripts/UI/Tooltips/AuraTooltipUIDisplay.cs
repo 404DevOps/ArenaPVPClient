@@ -15,8 +15,9 @@ public class AuraTooltipUIDisplay : TooltipBaseUIDisplay
 
     public void OnEnable()
     {
-        Name.text = AuraInfo.Aura.Name;
-        Description.text = AuraInfo.Aura.Description;
+        var aura = AbilityStorage.GetAura(AuraInfo.AuraId);
+        Name.text = aura.Name;
+        Description.text = aura.Description;
         TimeRemaining.text = AuraInfo.ExpiresInSec.ToString() + "sec remaining";
         StartCoroutine(WaitForFrame());
     }

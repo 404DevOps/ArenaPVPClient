@@ -36,6 +36,9 @@ public class ActionSlot : MonoBehaviour, IDropHandler
 
     private void Update()
     {
+        if (_player == null)
+            return;
+
         if (KeyBind.IsKeyUp())
         {
             var target = FindObjectOfType<TargetingSystem>().CurrentTarget?.GetComponent<Player>();
@@ -160,9 +163,9 @@ public class ActionSlot : MonoBehaviour, IDropHandler
         }
     }
 
-    private void OnEnable()
+    public void InitializeSlot(Player player)
     {
-        _player = FindObjectsOfType<Player>().First(p => p.IsOwnedByMe);
+        _player = player;
         _abilityDisplay = GetComponent<AbilityUIDisplay>();
         if (Ability != null)
         {
@@ -176,6 +179,7 @@ public class ActionSlot : MonoBehaviour, IDropHandler
         SetIcon();
         Swipe.fillAmount = 0;
     }
+
     public void OnDisable()
     {
         GameEvents.OnCooldownStarted.RemoveListener(StartCooldown);

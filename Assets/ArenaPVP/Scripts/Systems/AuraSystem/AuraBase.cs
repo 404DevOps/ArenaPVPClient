@@ -1,4 +1,5 @@
 using Assets.Scripts.Enums;
+using FishNet;
 using MonoFN.Cecil;
 using System;
 using System.Collections;
@@ -13,6 +14,7 @@ using Logger = Assets.Scripts.Helpers.Logger;
 [CreateAssetMenu(fileName = "NewAura", menuName = "Auras/New Aura")]
 public class AuraBase : ScriptableObject
 {
+    public int Id;
     public string Name;
     public string Description;
     public float Duration;
@@ -30,30 +32,32 @@ public class AuraBase : ScriptableObject
 
     public void Apply(Player owner, Player target) 
     {
-        switch (AuraTarget)
+        if (InstanceFinder.IsServerStarted)
         {
-            case AuraTargetType.Player:
-                _applyTo = owner;
-                break;
-            case AuraTargetType.Target:
-                _applyTo = target;
-                break;
-            default: throw new ArgumentOutOfRangeException();
-        }
-
-        var stackAmountBeforeApplyAura = AuraManager.Instance.GetStackAmount(_applyTo.Id, Name);
-
-        _auraId = AuraManager.Instance.AddAura(owner, _applyTo, this); //will stack if possible
-
-        if (stackAmountBeforeApplyAura < MaxStacks) 
-        {
-            foreach (var statMod in StatModifiers)
+            switch (AuraTarget)
             {
-                statMod.SourceAuraId = _auraId;
-                _applyTo.Stats.Mediator.AddModifier(statMod);
+                case AuraTargetType.Player:
+                    _applyTo = owner;
+                    break;
+                case AuraTargetType.Target:
+                    _applyTo = target;
+                    break;
+                default: throw new ArgumentOutOfRangeException();
+            }
+
+            var stackAmountBeforeApplyAura = AuraManager.Instance.GetStackAmount(_applyTo.Id, Id);
+
+            _auraId = AuraManager.Instance.AddAura(owner, _applyTo, this); //will stack if possible
+
+            if (stackAmountBeforeApplyAura < MaxStacks)
+            {
+                foreach (var statMod in StatModifiers)
+                {
+                    statMod.SourceAuraId = _auraId;
+                    _applyTo.Stats.Mediator.AddModifier(statMod);
+                }
             }
         }
-
     }
     public void Fade() 
     {

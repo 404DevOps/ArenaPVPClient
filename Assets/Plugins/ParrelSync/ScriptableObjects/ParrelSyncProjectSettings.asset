@@ -9,14 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 336b5dc8ee8485643a5ebb92c0c765f2, type: 3}
-  m_Name: CryomancerStats
+  m_Script: {fileID: 11500000, guid: c0011418c9d75434988a06b6df93b283, type: 3}
+  m_Name: ParrelSyncProjectSettings
   m_EditorClassIdentifier: 
-  AttackPower: 10
-  Spellpower: 50
-  Armor: 50
-  SpellResistance: 10
-  RessourceRegenerationRate: 10
-  MovementSpeed: 1
-  Health: 2500
-  Ressource: 4000
+  m_OptionalSymbolicLinkFolders: []

@@ -6,6 +6,10 @@ using System;
 using Unity.VisualScripting;
 using static UnityEngine.GraphicsBuffer;
 using GameKit.Dependencies.Utilities;
+using FishNet;
+using GameKit.Dependencies.Utilities.ObjectPooling.Examples;
+using FishNet.Object;
+using FishNet.Component.Transforming;
 
 public class ProjectileMove : MonoBehaviour
 {
@@ -34,17 +38,21 @@ public class ProjectileMove : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        MoveProjectile();
+        RotateProjectile();
+    }
+
+    private void MoveProjectile()
+    {
         _rb.velocity = MoveSpeed * transform.forward;
 
         _currentRotateSpeed += _rotateIncrement * Time.fixedDeltaTime;
         _currentRotateSpeed = Mathf.Min(_currentRotateSpeed, _rotateMaxSpeed);
-        if (Math.Abs(Vector3.Distance(transform.position, Target.transform.position)) < _minDistance) 
+        if (Math.Abs(Vector3.Distance(transform.position, Target.transform.position)) < _minDistance)
         {
             _currentRotateSpeed = _rotateMaxSpeed;
         }
-        RotateProjectile();
     }
-
     private void RotateProjectile()
     {
         var direction = Target.transform.position - transform.position;
@@ -57,11 +65,23 @@ public class ProjectileMove : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        //Logger.Log($"Collider ({other.transform.name}): " + other.GetComponent<Player>()?.Id + ", Target.Transform: " + Target.Id);
-        if (other.GetComponent<Player>()?.Id == Target.Id)
+        if (InstanceFinder.IsClientStarted)
         {
-            OnCollision?.Invoke();  
-            Destroy(gameObject);
-        }       
+            if (other.GetComponent<Player>()?.Id == Target.Id)
+            {
+                //Show VFX.
+                //Play Audio.
+            }
+        }
+        if (InstanceFinder.IsServerStarted)
+        {
+            if (other.GetComponent<Player>()?.Id == Target.Id)
+            {
+                OnCollision?.Invoke();
+                InstanceFinder.ServerManager.Despawn(gameObject);
+            }
+        }
+        //Logger.Log($"Collider ({other.transform.name}): " + other.GetComponent<Player>()?.Id + ", Target.Transform: " + Target.Id);
+      
     }
 }

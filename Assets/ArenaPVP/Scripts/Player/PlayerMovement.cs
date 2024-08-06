@@ -2,8 +2,10 @@ using System;
 using UnityEditorInternal;
 using Logger = Assets.Scripts.Helpers.Logger;
 using UnityEngine;
+using FishNet.Object;
+using FishNet.Connection;
 
-public class PlayerMovement: MonoBehaviour
+public class PlayerMovement: NetworkBehaviour
 {
     #region MovementVariables
 
@@ -34,22 +36,30 @@ public class PlayerMovement: MonoBehaviour
     //set by camera
     public bool steer;
 
-    // Start is called before the first frame update
-    void Awake()
+    public override void OnStartClient()
     {
-        _player = GetComponent<Player>();
-        if (!_player.IsOwnedByMe)
-            this.enabled = false;
+        base.OnStartClient();
+        if (base.IsOwner)
+        {
+            _player = GetComponent<Player>();
 
-        _characterController = GetComponent<CharacterController>();
-        _settings = FindObjectOfType<PlayerConfiguration>();
+            _characterController = GetComponent<CharacterController>();
+            _settings = FindObjectOfType<PlayerConfiguration>();
+            _controls = _settings.Settings.Controls;
+        }
+        else 
+        {
+            this.enabled = false;
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!_player.IsOwnedByMe)
+        if (!base.IsOwner)
             return;
+        //if (!base.IsOwner)
+        //    return;
 
         HandleCameraSteer();
        
@@ -83,7 +93,10 @@ public class PlayerMovement: MonoBehaviour
 
     private void FixedUpdate()
     {
-      _characterController.Move(new Vector3(_currentDirection.x * _walkSpeed, _velocityY, _currentDirection.z * _walkSpeed) * Time.deltaTime * _player.Stats.MovementSpeed);  
+        if (!base.IsOwner)
+            return;
+
+        _characterController.Move(new Vector3(_currentDirection.x * _walkSpeed, _velocityY, _currentDirection.z * _walkSpeed) * Time.deltaTime * _player.Stats.MovementSpeed);  
     }
 
     private void HandleJump()

@@ -7,7 +7,7 @@ public struct HealthChangedEventArgs
     public Player Player;
     public Player Source;
 
-    public AbilityBase Ability;
+    public int AbilityId;
 
     public float HealthChangeAmount;
     public HealthChangeType HealthChangeType;

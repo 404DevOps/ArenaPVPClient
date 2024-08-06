@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9da4e43a7d07ade4e934602626fa10a3, type: 3}
   m_Name: ColdStreak
   m_EditorClassIdentifier: 
+  Id: 10001
   Name: Cold Streak
   Description: Increases your Spell Damage by 20%
   Duration: 5
@@ -19,7 +20,7 @@ MonoBehaviour:
   Icon: {fileID: 21300000, guid: eb5bc873b3a0d154f8fea04279ae69b4, type: 3}
   AuraType: 4
   StatModifiers:
-  - SourceAuraId: 34
+  - SourceAuraId: 18
     _statType: 1
     _operatorType: 1
     _value: 0.2

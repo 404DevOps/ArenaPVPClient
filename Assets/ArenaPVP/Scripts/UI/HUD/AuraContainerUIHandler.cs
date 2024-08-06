@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Logger = Assets.Scripts.Helpers.Logger;
 
 public class AuraContainerUIHandler : MonoBehaviour
 {
@@ -44,13 +45,15 @@ public class AuraContainerUIHandler : MonoBehaviour
         if (ownerId != OwnerId)
             return;
 
-        RemoveAura(aura.AuraId);
+        RemoveAura(aura.AuraInstanceId);
     }
 
     private void OnAuraApplied(int ownerId, AuraInfo aura)
     {
         if (ownerId != OwnerId)
             return;
+
+        Logger.Log("On Aura Applied called.");
 
         AddAura(aura);
     }
@@ -60,7 +63,7 @@ public class AuraContainerUIHandler : MonoBehaviour
         for (int i = 0; i < AuraGrid.childCount; i++)
         {
             var auraDisplays = AuraGrid.GetChild(i).GetComponent<AuraDisplay>();
-            if (auraDisplays.AuraInfo.AuraId == auraId)
+            if (auraDisplays.AuraInfo.AuraInstanceId == auraId)
             {
                 Destroy(auraDisplays.gameObject);
             }

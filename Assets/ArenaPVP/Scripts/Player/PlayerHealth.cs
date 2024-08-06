@@ -1,37 +1,40 @@
+using FishNet.CodeGenerating;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Logger = Assets.Scripts.Helpers.Logger;
 
-public class PlayerHealth : MonoBehaviour
+public class PlayerHealth : NetworkBehaviour
 {
-    public float MaxHealth;
-    public float CurrentHealth;
+    [SerializeField][AllowMutableSyncType] public  SyncVar<float> MaxHealth = new SyncVar<float>();
+    [SerializeField][AllowMutableSyncType] public  SyncVar<float> CurrentHealth = new SyncVar<float>();
 
     public Player Player;
 
-    public void OnHealthChanged(HealthChangedEventArgs args) //Player player, float healthChange)
+    [Server]
+    public void UpdateHealthServer(HealthChangedEventArgs args)
     {
-        if (args.Player.Id != Player.Id)
-            return;
+        Logger.Log("UpdateHealth Server called.");
 
-        CurrentHealth += args.HealthChangeAmount;
-        if(CurrentHealth > MaxHealth)
-            CurrentHealth = MaxHealth;
+        CurrentHealth.Value += args.HealthChangeAmount;
+        if (CurrentHealth.Value > MaxHealth.Value)
+            CurrentHealth.Value = MaxHealth.Value;
+
+        HealthUpdated(args);
     }
 
-    private void OnEnable()
+    [ObserversRpc]
+    public void HealthUpdated(HealthChangedEventArgs args)
+    {
+        GameEvents.OnPlayerHealthChanged.Invoke(args);
+    }
+
+    private void Awake()
     {
         Player = GetComponent<Player>();
-        MaxHealth = Player.Stats.Health;
-        CurrentHealth = Player.Stats.Health;
-        GameEvents.OnPlayerHealthChanged.AddListener(OnHealthChanged);
-    }
-    private void OnDisable()
-    {
-        GameEvents.OnPlayerHealthChanged.AddListener(OnHealthChanged);
-    }
-    void Update()
-    {
-        
+        MaxHealth.Value = Player.Stats.Health;
+        CurrentHealth.Value = Player.Stats.Health;
     }
 }

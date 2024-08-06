@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19acb3430314c2a4684573360bbbbce6, type: 3}
   m_Name: Frostbolt
   m_EditorClassIdentifier: 
+  Id: 11001
   AbilityInfo:
     Name: Frostbolt
     Description: Hurls a bolt of Ice towards the Target, dealing $DAMAGE$ spell damage

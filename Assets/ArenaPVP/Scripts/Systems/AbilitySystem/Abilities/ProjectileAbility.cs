@@ -1,3 +1,5 @@
+using FishNet;
+using FishNet.Object;
 using GameKit.Dependencies.Utilities.ObjectPooling.Examples;
 using UnityEngine;
 using Logger = Assets.Scripts.Helpers.Logger;
@@ -9,7 +11,6 @@ public class ProjectileAbility : AbilityBase
     public AuraBase[] ApplyAuras;
     private Player _target;
     private Player _owner;
-
 
     private GameObject _projectile;
 
@@ -32,30 +33,33 @@ public class ProjectileAbility : AbilityBase
         projectileScript.OnCollision += OnCollision;
         _projectile.transform.SetParent(null);
         _projectile.SetActive(true);
+        InstanceFinder.ServerManager.Spawn(_projectile);
         Destroy(gO);
     }
+
     public void OnCollision()
     {
-        var projectileScript = _projectile.GetComponent<ProjectileMove>();
-        projectileScript.OnCollision -= OnCollision;
-
-        var args = new HealthChangedEventArgs()
+        if (InstanceFinder.IsServerStarted) 
         {
-            Player = _target.GetComponent<Player>(),
-            Source = _owner.GetComponent<Player>(),
-            HealthChangeAmount = -DamageCalculator.CalculateDamage(_owner, _target, this),
-            HealthChangeType = HealthChangeType.Damage, 
-            DamageType = AbilityInfo.DamageType,
-            Ability = this
-        };
+            var projectileScript = _projectile.GetComponent<ProjectileMove>();
+            projectileScript.OnCollision -= OnCollision;
 
-        foreach (var aura in ApplyAuras)
-        {
-            aura.Apply(_owner, _target);
+            var args = new HealthChangedEventArgs()
+            {
+                Player = _target.GetComponent<Player>(),
+                Source = _owner.GetComponent<Player>(),
+                HealthChangeAmount = -DamageCalculator.CalculateDamage(_owner, _target, this),
+                HealthChangeType = HealthChangeType.Damage,
+                DamageType = AbilityInfo.DamageType,
+                AbilityId = this.Id
+            };
+
+            foreach (var aura in ApplyAuras)
+            {
+                aura.Apply(_owner, _target);
+            }
+
+            _target.GetComponent<PlayerHealth>().UpdateHealthServer(args);
         }
-
-        GameEvents.OnPlayerHealthChanged.Invoke(args);
-
-
     }
 }

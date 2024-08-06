@@ -1,19 +1,15 @@
+using Assets.ArenaPVP.Scripts.Helpers;
 using Assets.Scripts.Enums;
-using Logger = Assets.Scripts.Helpers.Logger;
+using GameKit.Dependencies.Utilities;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using Assets.ArenaPVP.Scripts.Helpers;
-using GameKit.Dependencies.Utilities;
-using FishNet.Editing;
-using static UnityEngine.GraphicsBuffer;
-using static UnityEngine.UI.GridLayoutGroup;
-using System.Threading;
+using Logger = Assets.Scripts.Helpers.Logger;
 
 [Serializable]
 public abstract class AbilityBase : ScriptableObject
 {
+    public int Id;
     public AbilityInfo AbilityInfo;
     public AbilityTargetType TargetingType;
 
@@ -216,7 +212,6 @@ public abstract class AbilityBase : ScriptableObject
 [Serializable]
 public class AbilityInfo 
 {
-    public string Id => Guid.NewGuid().ToString();
     public string Name;
     [TextArea]
     public string Description;

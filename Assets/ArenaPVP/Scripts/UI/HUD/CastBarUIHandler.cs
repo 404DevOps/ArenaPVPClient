@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,25 +16,36 @@ public class CastBarUIHandler : MonoBehaviour
     [SerializeField] TextMeshProUGUI AbilityNameText;
     [SerializeField] Color CastbarColor;
 
-    public AbilityBase _ability;
-    public Player player;
+    public AbilityBase Ability;
+    public Player Player;
 
     private bool _isCasting;
     [SerializeField] private bool _isMainCastBar;
 
     // Start is called before the first frame update
+
+
     private void OnEnable()
     {
-        if (_isMainCastBar)
-            player = FindObjectsOfType<Player>().First(p => p.IsOwnedByMe);
-        else 
-        {
-            player = GetComponentInParent<NameplateUIHandler>().Player;
-        }
+        GameEvents.OnPlayerInitialized.AddListener(OnPlayerInitialized);
         GameEvents.OnCastStarted.AddListener(OnCastStarted);
         GameEvents.OnCastInterrupted.AddListener(OnCastInterrupted);
-        GameEvents.OnCastCompleted.AddListener(OnCastCompleted);
+        GameEvents.OnCastCompleted.AddListener(OnCastCompleted); 
     }
+
+    private void OnPlayerInitialized(Player player)
+    {
+        if (_isMainCastBar) 
+        {
+            if(player.IsOwnedByMe)
+                Player = player;
+        }    
+        else
+        {
+            Player = GetComponentInParent<NameplateUIHandler>().Player;
+        }
+    }
+
     private void OnDisable()
     {
         _isCasting = false;
@@ -44,22 +56,22 @@ public class CastBarUIHandler : MonoBehaviour
 
     public void OnCastStarted(int ownerId, AbilityBase ability)
     {
-        if (ownerId != player.Id)
+        if (ownerId != Player.Id)
             return;
 
-        this._ability = ability;
+        this.Ability = ability;
         Fill.fillAmount = 0;
         Fill.color = CastbarColor;
-        Icon.sprite = _ability.AbilityInfo.Icon;
-        AbilityNameText.text = _ability.AbilityInfo.Name;
+        Icon.sprite = Ability.AbilityInfo.Icon;
+        AbilityNameText.text = Ability.AbilityInfo.Name;
         CurrentCastTime.text = "0";
-        MaxCastTime.text = "/ " + _ability.AbilityInfo.CastTime.ToString();
+        MaxCastTime.text = "/ " + Ability.AbilityInfo.CastTime.ToString();
         _isCasting = true;
         CastBarParent.SetActive(true);
     }
     public void OnCastInterrupted(int ownerId)
     {
-        if (ownerId != player.Id)
+        if (ownerId != Player.Id)
             return;
 
         Fill.fillAmount = 1;
@@ -70,13 +82,13 @@ public class CastBarUIHandler : MonoBehaviour
     }
     public void OnCastCompleted(int ownerId)
     {
-        if (ownerId != player.Id)
+        if (ownerId != Player.Id)
             return;
 
         Fill.fillAmount = 1;
         Fill.color = Color.green;
         AbilityNameText.text = "Complete";
-        CurrentCastTime.text = _ability?.AbilityInfo?.CastTime.ToString("0.0");
+        CurrentCastTime.text = Ability?.AbilityInfo?.CastTime.ToString("0.0");
         StartCoroutine(SetInvisibleAfterTime(0.3f));
     }
 
@@ -84,20 +96,20 @@ public class CastBarUIHandler : MonoBehaviour
     {
         yield return new WaitForSeconds(seconds);
         _isCasting = false;
-        _ability = null;
+        Ability = null;
         CastBarParent.SetActive(false);
     }
 
     void Update()
     {
-        if (_ability != null)
+        if (Ability != null)
         {
             if (_isCasting)
             {
-                float timeSinceCastStart = CastManager.Instance.TimeSinceCastStarted(player.Id, _ability.AbilityInfo.Name);
+                float timeSinceCastStart = CastManager.Instance.TimeSinceCastStarted(Player.Id, Ability.AbilityInfo.Name);
                 if (timeSinceCastStart > 0)
                 {
-                    var percentage = timeSinceCastStart / _ability.AbilityInfo.CastTime;
+                    var percentage = timeSinceCastStart / Ability.AbilityInfo.CastTime;
                     Fill.fillAmount = percentage;
                     CurrentCastTime.text = timeSinceCastStart.ToString("0.0");
                 }

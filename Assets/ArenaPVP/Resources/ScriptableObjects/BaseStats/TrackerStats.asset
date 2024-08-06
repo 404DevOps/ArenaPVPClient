@@ -16,7 +16,7 @@ MonoBehaviour:
   Spellpower: 500
   Armor: 100
   SpellResistance: 0.2
-  RessourceRegenerationRate: 0
+  RessourceRegenerationRate: 5
   MovementSpeed: 1
   Health: 2800
   Ressource: 3000

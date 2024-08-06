@@ -2,6 +2,7 @@ using Assets.Scripts.Enums;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CameraController: MonoBehaviour
@@ -23,41 +24,55 @@ public class CameraController: MonoBehaviour
     public float currentPan, currentTilt = 10, currentDistance = 7;
 
 
-    float dragThreshold = 10f;
+    float _dragThreshold = 10f;
     [HideInInspector]
     public bool isDragging = false;
-    Vector3 startDragPosition;
+    Vector3 _startDragPosition;
 
     //references
-    [SerializeField] private Transform playerTransform;
-    private PlayerMovement player;
+    [SerializeField] private Transform _playerTransform;
+    private PlayerMovement _player;
     public Transform Tilt;
     Camera mainCam;
 
-    private bool isCamLocked;
+    private bool _isCamLocked;
 
     // Start is called before the first frame update
-    void Start()
+
+
+    void OnPlayerInitialized(Player player)
     {
-        mainCam = Camera.main;
-        player = playerTransform.GetComponent<PlayerMovement>();
-        player.mainCam = this;
+        if (player.IsOwnedByMe)
+        {
+            mainCam = Camera.main;
+            _playerTransform = player.transform;
+            _player = player.GetComponent<PlayerMovement>();
+            _player.mainCam = this;
 
-        transform.position = playerTransform.position + Vector3.up * CameraHeight;
-        transform.rotation = playerTransform.rotation;
+            transform.position = _playerTransform.position + Vector3.up * CameraHeight;
+            transform.rotation = _playerTransform.rotation;
 
-        Tilt.eulerAngles = new Vector3(currentTilt, transform.eulerAngles.y, transform.eulerAngles.z);
-        mainCam.transform.position += Tilt.forward * -currentDistance;
+            Tilt.eulerAngles = new Vector3(currentTilt, transform.eulerAngles.y, transform.eulerAngles.z);
+            mainCam.transform.position += Tilt.forward * -currentDistance;
+
+            GameEvents.OnPlayerInitialized.RemoveListener(OnPlayerInitialized);
+        }
     }
 
     public void Update()
     {
+        if (_player == null)
+            return;
+
         SetCamState();
         CameraRotation();
 
     }
     public void LateUpdate()
     {
+        if (_player == null)
+            return;
+
         CameraTransform();
     }
     public void SetCamState()
@@ -67,7 +82,7 @@ public class CameraController: MonoBehaviour
 
         if (Input.GetKey(leftMouse) && Input.GetKey(rightMouse))
             newState = CameraState.Run;
-        else if (Input.GetKey(leftMouse) && !isCamLocked)
+        else if (Input.GetKey(leftMouse) && !_isCamLocked)
             newState = CameraState.Rotate;
         else if (Input.GetKey(rightMouse))
             newState = CameraState.Steer;
@@ -82,19 +97,19 @@ public class CameraController: MonoBehaviour
             {
                 if (previousState == CameraState.None)
                 {
-                    startDragPosition = Input.mousePosition;
+                    _startDragPosition = Input.mousePosition;
                 }
-                if (Vector3.Distance(Input.mousePosition, startDragPosition) > dragThreshold)
+                if (Vector3.Distance(Input.mousePosition, _startDragPosition) > _dragThreshold)
                 { 
                     isDragging = true;
                 }
 
                 currentPan += Input.GetAxis("Mouse X") * CameraSpeed;
-                player.steer = false;
+                _player.steer = false;
             }
             else
             {
-                player.steer = true;
+                _player.steer = true;
             } 
 
             currentTilt -= Input.GetAxis("Mouse Y") * CameraSpeed;
@@ -103,10 +118,10 @@ public class CameraController: MonoBehaviour
         else  //when its none
         {
             isDragging = false;
-            player.steer = false;
+            _player.steer = false;
         }
 
-        if (isCamLocked)
+        if (_isCamLocked)
             return;
 
         currentDistance -= Input.GetAxis("Mouse ScrollWheel") * 2;
@@ -117,7 +132,7 @@ public class CameraController: MonoBehaviour
         switch (State)
         {
             case CameraState.None: //rotate back when state is none
-                var signedAngle = Vector3.SignedAngle(player.transform.forward, transform.forward, Vector3.up);
+                var signedAngle = Vector3.SignedAngle(_player.transform.forward, transform.forward, Vector3.up);
                 if (Mathf.Round(signedAngle) > 0)
                     currentPan -= camAutoPanSpeed * Mathf.Abs(signedAngle) * Time.deltaTime;
                 if (Mathf.Round(signedAngle) < 0)
@@ -130,9 +145,9 @@ public class CameraController: MonoBehaviour
                 //rotate when start running.
                 if (previousState == CameraState.Rotate && State == CameraState.Run)
                 { 
-                    playerTransform.transform.eulerAngles = new Vector3(playerTransform.eulerAngles.x, currentPan, playerTransform.eulerAngles.z);
+                    _playerTransform.transform.eulerAngles = new Vector3(_playerTransform.eulerAngles.x, currentPan, _playerTransform.eulerAngles.z);
                 }
-                currentPan = playerTransform.eulerAngles.y;
+                currentPan = _playerTransform.eulerAngles.y;
                 break;
             case CameraState.Rotate:
                 Cursor.visible = false;
@@ -141,7 +156,7 @@ public class CameraController: MonoBehaviour
                 break;
         }
 
-        transform.position = playerTransform.position + Vector3.up * CameraHeight;
+        transform.position = _playerTransform.position + Vector3.up * CameraHeight;
         transform.eulerAngles = new Vector3(transform.eulerAngles.x, currentPan, 0);
         Tilt.eulerAngles = new Vector3(currentTilt, transform.eulerAngles.y, 0);
         mainCam.transform.position = transform.position + Tilt.forward * -currentDistance;
@@ -149,6 +164,7 @@ public class CameraController: MonoBehaviour
 
     private void OnEnable()
     {
+        GameEvents.OnPlayerInitialized.AddListener(OnPlayerInitialized);
         UIEvents.OnAbilityDrag.AddListener(SetCamLock);
         UIEvents.OnMainMenuOpen.AddListener(SetCamLock);
     }
@@ -160,6 +176,6 @@ public class CameraController: MonoBehaviour
 
     void SetCamLock(bool isLock)
     {
-        isCamLocked = isLock;
+        _isCamLocked = isLock;
     }
 }

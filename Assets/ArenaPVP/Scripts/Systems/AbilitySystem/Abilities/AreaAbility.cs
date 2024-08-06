@@ -43,7 +43,7 @@ public class AreaAbility : AbilityBase
             HealthChangeAmount = -DamageCalculator.CalculateDamage(_owner, target, this),
             HealthChangeType = HealthChangeType.Damage,
             DamageType = AbilityInfo.DamageType,
-            Ability = this
+            AbilityId = Id
         };
 
         foreach (var aura in ApplyAuras)

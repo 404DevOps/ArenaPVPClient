@@ -8,10 +8,10 @@ using UnityEngine;
 public class Targetable : MonoBehaviour
 {
     [SerializeField]
-    public bool isSelf = false;
+    public bool IsSelf = false;
     public void Start()
     {
-        isSelf = GetComponent<Player>().IsOwnedByMe;
+        IsSelf = GetComponent<Player>().IsOwnedByMe;
     }
 
     public void Select()

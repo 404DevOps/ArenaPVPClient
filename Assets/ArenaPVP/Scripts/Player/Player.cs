@@ -1,9 +1,12 @@
 using Assets.Scripts.Enums;
+using FishNet.Object;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using FishNet.Object;
+using FishNet.Connection;
 
-public class Player : MonoBehaviour
+public class Player : NetworkBehaviour
 {
     public string Name;
     public bool IsOwnedByMe;
@@ -19,11 +22,14 @@ public class Player : MonoBehaviour
         baseStats = ClassStatMapping.Instance().GetBaseStats(ClassType);
         Stats = new Stats(new StatsMediator(), baseStats);
     }
-    
 
-    private void OnEnable()
+    public override void OnStartClient()
     {
+        base.OnStartClient();
+
         Id = IdentifierService.GetPlayerId();
+        IsOwnedByMe = this.IsOwner;
         GameEvents.OnPlayerInitialized.Invoke(this);
+        GetComponent<Targetable>().IsSelf =  this.IsOwner;
     }
 }

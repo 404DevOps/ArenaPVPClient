@@ -13,55 +13,61 @@ public class TargetingSystem : MonoBehaviour
 {
     [SerializeField]
     public Targetable CurrentTarget;
-
-
-    private List<Targetable> targetClosedList;
-    private Targetable previousTarget;
     public float searchRadius = 30f;
 
-    private Controls controls;
-    private Camera mainCam;
-    private Player player;
-    private CameraController camController;
-    private PlayerConfiguration playerSettings;
-    private bool isMenuOpen;
-    private bool isClickTargetLocked;
+
+    private List<Targetable> _targetClosedList;
+    private Targetable _previousTarget;
+
+    private Controls _controls;
+    private Camera _mainCam;
+    private Player _player;
+    private CameraController _camController;
+    private PlayerConfiguration _playerSettings;
+    private bool _isMenuOpen;
+    private bool _isClickTargetLocked;
 
     // Start is called before the first frame update
-    void Start()
+    void OnPlayerInitialized(Player player)
     {
-        player = FindObjectsByType<Player>(FindObjectsSortMode.None).First(x => x.IsOwnedByMe);
-        targetClosedList = new();
-        mainCam = Camera.main;
-        camController = mainCam.GetComponentInParent<CameraController>();
+        if (player.IsOwnedByMe)
+        {
+            _player = player;
+            _targetClosedList = new();
+            _mainCam = Camera.main;
+            _camController = _mainCam.GetComponentInParent<CameraController>();
+        }
     }
     public void ReloadControls()
     {
-        playerSettings = PlayerConfiguration.Instance;
-        controls = playerSettings.Settings.Controls;
+        _playerSettings = PlayerConfiguration.Instance;
+        _controls = _playerSettings.Settings.Controls;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (isMenuOpen)
+        if (_player == null)
+            return;
+        if (_isMenuOpen)
             return;
 
+
         //targetEnemy with tab
-        if (controls.targetNext.IsKeyDown())
+        if (_controls.targetNext.IsKeyDown())
         {
             //target nearest to 
             var nextTarget = GetNextTabTarget();
             DoSelectTarget(nextTarget, false);
         }
         //targetSelf
-        if (controls.targetSelf.IsKeyDown())
+        if (_controls.targetSelf.IsKeyDown())
         {
-            var self = FindObjectsOfType<Targetable>().Where(t => t.isSelf).First();
+            var self = FindObjectsOfType<Targetable>().Where(t => t.IsSelf).First();
             DoSelectTarget(self, true);
         }
         //target with leftMouse
-        if (!isClickTargetLocked) {
+        if (!_isClickTargetLocked) {
             if (Input.GetKeyUp(KeyCode.Mouse0) && MouseNotUsedByCam())
             {
                 Debug.Log("GetTarget");
@@ -75,7 +81,7 @@ public class TargetingSystem : MonoBehaviour
             {
                 CurrentTarget.Unselect();
                 CurrentTarget = null;
-                targetClosedList.Clear();
+                _targetClosedList.Clear();
             }
             UIEvents.OnTargetChanged.Invoke(null);
         }
@@ -83,7 +89,7 @@ public class TargetingSystem : MonoBehaviour
 
     private void GetTargetUnderMouse()
     {
-        var ray = mainCam.ScreenPointToRay(Input.mousePosition);
+        var ray = _mainCam.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hitInfo))
         {
             var tar = hitInfo.collider.gameObject.GetComponentInParent<Targetable>();
@@ -97,44 +103,44 @@ public class TargetingSystem : MonoBehaviour
     private bool MouseNotUsedByCam()
     {
         return
-            !camController.isDragging &&
-            (camController.State == CameraState.None || camController.State == CameraState.Rotate) &&
-            (camController.previousState != CameraState.Run || camController.previousState == CameraState.Steer);
+            !_camController.isDragging &&
+            (_camController.State == CameraState.None || _camController.State == CameraState.Rotate) &&
+            (_camController.previousState != CameraState.Run || _camController.previousState == CameraState.Steer);
     }
 
     private void DoSelectTarget(Targetable target, bool clearClosedList)
     {
         if (clearClosedList)
         {
-            targetClosedList.Clear();
+            _targetClosedList.Clear();
         }
         if (target != null)
         {
-            previousTarget = CurrentTarget;
-            targetClosedList.Add(target);
+            _previousTarget = CurrentTarget;
+            _targetClosedList.Add(target);
             CurrentTarget = target;
             target.Select();
             var player = target.GetComponent<Player>();
             UIEvents.OnTargetChanged.Invoke(player);
 
         }
-        if (CurrentTarget != previousTarget && previousTarget != null)
+        if (CurrentTarget != _previousTarget && _previousTarget != null)
         {
-            previousTarget.Unselect();
+            _previousTarget.Unselect();
         }
     }
 
     private Targetable GetNextTabTarget()
     {
-        var possibleTargets = FindObjectsByType<Targetable>(FindObjectsSortMode.None).Where(t => PositionHelper.IsInFront(mainCam.transform, t.transform, searchRadius) && !t.isSelf).ToList();
+        var possibleTargets = FindObjectsByType<Targetable>(FindObjectsSortMode.None).Where(t => PositionHelper.IsInFront(_mainCam.transform, t.transform, searchRadius) && !t.IsSelf).ToList();
 
-        if (targetClosedList.Count >= possibleTargets.Count)
-            targetClosedList.Clear();
+        if (_targetClosedList.Count >= possibleTargets.Count)
+            _targetClosedList.Clear();
 
-        var untappedTargets = possibleTargets.Where(t => !targetClosedList.Contains(t)).ToList();
+        var untappedTargets = possibleTargets.Where(t => !_targetClosedList.Contains(t)).ToList();
         if (!untappedTargets.Any())
         {
-            targetClosedList.Clear();
+            _targetClosedList.Clear();
         }
         else 
         {
@@ -153,14 +159,14 @@ public class TargetingSystem : MonoBehaviour
         }
 
         Debug.Log("None found, default Target returned.");
-        targetClosedList.Clear();
+        _targetClosedList.Clear();
         return null;
     }
 
     private Targetable GetClosestTarget(List<Targetable> possibleTargets)
     {
         var orderedTargets = possibleTargets.OrderBy(t => GetDistance(t.transform));
-        var targetsInFrontOfPlayer = orderedTargets.Where(t => PositionHelper.IsInFront(player.transform, t.transform, searchRadius));
+        var targetsInFrontOfPlayer = orderedTargets.Where(t => PositionHelper.IsInFront(_player.transform, t.transform, searchRadius));
         if(targetsInFrontOfPlayer.Any())
             return targetsInFrontOfPlayer.First();
         else if(orderedTargets.Any())
@@ -171,13 +177,14 @@ public class TargetingSystem : MonoBehaviour
 
     private float GetDistance(Transform transform)
     { 
-        var screenPointOfTransform = mainCam.WorldToViewportPoint(transform.position);
+        var screenPointOfTransform = _mainCam.WorldToViewportPoint(transform.position);
         screenPointOfTransform.z = 0; //remove distance from camera as parameter
         return Vector3.Distance(screenPointOfTransform, new Vector3(0.5f, 0.5f, 0));
     }
 
     private void OnEnable()
     {
+        GameEvents.OnPlayerInitialized.AddListener(OnPlayerInitialized);
         UIEvents.OnSettingsLoaded.AddListener(ReloadControls);
         UIEvents.OnAbilityDrag.AddListener(SetTargetLock);
         UIEvents.OnMainMenuOpen.AddListener(SetMenuOpen);
@@ -190,10 +197,10 @@ public class TargetingSystem : MonoBehaviour
     }
     private void SetTargetLock(bool isLock)
     {
-        isClickTargetLocked = isLock;
+        _isClickTargetLocked = isLock;
     }
     private void SetMenuOpen(bool isOpen)
     {
-        isMenuOpen = isOpen;  
+        _isMenuOpen = isOpen;  
     }
 }

@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 795a738337c818840a2c004abc5680a3, type: 3}
   m_Name: Frost Nova
   m_EditorClassIdentifier: 
+  Id: 11000
   AbilityInfo:
     Name: Frost Nova
     Description: Conjures freezing Winds around the Player deals $DAMAGE$  magic

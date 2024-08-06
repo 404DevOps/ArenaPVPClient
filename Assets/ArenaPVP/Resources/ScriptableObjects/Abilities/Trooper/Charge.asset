@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31e6eee791fac8b46987e6d6991a6ae0, type: 3}
   m_Name: Charge
   m_EditorClassIdentifier: 
+  Id: 12000
   AbilityInfo:
     Name: Charge
     Description: 'Charge to an enemy, dealing (21% of Attack power) Physical damage,
@@ -25,7 +26,10 @@ MonoBehaviour:
     ResourceCost: 5
     Range: 20
     Icon: {fileID: 21300000, guid: bc894b40f78a8124480df3a9a3f41f33, type: 3}
+    DamageType: 0
+    Damage: 0
     ClassType: 1
+    AbilityType: 0
   TargetingType: 3
   NeedLineOfSight: 1
   NeedTargetInFront: 1

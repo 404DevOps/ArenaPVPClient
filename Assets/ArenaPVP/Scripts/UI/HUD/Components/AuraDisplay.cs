@@ -1,4 +1,5 @@
 using Assets.ArenaPVP.Scripts.Enums;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -21,9 +22,10 @@ public class AuraDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     public void OnEnable()
     {
-        AuraIcon.sprite = AuraInfo.Aura.Icon;
-        AuraIconDark.sprite = AuraInfo.Aura.Icon;
-        AuraBorder.color = AuraInfo.Aura.isDebuff ? Color.red : Color.green;
+        var aura = AbilityStorage.GetAura(AuraInfo.AuraId);
+        AuraIcon.sprite = aura.Icon;
+        AuraIconDark.sprite = aura.Icon;
+        AuraBorder.color = aura.isDebuff ? Color.red : Color.green;
         StackAmountText.gameObject.SetActive(false);
     }
 
@@ -40,7 +42,7 @@ public class AuraDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             }
         }
 
-        _expiresIn = AuraManager.Instance.GetRemainingAuraDuration(AuraInfo.AppliedTo.Id, AuraInfo.AuraId);
+        _expiresIn = AuraManager.Instance.GetRemainingAuraDuration(AuraInfo.AppliedTo.Id, AuraInfo.AuraInstanceId);
         _stackAmount = AuraManager.Instance.GetStackAmount(AuraInfo.AppliedTo.Id, AuraInfo.AuraId);
     }
 
@@ -48,7 +50,7 @@ public class AuraDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     {
         if (_expiresIn >= 0)
         {
-            var percentage = _expiresIn / AuraInfo.Aura.Duration;
+            var percentage = _expiresIn / AuraInfo.Duration;
             AuraIcon.fillAmount = percentage;
         }
         if (_expiresIn <= 3)

@@ -19,7 +19,7 @@ public class NameplateUIHandler : MonoBehaviour
         GameEvents.OnPlayerHealthChanged.AddListener(OnHealthChanged);
 
         _healthbar = GetComponentInChildren<Healthbar>();
-        _healthbar.InitializeBar(Player.ClassType, _playerHealth.CurrentHealth, _playerHealth.MaxHealth);
+        _healthbar.InitializeBar(Player.ClassType, _playerHealth.CurrentHealth.Value, _playerHealth.MaxHealth.Value);
 
         if (Player.IsOwnedByMe)
             Destroy(CastbarParent.gameObject);
@@ -34,6 +34,6 @@ public class NameplateUIHandler : MonoBehaviour
         if (args.Player.Id != Player.Id)
             return;
 
-        _healthbar.SetNewHealth(_playerHealth.CurrentHealth, _playerHealth.MaxHealth);
+        _healthbar.SetNewHealth(_playerHealth.CurrentHealth.Value, _playerHealth.MaxHealth.Value);
     }
 }

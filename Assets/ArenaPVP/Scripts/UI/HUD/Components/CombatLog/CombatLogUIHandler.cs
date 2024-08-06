@@ -27,7 +27,8 @@ public class CombatLogUIHandler : MonoBehaviour
 
     private void OnAuraExpired(int target, AuraInfo aura)
     {
-        var str = $"{aura.AppliedBy.Name}'s {aura.Aura.Name} Aura has expired on {aura.AppliedTo.Name}.";
+        var auraName = AbilityStorage.GetAura(aura.AuraId).Name;
+        var str = $"{aura.AppliedBy.Name}'s {auraName} Aura has expired on {aura.AppliedTo.Name}.";
         var color = GetAuraTextColor(aura);
         InstantiateText(str, color);
         //throw new NotImplementedException();
@@ -35,7 +36,8 @@ public class CombatLogUIHandler : MonoBehaviour
 
     private void OnAuraApplied(int target, AuraInfo aura)
     {
-        var str = $"{aura.AppliedBy.Name}'s {aura.Aura.Name} Aura has been applied to {aura.AppliedTo.Name}.";
+        var auraName = AbilityStorage.GetAura(aura.AuraId).Name;
+        var str = $"{aura.AppliedBy.Name}'s {auraName} Aura has been applied to {aura.AppliedTo.Name}.";
         var color = GetAuraTextColor(aura);
         InstantiateText(str, color);
         //throw new NotImplementedException();
@@ -43,8 +45,9 @@ public class CombatLogUIHandler : MonoBehaviour
 
     private void OnPlayerHealthChanged(HealthChangedEventArgs args)
     {
+        var abilityName = AbilityStorage.GetAbility(args.AbilityId).AbilityInfo.Name;
         var hitOrHeal = args.HealthChangeType == HealthChangeType.Heal ? "heals" : "hits";
-        var str = $"{args.Source.Name}'s {args.Ability.name} {hitOrHeal} {args.Player.Name} for {Mathf.Abs(args.HealthChangeAmount)} {args.DamageType} Damage.";
+        var str = $"{args.Source.Name}'s {abilityName} {hitOrHeal} {args.Player.Name} for {Mathf.Abs(args.HealthChangeAmount)} {args.DamageType} Damage.";
         var color = GetCombatLogTextColor(args);
         InstantiateText(str, color);
     }

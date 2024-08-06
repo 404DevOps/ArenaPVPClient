@@ -13,24 +13,30 @@ public class ActionBarUIHandler : MonoBehaviour
 
     private string actionBarMappingPath;
     private ActionBarMapping actionBarMapping;
-    private Player player;
+    private Player _player;
 
     public void OnEnable()
     {
-        UIEvents.OnSettingsLoaded.AddListener(InitializeActionBars);
+        //UIEvents.OnSettingsLoaded.AddListener(InitializeActionBars);
         UIEvents.OnKeyBindsChanged.AddListener(RebuildActionBars);
-    }
-    public void OnDisable()
-    {
-        UIEvents.OnSettingsLoaded.RemoveListener(RebuildActionBars);
-        UIEvents.OnKeyBindsChanged.RemoveListener(RebuildActionBars);
+        GameEvents.OnPlayerInitialized.AddListener(OnPlayerInitialized);
     }
 
-    // Start is called before the first frame update
-    void Awake()
+    private void OnPlayerInitialized(Player player)
     {
-        player = FindObjectsOfType<Player>().FirstOrDefault(p => p.IsOwnedByMe);
-        actionBarMappingPath = Application.persistentDataPath + "/ActionBarMapping_" + player.ClassType.ToString() + ".json";
+        if (player.IsOwnedByMe)
+        {
+            _player = player;
+            actionBarMappingPath = Application.persistentDataPath + "/ActionBarMapping_" + _player.ClassType.ToString() + ".json";
+            InitializeActionBars();
+            GameEvents.OnPlayerInitialized.RemoveListener(OnPlayerInitialized);
+        }
+    }
+
+    public void OnDisable()
+    {
+        //UIEvents.OnSettingsLoaded.RemoveListener(RebuildActionBars);
+        UIEvents.OnKeyBindsChanged.RemoveListener(RebuildActionBars);
     }
 
     public void InitializeActionBars() 
@@ -57,6 +63,7 @@ public class ActionBarUIHandler : MonoBehaviour
             slot.Ability = GetAbilityForSlot(i);
             slot.OnAbilityChanged = OnAbilityChanged; //register event
             actionSlotGo.transform.SetParent(parentTransform, false);
+            slot.InitializeSlot(_player);
             actionSlotGo.SetActive(true);
             i++;
             Destroy(gO);
@@ -116,7 +123,7 @@ public class ActionBarUIHandler : MonoBehaviour
     {
         actionBarMapping = new ActionBarMapping();
         int i = 0;
-        foreach (var ability in AbilityManager.AllAbilities.Where(a => a.AbilityInfo.ClassType == player.ClassType))
+        foreach (var ability in AbilityStorage.AllAbilities.Where(a => a.AbilityInfo.ClassType == _player.ClassType))
         {
             actionBarMapping.AddOrUpdateSlot(i, ability);
         }
