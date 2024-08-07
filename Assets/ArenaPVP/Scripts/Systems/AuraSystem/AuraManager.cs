@@ -1,4 +1,5 @@
 using FishNet;
+using FishNet.CodeGenerating;
 using FishNet.Demo.AdditiveScenes;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
@@ -6,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
+using static UnityEngine.GraphicsBuffer;
 
 public class AuraManager : NetworkBehaviour
 {
@@ -13,7 +16,8 @@ public class AuraManager : NetworkBehaviour
     private static AuraManager _instance;
     public static AuraManager Instance => _instance;
 
-    private readonly SyncDictionary<int, List<AuraInfo>> _playerAurasDict = new SyncDictionary<int, List<AuraInfo>>();
+    [AllowMutableSyncType]
+    private SyncDictionary<int, List<AuraInfo>> _playerAurasDict = new SyncDictionary<int, List<AuraInfo>>();
 
     void Awake()
     {
@@ -26,68 +30,91 @@ public class AuraManager : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        CheckAndUpdateAuraDurations();
+        if (InstanceFinder.IsServerStarted)
+        {
+            CheckAuraExpiration();
+        } 
     }
 
-    private void CheckAndUpdateAuraDurations()
+    [Server]
+    private void CheckAuraExpiration()
     {
-        foreach (var entry in _playerAurasDict)
+        if (!InstanceFinder.IsServerStarted) { return; }
+
+        for (int entryIndex = 0; entryIndex < _playerAurasDict.Count; entryIndex++)
         {
+            var entry = _playerAurasDict.ElementAt(entryIndex);
             for (int i = 0; i < entry.Value.Count; i++)
             {
-                var auraInfo = entry.Value[i];
-                if (auraInfo.AppliedTime + auraInfo.Duration <= +Time.time)
+                entry.Value[i].RemainingDuration -= Time.deltaTime;
+                _playerAurasDict[entry.Key] = entry.Value; //sync clients
+                if (entry.Value[i].RemainingDuration <= 0)
                 {
                     RemoveAura(entry.Key, i);
-                    i--; //avoid skipping indexes when removing an item.
-                }
-                else
-                {
-                    auraInfo.ExpiresInSec = Mathf.CeilToInt(auraInfo.AppliedTime + auraInfo.Duration);
+                    i--; //avoid skipping indexes
                 }
             }
         }
     }
 
-    private void RemoveAura(int playerId, int index)
-    {
-        var entry = _playerAurasDict[playerId];
-        GameEvents.OnAuraExpired.Invoke(playerId, entry[index]);
-        AbilityStorage.GetAura(entry[index].AuraId).Fade();
-        entry.RemoveAt(index);
-    }
+
+    [Server]
     public int AddAura(Player source, Player target, AuraBase aura)
     {
         var auraInfo = new AuraInfo(IdentifierService.GetAuraId(), source, target, aura);
 
         if (_playerAurasDict.ContainsKey(target.Id))
         {
-            var entry = _playerAurasDict[target.Id];
-            var auraIndex = entry.FindIndex(a => a.AuraId == aura.Id); // && a.AppliedBy == source);
+            var playerEntry = _playerAurasDict[target.Id];
+            var auraIndex = playerEntry.FindIndex(a => a.AuraId == aura.Id); // && a.AppliedBy == source);
             //aura already applied, refresh duration and addStack if possible
             if (auraIndex >= 0)
             {
-                entry[auraIndex].AppliedTime = Time.time;
-                var newStacks = entry[auraIndex].Stacks + 1;
-                if (entry[auraIndex].MaxStacks >= newStacks)
+                var newStacks = playerEntry[auraIndex].Stacks + 1;
+                if (playerEntry[auraIndex].MaxStacks >= newStacks)
                 {
-                    entry[auraIndex].Stacks = newStacks;
+                    playerEntry[auraIndex].Stacks = newStacks;
+                    _playerAurasDict[target.Id] = playerEntry; //set variable back to dict so it syncs
                 }
-                return entry[auraIndex].AuraInstanceId;
+                return playerEntry[auraIndex].AuraInstanceId;
             }
             else 
             {
-                entry.Add(auraInfo);
-                GameEvents.OnAuraApplied.Invoke(target.Id, auraInfo);
+                playerEntry.Add(auraInfo);
+                _playerAurasDict[target.Id] = playerEntry; //set variable back to dict so it syncs
+                AuraAppliedClient(target.Id, auraInfo);
                 return auraInfo.AuraInstanceId;
             }
         }
         else 
         {
             _playerAurasDict.Add(target.Id, new List<AuraInfo> { auraInfo });
-            GameEvents.OnAuraApplied.Invoke(target.Id, auraInfo);
+            AuraAppliedClient(target.Id, auraInfo);
             return auraInfo.AuraInstanceId;
         }
+    }
+    [Server]
+    private void RemoveAura(int playerId, int auraIndex)
+    {
+        var playeEntry = _playerAurasDict[playerId];
+        AbilityStorage.GetAura(playeEntry[auraIndex].AuraId).Fade();
+        AuraRemovedClient(playerId, playeEntry[auraIndex]);
+
+        playeEntry.RemoveAt(auraIndex);
+        _playerAurasDict[playerId] = playeEntry;
+    }
+
+    [ObserversRpc]
+    private void AuraAppliedClient(int targetId, AuraInfo aura)
+    {
+        //local event so UI can react.
+        GameEvents.OnAuraApplied.Invoke(targetId, aura);
+    }
+    [ObserversRpc]
+    private void AuraRemovedClient(int targetId, AuraInfo aura)
+    {
+        //local event so UI can react.
+        GameEvents.OnAuraExpired.Invoke(targetId, aura);
     }
 
     public List<AuraInfo> GetAuraInfosForPlayer(int playerId)
@@ -127,14 +154,12 @@ public class AuraManager : NetworkBehaviour
             {
                 int index = _playerAurasDict[playerId].FindIndex(a => a.AuraInstanceId == auraId);
                 var auraInfo = _playerAurasDict[playerId][index];
-                float remainingDuration = (auraInfo.AppliedTime + auraInfo.Duration) - Time.time;
-                if (remainingDuration > 0)
+                if (auraInfo.RemainingDuration > 0)
                 {
-                    return remainingDuration;
+                    return auraInfo.RemainingDuration;
                 }
                 else
                 {
-                    RemoveAura(playerId, index);
                     return 0;
                 }
             }
@@ -169,22 +194,20 @@ public class AuraInfo
         AuraInstanceId = id;
         AuraId = aura.Id;
         AppliedBy = appliedById;
-        AppliedTime = Time.time;
-        ExpiresInSec = Mathf.CeilToInt(aura.Duration);
         AppliedTo = appliedToId;
         Stacks = 1;
         Duration = aura.Duration;
+        RemainingDuration = aura.Duration;
         MaxStacks = aura.MaxStacks;
     }
 
     public int AuraInstanceId;
     public int AuraId;
-    public float AppliedTime;
     public Player AppliedBy;
     public Player AppliedTo;
-    public int ExpiresInSec;
     public int Stacks;
     public float Duration;
+    public float RemainingDuration;
     public int MaxStacks;
 
     public static AuraInfo Null = null;

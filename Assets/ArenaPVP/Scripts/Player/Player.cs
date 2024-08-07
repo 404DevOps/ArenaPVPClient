@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using FishNet.Object;
 using FishNet.Connection;
+using FishNet;
+using UnityEditor.MemoryProfiler;
 
 public class Player : NetworkBehaviour
 {
@@ -26,10 +28,9 @@ public class Player : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
-
-        Id = IdentifierService.GetPlayerId();
+        Id = GetComponent<NetworkObject>().OwnerId;
         IsOwnedByMe = this.IsOwner;
         GameEvents.OnPlayerInitialized.Invoke(this);
-        GetComponent<Targetable>().IsSelf =  this.IsOwner;
+        GetComponent<Targetable>().IsSelf = this.IsOwner;
     }
 }

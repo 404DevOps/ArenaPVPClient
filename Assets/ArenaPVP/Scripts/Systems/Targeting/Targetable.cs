@@ -9,10 +9,6 @@ public class Targetable : MonoBehaviour
 {
     [SerializeField]
     public bool IsSelf = false;
-    public void Start()
-    {
-        IsSelf = GetComponent<Player>().IsOwnedByMe;
-    }
 
     public void Select()
     {

@@ -37,7 +37,7 @@ public class AuraContainerUIHandler : MonoBehaviour
     private void OnDisable()
     {
         GameEvents.OnAuraApplied.RemoveListener(OnAuraApplied);
-        GameEvents.OnAuraExpired.AddListener(OnAuraExpired);
+        GameEvents.OnAuraExpired.RemoveListener(OnAuraExpired);
     }
 
     private void OnAuraExpired(int ownerId, AuraInfo aura)
@@ -45,7 +45,7 @@ public class AuraContainerUIHandler : MonoBehaviour
         if (ownerId != OwnerId)
             return;
 
-        RemoveAura(aura.AuraInstanceId);
+        RemoveAuraDisplay(aura.AuraInstanceId);
     }
 
     private void OnAuraApplied(int ownerId, AuraInfo aura)
@@ -58,16 +58,20 @@ public class AuraContainerUIHandler : MonoBehaviour
         AddAura(aura);
     }
 
-    private void RemoveAura(int auraId)
+    private void RemoveAuraDisplay(int auraId)
     {
+        bool auraFoundAndRemoved = false;
         for (int i = 0; i < AuraGrid.childCount; i++)
         {
             var auraDisplays = AuraGrid.GetChild(i).GetComponent<AuraDisplay>();
             if (auraDisplays.AuraInfo.AuraInstanceId == auraId)
             {
                 Destroy(auraDisplays.gameObject);
+                auraFoundAndRemoved |= true;
             }
         }
+
+        Logger.Log("Tried remove expired Aura: Success = " + auraFoundAndRemoved);
     }
 
     private void AddAura(AuraInfo auraInfo)
