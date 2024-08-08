@@ -17,5 +17,10 @@ public class MeleeAbility : AbilityBase
         //applyAura(AuraType.Stun, target)
         //get transform, move towards
         throw new System.NotImplementedException();
+        ApplyEffects(owner, target);
+    }
+    public override void ApplyEffects(Player owner, Player target)
+    {
+        throw new System.NotImplementedException();
     }
 }

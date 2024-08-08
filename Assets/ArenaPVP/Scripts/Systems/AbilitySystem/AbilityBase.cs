@@ -128,7 +128,7 @@ public abstract class AbilityBase : ScriptableObject
     private bool HasEnoughResource(Player owner)
     {
         var resComp = owner.GetComponent<PlayerResource>();
-        if (resComp.CurrentResource >= this.AbilityInfo.ResourceCost)
+        if (resComp.CurrentResource.Value >= this.AbilityInfo.ResourceCost)
             return true;
 
         return false;
@@ -207,6 +207,7 @@ public abstract class AbilityBase : ScriptableObject
         return false;
     }
     protected abstract void Use(Player owner, Player target);
+    public abstract void ApplyEffects(Player owner, Player target);
 }
 
 [Serializable]

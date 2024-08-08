@@ -1,33 +1,37 @@
-using System.Collections;
-using System.Collections.Generic;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using UnityEngine;
+using Logger = Assets.Scripts.Helpers.Logger;
 
-public class PlayerResource : MonoBehaviour
+public class PlayerResource : NetworkBehaviour
 {
-    public float MaxResource;
-    public float CurrentResource;
+    public readonly SyncVar<float> MaxResource = new SyncVar<float>();
+    public readonly SyncVar<float> CurrentResource = new SyncVar<float>();
 
     public Player Player;
 
-    public void OnResourceChanged(ResourceChangedEventArgs args) //Player player, float healthChange)
-    {
-        if (args.Player.Id != Player.Id)
-            return;
-
-        CurrentResource += args.ResourceChangeAmount;
-        if(CurrentResource > MaxResource)
-            CurrentResource = MaxResource;
-    }
-
-    private void OnEnable()
+    void Awake()
     {
         Player = GetComponent<Player>();
-        MaxResource = Player.Stats.Resource;
-        CurrentResource = Player.Stats.Resource;
-        GameEvents.OnPlayerResourceChanged.AddListener(OnResourceChanged);
+        MaxResource.Value = Player.Stats.Resource;
+        CurrentResource.Value = Player.Stats.Resource;
     }
-    private void OnDisable()
+
+    [ServerRpc]
+    public void UpdateResourceServer(ResourceChangedEventArgs args)
     {
-        GameEvents.OnPlayerResourceChanged.RemoveListener(OnResourceChanged);
+        Logger.Log("UpdateResource Server called.");
+
+        CurrentResource.Value += args.ResourceChangeAmount;
+        if (CurrentResource.Value > MaxResource.Value)
+            CurrentResource.Value = MaxResource.Value;
+
+        ResourceUpdated(args);
+    }
+
+    [ObserversRpc]
+    public void ResourceUpdated(ResourceChangedEventArgs args)
+    {
+        GameEvents.OnPlayerResourceChanged.Invoke(args);
     }
 }

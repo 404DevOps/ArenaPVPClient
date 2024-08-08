@@ -47,7 +47,6 @@ public class UnitFrameUIHandler : MonoBehaviour
 
     private void OnPlayerInitialized(Player player)
     {
-
         if (IconRightSide)
         {
             IconHolder.SetAsLastSibling();
@@ -64,7 +63,7 @@ public class UnitFrameUIHandler : MonoBehaviour
                 _playerHealth = Player.GetComponent<PlayerHealth>();
                 _playerResource = Player.GetComponent<PlayerResource>();
                 _healthbar.InitializeBar(Player.ClassType, _playerHealth.CurrentHealth.Value, _playerHealth.MaxHealth.Value);
-                _resourcebar.InitializeBar(Player.ClassType, _playerResource.CurrentResource, _playerResource.MaxResource);
+                _resourcebar.InitializeBar(Player.ClassType, _playerResource.CurrentResource.Value, _playerResource.MaxResource.Value);
                 ActivateAuraGrid();
             }
         }
@@ -87,7 +86,7 @@ public class UnitFrameUIHandler : MonoBehaviour
         if (Player == null || Player.Id != args.Player.Id)
             return;
 
-        _resourcebar.SetNewValue(_playerResource.CurrentResource + args.ResourceChangeAmount, _playerResource.MaxResource);
+        _resourcebar.SetNewValue(_playerResource.CurrentResource.Value, _playerResource.MaxResource.Value);
     }
     private void OnTargetChanged(Player player)
     {
@@ -98,7 +97,7 @@ public class UnitFrameUIHandler : MonoBehaviour
             _playerResource = Player.GetComponent<PlayerResource>();
             SetUnitFrameIcon();
             _healthbar.InitializeBar(Player.ClassType, _playerHealth.CurrentHealth.Value, _playerHealth.MaxHealth.Value);
-            _resourcebar.InitializeBar(Player.ClassType, _playerResource.CurrentResource, _playerResource.MaxResource);
+            _resourcebar.InitializeBar(Player.ClassType, _playerResource.CurrentResource.Value, _playerResource.MaxResource.Value);
             FrameParent.gameObject.SetActive(true);
             ActivateAuraGrid();
 

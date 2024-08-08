@@ -16,8 +16,6 @@ public class PlayerHealth : NetworkBehaviour
     [Server]
     public void UpdateHealthServer(HealthChangedEventArgs args)
     {
-        Logger.Log("UpdateHealth Server called.");
-
         CurrentHealth.Value += args.HealthChangeAmount;
         if (CurrentHealth.Value > MaxHealth.Value)
             CurrentHealth.Value = MaxHealth.Value;

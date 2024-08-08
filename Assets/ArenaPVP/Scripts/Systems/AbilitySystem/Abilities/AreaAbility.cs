@@ -29,12 +29,12 @@ public class AreaAbility : AbilityBase
             //TODO: check if target is enemy or friendly and check TargetingType to match that.
             if (IsLineOfSight(origin.transform, target.transform))
             {
-                ApplyAbilityEffectAndDamage(origin, target);
+                ApplyEffects(origin, target);
             }
         }
     }
 
-    public virtual void ApplyAbilityEffectAndDamage(Player origin, Player target) 
+    public override void ApplyEffects(Player origin, Player target) 
     {
         var args = new HealthChangedEventArgs()
         {
