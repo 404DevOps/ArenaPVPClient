@@ -1,3 +1,4 @@
+using Assets.ArenaPVP.Scripts.Models.Enums;
 using Assets.Scripts.Enums;
 using FishNet;
 using MonoFN.Cecil;
@@ -19,8 +20,9 @@ public class AuraBase : ScriptableObject
     public string Description;
     public float Duration;
     public AuraTargetType AuraTarget;
-    public Sprite Icon;
     public AuraType AuraType;
+    public AuraApplyTiming AuraApplyTiming;
+    public Sprite Icon;
     public List<StatModifier> StatModifiers;
     public bool isDebuff;
     private int _auraId;

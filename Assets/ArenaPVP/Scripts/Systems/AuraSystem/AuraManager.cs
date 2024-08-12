@@ -1,14 +1,12 @@
 using FishNet;
 using FishNet.CodeGenerating;
-using FishNet.Demo.AdditiveScenes;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering;
-using static UnityEngine.GraphicsBuffer;
+using Logger = Assets.Scripts.Helpers.Logger;
 
 public class AuraManager : NetworkBehaviour
 {
@@ -32,12 +30,12 @@ public class AuraManager : NetworkBehaviour
     {
         if (InstanceFinder.IsServerStarted)
         {
-            CheckAuraExpiration();
+            UpdateAuraExpiration();
         } 
     }
 
     [Server]
-    private void CheckAuraExpiration()
+    private void UpdateAuraExpiration()
     {
         if (!InstanceFinder.IsServerStarted) { return; }
 
@@ -71,10 +69,14 @@ public class AuraManager : NetworkBehaviour
             if (auraIndex >= 0)
             {
                 var newStacks = playerEntry[auraIndex].Stacks + 1;
+                var existingAura = playerEntry[auraIndex];
                 if (playerEntry[auraIndex].MaxStacks >= newStacks)
                 {
-                    playerEntry[auraIndex].Stacks = newStacks;
+                    existingAura.Stacks = newStacks;
+                    existingAura.RemainingDuration = aura.Duration;
+                    playerEntry[auraIndex] = existingAura;
                     _playerAurasDict[target.Id] = playerEntry; //set variable back to dict so it syncs
+                    Logger.Log("Server: Refreshed Aura Duration of Aura. Id " + playerEntry[auraIndex].AuraInstanceId);
                 }
                 return playerEntry[auraIndex].AuraInstanceId;
             }
@@ -142,17 +144,17 @@ public class AuraManager : NetworkBehaviour
     /// Returns Remaining Duration for given PlayerId and AuraId combination. Returns 0 if Aura is expired.
     /// </summary>
     /// <param name="playerId"></param>
-    /// <param name="auraId"></param>
+    /// <param name="auraInstanceId"></param>
     /// <returns></returns>
-    public float GetRemainingAuraDuration(int playerId, int auraId)
+    public float GetRemainingAuraDuration(int playerId, int auraInstanceId)
     {
         if (_playerAurasDict.ContainsKey(playerId))
         {
-            if (!_playerAurasDict[playerId].Any(a => a.AuraInstanceId == auraId))
+            if (!_playerAurasDict[playerId].Any(a => a.AuraInstanceId == auraInstanceId))
                 return 0;
             else
             {
-                int index = _playerAurasDict[playerId].FindIndex(a => a.AuraInstanceId == auraId);
+                int index = _playerAurasDict[playerId].FindIndex(a => a.AuraInstanceId == auraInstanceId);
                 var auraInfo = _playerAurasDict[playerId][index];
                 if (auraInfo.RemainingDuration > 0)
                 {

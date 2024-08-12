@@ -41,7 +41,6 @@ public class AuraDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
                 _showTooltip = false;
             }
         }
-
         _expiresIn = AuraManager.Instance.GetRemainingAuraDuration(AuraInfo.AppliedTo.Id, AuraInfo.AuraInstanceId);
         _stackAmount = AuraManager.Instance.GetStackAmount(AuraInfo.AppliedTo.Id, AuraInfo.AuraId);
     }

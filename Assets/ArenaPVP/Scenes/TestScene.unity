@@ -536,6 +536,7 @@ MonoBehaviour:
   _componentIndexCache: 0
   _addedNetworkObject: {fileID: 383412797}
   _networkObjectCache: {fileID: 383412797}
+  Projectiles: {fileID: 11400000, guid: 5122bedceb2d25144b3a47241f66ee6d, type: 2}
 --- !u!4 &383412796
 Transform:
   m_ObjectHideFlags: 0
@@ -595,7 +596,7 @@ MonoBehaviour:
   _teleportThreshold: 1
   <PrefabId>k__BackingField: 0
   <SpawnableCollectionId>k__BackingField: 0
-  <SceneId>k__BackingField: 2063575759
+  <SceneId>k__BackingField: 2130554564
   <AssetPathHash>k__BackingField: 0
 --- !u!1 &445823555
 GameObject:
@@ -1966,7 +1967,7 @@ MonoBehaviour:
   _teleportThreshold: 1
   <PrefabId>k__BackingField: 0
   <SpawnableCollectionId>k__BackingField: 0
-  <SceneId>k__BackingField: 931134429
+  <SceneId>k__BackingField: 828374759
   <AssetPathHash>k__BackingField: 0
 --- !u!224 &1311741019 stripped
 RectTransform:

@@ -28,9 +28,13 @@ public class Player : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
-        Id = GetComponent<NetworkObject>().OwnerId;
         IsOwnedByMe = this.IsOwner;
         GameEvents.OnPlayerInitialized.Invoke(this);
         GetComponent<Targetable>().IsSelf = this.IsOwner;
+    }
+    public override void OnStartNetwork()
+    {
+        base.OnStartNetwork();
+        Id = GetComponent<NetworkObject>().OwnerId;
     }
 }
