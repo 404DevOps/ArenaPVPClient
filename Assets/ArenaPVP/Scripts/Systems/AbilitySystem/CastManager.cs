@@ -1,14 +1,21 @@
+using FishNet;
+using FishNet.CodeGenerating;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class CastManager : MonoBehaviour
+public class CastManager : NetworkBehaviour
 {
     private static CastManager _instance;
     public static CastManager Instance => _instance;
 
-    private Dictionary<int, AbilityCastInfo> _castStartedDict = new Dictionary<int, AbilityCastInfo>();
+    [AllowMutableSyncType]
+    private SyncDictionary<int, AbilityCastInfo> _castTimerDict = new SyncDictionary<int, AbilityCastInfo>();
 
     void Awake()
     {
@@ -18,48 +25,79 @@ public class CastManager : MonoBehaviour
             Destroy(this.gameObject);
     }
 
-    public void AddOrUpdate(int owner, string abilityName)
+    private void Update()
     {
-        var castInfo = new AbilityCastInfo(abilityName);
-        if (_castStartedDict.ContainsKey(owner))
+        if (InstanceFinder.IsServerStarted) 
         {
-            _castStartedDict[owner] = castInfo;
+            UpdateCastTimers();
+        }
+    }
+
+    [ObserversRpc]
+    private void OnCastStartedClient(int ownerId, int abilityId)
+    {
+        GameEvents.OnCastStarted.Invoke(ownerId, abilityId);
+    }
+
+    [Server]
+    private void UpdateCastTimers()
+    {
+        for (int i = 0; i < _castTimerDict.Count; i++)
+        {
+            var entry = _castTimerDict.ElementAt(i);
+            if (entry.Value.CastTimeRemaining > 0f)
+            {
+                var newValue = entry.Value.CastTimeRemaining - Time.deltaTime;
+                _castTimerDict[entry.Key] = new AbilityCastInfo(entry.Value.AbilityId, newValue);
+            }
+        }
+    }
+
+    [Server]
+    public void AddOrUpdate(int owner, AbilityCastInfo castInfo)
+    {
+        if (_castTimerDict.ContainsKey(owner))
+        {
+            _castTimerDict[owner] = castInfo;
         }
         else 
         {
-            _castStartedDict.Add(owner, castInfo);
+            _castTimerDict.Add(owner, castInfo);
         }
+
+        OnCastStartedClient(owner, castInfo.AbilityId);
     }
     public AbilityCastInfo? GetCastInfo(int owner)
     {
-        if (_castStartedDict.ContainsKey(owner))
+        if (_castTimerDict.ContainsKey(owner))
         {
-            return _castStartedDict[owner];
+            return _castTimerDict[owner];
         }
         return null;
     }
-    public bool Contains(int owner, string abilityName)
+    public bool Contains(int owner, int abilityId)
     {
-        if (_castStartedDict.ContainsKey(owner))
+        if (_castTimerDict.ContainsKey(owner))
         {
-            return _castStartedDict[owner].AbilityName == abilityName;
+            return _castTimerDict[owner].AbilityId == abilityId;
         }
         return false;
     }
-    public float TimeSinceCastStarted(int owner, string abilityname)
+    public float GetRemainingCastTime(int owner, int abilityId)
     {
-        if (_castStartedDict.ContainsKey(owner))
+        if (_castTimerDict.ContainsKey(owner))
         {
-            if (_castStartedDict[owner].AbilityName == abilityname)
-                return Time.time - _castStartedDict[owner].CastStarted;
+            return _castTimerDict[owner].CastTimeRemaining;
         }
-        return -1f;
+        return 0f;
     }
+
+    [Server]
     public void Remove(int owner)
     {
-        if (_castStartedDict.ContainsKey(owner))
+        if (_castTimerDict.ContainsKey(owner))
         {
-            _castStartedDict.Remove(owner);
+            _castTimerDict.Remove(owner);
         }
     }
 

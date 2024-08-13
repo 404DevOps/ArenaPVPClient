@@ -17,12 +17,13 @@ MonoBehaviour:
   Description: Increases your Spell Damage by 20%
   Duration: 5
   AuraTarget: 0
-  Icon: {fileID: 21300000, guid: eb5bc873b3a0d154f8fea04279ae69b4, type: 3}
   AuraType: 4
+  AuraApplyTiming: 2
+  Icon: {fileID: 21300000, guid: eb5bc873b3a0d154f8fea04279ae69b4, type: 3}
   StatModifiers:
-  - SourceAuraId: 18
+  - SourceAuraId: 58
     _statType: 1
     _operatorType: 1
     _value: 0.2
-  isDebuff: 1
+  isDebuff: 0
   MaxStacks: 3

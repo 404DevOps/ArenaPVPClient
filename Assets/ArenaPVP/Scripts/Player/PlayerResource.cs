@@ -17,7 +17,7 @@ public class PlayerResource : NetworkBehaviour
         CurrentResource.Value = Player.Stats.Resource;
     }
 
-    [ServerRpc]
+    [Server]
     public void UpdateResourceServer(ResourceChangedEventArgs args)
     {
         Logger.Log("UpdateResource Server called.");
@@ -26,11 +26,11 @@ public class PlayerResource : NetworkBehaviour
         if (CurrentResource.Value > MaxResource.Value)
             CurrentResource.Value = MaxResource.Value;
 
-        ResourceUpdated(args);
+        ResourceUpdatedClient(args);
     }
 
     [ObserversRpc]
-    public void ResourceUpdated(ResourceChangedEventArgs args)
+    public void ResourceUpdatedClient(ResourceChangedEventArgs args)
     {
         GameEvents.OnPlayerResourceChanged.Invoke(args);
     }

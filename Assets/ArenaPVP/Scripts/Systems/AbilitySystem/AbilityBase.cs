@@ -1,5 +1,6 @@
 using Assets.ArenaPVP.Scripts.Helpers;
 using Assets.Scripts.Enums;
+using FishNet;
 using GameKit.Dependencies.Utilities;
 using System;
 using System.Collections;
@@ -20,68 +21,28 @@ public abstract class AbilityBase : ScriptableObject
     private int _ownerId;
 
     //TODO: make ServerCharacter owner and target
-    public bool TryUseAbility(Player origin, Player target)
+    public void TryUseAbility(Player origin, Player target)
     {
         _wasInterrupted = false;
         _ownerId = origin.Id;
 
-        GameEvents.OnCastInterrupted.AddListener(WasInterrupted);
-        if (CanBeUsed(origin, target))
-        {
-            if (AbilityInfo.CastTime > 0)
-            {
-                GameEvents.OnCastStarted.Invoke(_ownerId, this);
-                CastManager.Instance.AddOrUpdate(_ownerId, AbilityInfo.Name);
-                CastManager.Instance.StartCastCoroutine(CastTimer(origin, target,AbilityInfo.CastTime));
-            }
-            else{
-                Use(origin, target);
-            }
-            return true;
-        }
-        return false;
+        AbilityExecutor.Instance.TryUseAbilityClient(new UseAbilityArgs(Id, origin, target));
     }
 
-    IEnumerator CastTimer(Player owner, Player target, float castTime)
-    {
-        if (_wasInterrupted)
-        {
-            _wasInterrupted = false;
-            GameEvents.OnCastInterrupted.Invoke(_ownerId);
-            GameEvents.OnCastInterrupted.RemoveListener(WasInterrupted);
-            Logger.Log($"Ability {AbilityInfo.Name} was Interrupted while casting.");
-        }
-
-        yield return new WaitForSeconds(castTime);
-
-        CastManager.Instance.Remove(_ownerId);
-        //check line of sight again
-        if (AbilityInfo.AbilityType != AbilityType.AreaOfEffect  && (!IsInFront(owner.transform,target.transform) || !IsLineOfSight(owner.transform,target.transform)))
-        {
-            _wasInterrupted = true;
-        }
-        if (!_wasInterrupted)
-        {
-            GameEvents.OnCastCompleted.Invoke(_ownerId);
-            CooldownManager.Instance.AddOrUpdate(new AbilityWithOwner(_ownerId, AbilityInfo.Name));
-            GameEvents.OnCooldownStarted.Invoke(_ownerId, AbilityInfo.Name);
-
-            Use(owner, target);
-        }
-    }
-
-    private void WasInterrupted(int ownerId)
-    {
-        if (_ownerId != ownerId) return;
-        _wasInterrupted = true;
-    }
-    private bool CanBeUsed(Player owner, Player target)
+    //private void WasInterrupted(int ownerId)
+    //{
+    //    if (_ownerId != ownerId) return;
+    //    _wasInterrupted = true;
+    //}
+    public bool CanBeUsed(Player owner, Player target)
     {
         bool canbeUse = true;
 
         if (!IsCooldownReady(owner.Id)) 
         {
-            UIEvents.OnShowInformationPopup.Invoke("This ability is not ready yet");
+            if(InstanceFinder.IsClientStarted)
+                UIEvents.OnShowInformationPopup.Invoke("This ability is not ready yet");
+
             return false;
         }
         if (IsAlreadyCasting(owner.Id))
@@ -91,12 +52,16 @@ public abstract class AbilityBase : ScriptableObject
         }
         if (!HasEnoughResource(owner))
         {
-            var ressourceName = AppearanceData.Instance().GetRessourceDescriptor(owner.ClassType);
-            UIEvents.OnShowInformationPopup.Invoke($"Not enough {ressourceName}");
+            if (InstanceFinder.IsClientStarted)
+            {
+                var ressourceName = AppearanceData.Instance().GetRessourceDescriptor(owner.ClassType);
+                UIEvents.OnShowInformationPopup.Invoke($"Not enough {ressourceName}");
+            }
+
             return false;
         }
-        //all checks for AoE abilities should be done at this point, so we can already return and use the ability which will select its own targets
-        //or none if none meets criteria, but it will go off anyways, similar to a frost nova in wow.
+        //all checks for AoE abilities should be done at this point, so we can already return and Use() the ability which will select its own targets
+        //or none if none meets criteria, but it will go off anyways, without hitting anything.
         if (AbilityInfo.AbilityType == AbilityType.AreaOfEffect) 
         {
             return true;
@@ -104,22 +69,26 @@ public abstract class AbilityBase : ScriptableObject
 
         if (target == null)
         {
-            UIEvents.OnShowInformationPopup.Invoke("No valid Target selected");
+            if (InstanceFinder.IsClientStarted)
+                UIEvents.OnShowInformationPopup.Invoke("No valid Target selected");
             return false;
         }
         if (!IsInRange(owner.transform, target.transform))
         {
-            UIEvents.OnShowInformationPopup.Invoke("Out of range");
+            if (InstanceFinder.IsClientStarted)
+                UIEvents.OnShowInformationPopup.Invoke("Out of range");
             return false;
         }
         if (!IsLineOfSight(owner.transform, target.transform))
         {
-            UIEvents.OnShowInformationPopup.Invoke("Target not line of sight");
+            if (InstanceFinder.IsClientStarted)
+                UIEvents.OnShowInformationPopup.Invoke("Target not line of sight");
             return false;
         }
         if (!IsInFront(owner.transform, target.transform))
         {
-            UIEvents.OnShowInformationPopup.Invoke("Target is not in front of you");
+            if (InstanceFinder.IsClientStarted)
+                UIEvents.OnShowInformationPopup.Invoke("Target is not in front of you");
             return false;
         }
 
@@ -135,7 +104,7 @@ public abstract class AbilityBase : ScriptableObject
     }
     private bool IsAlreadyCasting(int ownerId)
     {
-        if (CastManager.Instance.Contains(ownerId, AbilityInfo.Name))
+        if (CastManager.Instance.Contains(ownerId, Id) && CastManager.Instance.GetRemainingCastTime(ownerId, Id) > 0)
         {
             return true;
         }
@@ -143,13 +112,13 @@ public abstract class AbilityBase : ScriptableObject
     }
     private bool IsCooldownReady(int ownerId)
     {
-        var abilityWithOwner = new AbilityWithOwner(ownerId, AbilityInfo.Name);
+        var abilityWithOwner = new AbilityCooldownInfo(ownerId, Id);
         
         if (!CooldownManager.Instance.Contains(abilityWithOwner.Identifier))
         {
             return true;
         }
-        else if (CooldownManager.Instance.TimeSinceLastUse(abilityWithOwner) >= AbilityInfo.Cooldown)
+        else if (CooldownManager.Instance.GetRemainingCooldown(abilityWithOwner) <= 0)
         {
             return true;
         }
@@ -158,7 +127,7 @@ public abstract class AbilityBase : ScriptableObject
             return false;
         }
     }
-    private bool IsInFront(Transform owner, Transform target)
+    internal bool IsInFront(Transform owner, Transform target)
     {
         if (!NeedTargetInFront)
             return true;
@@ -206,8 +175,21 @@ public abstract class AbilityBase : ScriptableObject
 
         return false;
     }
-    protected abstract void Use(Player owner, Player target);
-    public abstract void ApplyEffects(Player owner, Player target);
+    internal virtual void UseServer(Player owner, Player target) 
+    {
+        if (!InstanceFinder.IsServerStarted)
+            throw new Exception("Tried execute Server function from Client");
+    }
+    internal virtual void UseClient(Player owner, Player target)
+    {
+        if (!InstanceFinder.IsClientStarted)
+            throw new Exception("Tried execute Client function from Server");
+    }
+    internal virtual void ApplyEffectsServer(Player owner, Player target)
+    {
+        if (!InstanceFinder.IsServerStarted)
+            throw new Exception("Tried execute Server function from Client");
+    }
 }
 
 [Serializable]

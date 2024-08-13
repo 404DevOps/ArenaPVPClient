@@ -20,11 +20,11 @@ public class PlayerHealth : NetworkBehaviour
         if (CurrentHealth.Value > MaxHealth.Value)
             CurrentHealth.Value = MaxHealth.Value;
 
-        HealthUpdated(args);
+        HealthUpdatedClient(args);
     }
 
     [ObserversRpc]
-    public void HealthUpdated(HealthChangedEventArgs args)
+    public void HealthUpdatedClient(HealthChangedEventArgs args)
     {
         GameEvents.OnPlayerHealthChanged.Invoke(args);
     }

@@ -12,14 +12,14 @@ public class MeleeAbility : AbilityBase
     public float weaponDamagePercentage;
     public AuraBase[] AurasToApply;
 
-    protected override void Use(Player owner, Player target)
+    internal override void UseServer(Player owner, Player target)
     {
         //applyAura(AuraType.Stun, target)
         //get transform, move towards
         throw new System.NotImplementedException();
-        ApplyEffects(owner, target);
+        ApplyEffectsServer(owner, target);
     }
-    public override void ApplyEffects(Player owner, Player target)
+    internal override void ApplyEffectsServer(Player owner, Player target)
     {
         throw new System.NotImplementedException();
     }

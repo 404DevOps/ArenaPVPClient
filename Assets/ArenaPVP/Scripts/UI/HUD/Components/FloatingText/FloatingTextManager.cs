@@ -11,7 +11,7 @@ public class FloatingTextManager : MonoBehaviour
 
     private Dictionary<int, Transform> _playerTextContainers = new Dictionary<int, Transform>();
     private void OnPlayerHealthChanged(HealthChangedEventArgs args)
-        {
+    {
         if (!args.Source.IsOwnedByMe) //if damage/healing wasnt done by me, dont show floating text.
             return;
         TryInitializePlayerTextContainers(args.Player);

@@ -62,7 +62,7 @@ public class ProjectileTargeted : ProjectileBase
             if (InstanceFinder.IsServerStarted)
             {
                 Logger.Log($"Projectile Server hit.");
-                AbilityStorage.GetAbility(_abilityId).ApplyEffects(Origin,Target);
+                AbilityStorage.GetAbility(_abilityId).ApplyEffectsServer(Origin,Target);
             }
 
             Destroy(gameObject);

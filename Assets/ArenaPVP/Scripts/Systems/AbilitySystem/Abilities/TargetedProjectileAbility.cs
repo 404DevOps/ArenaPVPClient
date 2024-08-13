@@ -13,11 +13,9 @@ public class TargetedProjectileAbility : AbilityBase
     public ProjectileIdentifier ProjectileIdentifier;
     public AuraBase[] ApplyAuras;
 
-    protected override void Use(Player origin, Player target)
+    internal override void UseServer(Player origin, Player target)
     {
-        ProjectileSpawner.Instance.ClientFireTargeted(new FireTargetedProjectileArgs(Id, origin, target, ProjectileIdentifier));
-        origin.GetComponent<PlayerResource>().UpdateResourceServer(new ResourceChangedEventArgs() { Player = origin, ResourceChangeAmount = -AbilityInfo.ResourceCost });
-
+        base.UseServer(origin, target);
         if (ApplyAuras != null)
         {
             foreach (var aura in ApplyAuras.Where(a => a.AuraApplyTiming == AuraApplyTiming.OnCastFinished))
@@ -29,9 +27,16 @@ public class TargetedProjectileAbility : AbilityBase
             }
         }
     }
-
-    public override void ApplyEffects(Player origin,Player target)
+    internal override void UseClient(Player origin, Player target)
     {
+        base.UseClient(origin, target);
+        ProjectileSpawner.Instance.ClientFireTargeted(new FireTargetedProjectileArgs(Id, origin, target, ProjectileIdentifier));
+    }
+
+    internal override void ApplyEffectsServer(Player origin,Player target)
+    {
+        base.ApplyEffectsServer(origin, target);
+
         if(InstanceFinder.IsServerStarted)
         {
             var args = new HealthChangedEventArgs()

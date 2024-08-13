@@ -1,3 +1,4 @@
+using FishNet;
 using System.Collections.Generic;
 using UnityEngine;
 using Logger = Assets.Scripts.Helpers.Logger;
@@ -10,23 +11,30 @@ public class CircleAreaSelector : AreaSelectorBase
     private Player _source;
     public override List<Player> GetTargetsInArea(Player source)
     {
-        _source = source;
-
-        Collider[] colliders;
-        var playersInArea = new List<Player>();
-
-        var layerMask = LayerMask.GetMask(new string[] { "Player" });
-        colliders = Physics.OverlapSphere(source.transform.position, _radius, layerMask);
-        foreach (Collider collider in colliders) 
+        if (InstanceFinder.IsServerStarted)
         {
-            var player = collider.GetComponent<Player>();
-            if (player != null)
+            _source = source;
+
+            Collider[] colliders;
+            var playersInArea = new List<Player>();
+
+            var layerMask = LayerMask.GetMask(new string[] { "Player" });
+            colliders = Physics.OverlapSphere(source.transform.position, _radius, layerMask);
+            foreach (Collider collider in colliders)
             {
-                playersInArea.Add(player);
+                var player = collider.GetComponent<Player>();
+                if (player != null)
+                {
+                    playersInArea.Add(player);
+                }
             }
+            Logger.Log($"Found {playersInArea.Count} Targets in Area.");
+            return playersInArea;
         }
-        Logger.Log($"Found {playersInArea.Count} Targets in Area.");
-        return playersInArea;
+        else 
+        {
+            throw new System.Exception("Cannot be executed on Client");
+        }
     }
 
     public void OnDrawGizmos()

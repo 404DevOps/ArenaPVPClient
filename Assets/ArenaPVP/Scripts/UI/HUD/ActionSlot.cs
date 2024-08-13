@@ -46,19 +46,17 @@ public class ActionSlot : MonoBehaviour, IDropHandler
             FlashActionSlot();
             if (Ability != null)
             {
-                if (Ability.TryUseAbility(_player, target))
-                {
-                    _flashTime = Ability.AbilityInfo.CastTime - _flashTimePassed;
-                }
+                Ability.TryUseAbility(_player, target);
+                _flashTime = Ability.AbilityInfo.CastTime - _flashTimePassed;
             }
         }
         ResetActionSlotFlash();
         ShowCooldown(_player.Id);
     }
 
-    private void StartCooldown(int ownerId, string abilityName)
+    private void StartCooldown(int ownerId, int abilityId)
     {
-        if (_player.Id == ownerId && Ability.AbilityInfo.Name == abilityName)
+        if (_player.Id == ownerId && Ability.Id == abilityId)
         {
             _isOnCooldown = true;
             Swipe.gameObject.SetActive(true);
@@ -75,9 +73,8 @@ public class ActionSlot : MonoBehaviour, IDropHandler
 
         if (_isOnCooldown)
         {
-            var identifier = new AbilityWithOwner(ownerId, Ability.AbilityInfo.Name);
-            var timeSinceLastUse = CooldownManager.Instance.TimeSinceLastUse(identifier);
-            var remainingCooldown = timeSinceLastUse - Ability.AbilityInfo.Cooldown;
+            var identifier = new AbilityCooldownInfo(ownerId, Ability.Id);
+            var remainingCooldown = CooldownManager.Instance.GetRemainingCooldown(identifier);
 
             if (CooldownManager.Instance.Contains(identifier) && remainingCooldown < 0)
             {

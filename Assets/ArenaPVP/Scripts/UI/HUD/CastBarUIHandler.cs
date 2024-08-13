@@ -54,10 +54,12 @@ public class CastBarUIHandler : MonoBehaviour
         GameEvents.OnCastCompleted.RemoveListener(OnCastCompleted);
     }
 
-    public void OnCastStarted(int ownerId, AbilityBase ability)
+    public void OnCastStarted(int ownerId, int abilityId)
     {
         if (ownerId != Player.Id)
             return;
+
+        var ability = AbilityStorage.GetAbility(abilityId);
 
         this.Ability = ability;
         Fill.fillAmount = 0;
@@ -106,12 +108,12 @@ public class CastBarUIHandler : MonoBehaviour
         {
             if (_isCasting)
             {
-                float timeSinceCastStart = CastManager.Instance.TimeSinceCastStarted(Player.Id, Ability.AbilityInfo.Name);
-                if (timeSinceCastStart > 0)
+                float remainingCastTime = CastManager.Instance.GetRemainingCastTime(Player.Id, Ability.Id);
+                if (remainingCastTime > 0)
                 {
-                    var percentage = timeSinceCastStart / Ability.AbilityInfo.CastTime;
-                    Fill.fillAmount = percentage;
-                    CurrentCastTime.text = timeSinceCastStart.ToString("0.0");
+                    var percentage = remainingCastTime / Ability.AbilityInfo.CastTime;
+                    Fill.fillAmount = 1 - percentage;
+                    CurrentCastTime.text = remainingCastTime.ToString("0.0");
                 }
             }
         }

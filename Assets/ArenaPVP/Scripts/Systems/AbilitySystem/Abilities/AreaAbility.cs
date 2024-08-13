@@ -1,3 +1,4 @@
+using FishNet;
 using GameKit.Dependencies.Utilities.ObjectPooling.Examples;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,31 +11,29 @@ public class AreaAbility : AbilityBase
     public AuraBase[] ApplyAuras;
     private List<Player> _targets;
     private Player _owner;
-    [SerializeField] private AreaSelectorBase _areaSelector; 
+    [SerializeField] private AreaSelectorBase _areaSelector;
 
-    protected override void Use(Player origin, Player tar = null)
+    internal override void UseServer(Player origin, Player target)
     {
-        _targets = _areaSelector.GetTargetsInArea(origin);
-        GameEvents.OnCastCompleted.Invoke(origin.Id);
-        CooldownManager.Instance.AddOrUpdate(new AbilityWithOwner(origin.Id, AbilityInfo.Name));
-        GameEvents.OnCooldownStarted.Invoke(origin.Id, AbilityInfo.Name);
-
-        _owner = origin;
-        GameEvents.OnPlayerResourceChanged.Invoke(new ResourceChangedEventArgs() { Player = origin, ResourceChangeAmount = -AbilityInfo.ResourceCost });
-        
-        foreach (var target in _targets)
+        if (InstanceFinder.IsServerStarted)
         {
-            if (target.IsOwnedByMe)
-                continue;
-            //TODO: check if target is enemy or friendly and check TargetingType to match that.
-            if (IsLineOfSight(origin.transform, target.transform))
+            _targets = _areaSelector.GetTargetsInArea(origin);
+            _owner = origin;
+
+            foreach (var tar in _targets)
             {
-                ApplyEffects(origin, target);
+                if (tar.IsOwnedByMe)
+                    continue;
+                //TODO: check if target is enemy or friendly and check TargetingType to match that.
+                if (IsLineOfSight(origin.transform, tar.transform))
+                {
+                    ApplyEffectsServer(origin, tar);
+                }
             }
         }
     }
 
-    public override void ApplyEffects(Player origin, Player target) 
+    internal override void ApplyEffectsServer(Player origin, Player target) 
     {
         var args = new HealthChangedEventArgs()
         {
