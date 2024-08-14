@@ -8,14 +8,16 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using Logger = Assets.Scripts.Helpers.Logger;
 
 public class CastManager : NetworkBehaviour
 {
     private static CastManager _instance;
     public static CastManager Instance => _instance;
 
-    [AllowMutableSyncType]
-    private SyncDictionary<int, AbilityCastInfo> _castTimerDict = new SyncDictionary<int, AbilityCastInfo>();
+    private Dictionary<int, AbilityCastInfo> _castTimerDict = new Dictionary<int, AbilityCastInfo>();
+
+    private readonly object _lock = new object();
 
     void Awake()
     {
@@ -45,7 +47,7 @@ public class CastManager : NetworkBehaviour
         for (int i = 0; i < _castTimerDict.Count; i++)
         {
             var entry = _castTimerDict.ElementAt(i);
-            if (entry.Value.CastTimeRemaining > 0f)
+            if (entry.Value.CastTimeRemaining > 0f && !entry.Value.WasInterrupted)
             {
                 var newValue = entry.Value.CastTimeRemaining - Time.deltaTime;
                 _castTimerDict[entry.Key] = new AbilityCastInfo(entry.Value.AbilityId, newValue);
@@ -83,7 +85,7 @@ public class CastManager : NetworkBehaviour
         }
         return false;
     }
-    public float GetRemainingCastTime(int owner, int abilityId)
+    public float GetRemainingCastTime(int owner)
     {
         if (_castTimerDict.ContainsKey(owner))
         {
@@ -101,8 +103,32 @@ public class CastManager : NetworkBehaviour
         }
     }
 
+    [Server]
+    internal void InterruptPlayer(int playerId)
+    {
+        if (_castTimerDict.ContainsKey(playerId))
+        {
+            var entry = _castTimerDict[playerId];
+            entry.WasInterrupted = true;
+            _castTimerDict[playerId] = new AbilityCastInfo(entry.AbilityId, entry.CastTimeRemaining, true);
+
+            Logger.Log($"Player {playerId} was interrupted. Entry: {_castTimerDict[playerId].WasInterrupted}");
+        }
+    }
     public void StartCastCoroutine(IEnumerator coroutine)
     {
         StartCoroutine(coroutine);
+    }
+
+    [Server]
+    internal bool GetInterrupted(int playerId)
+    {
+        if (_castTimerDict.ContainsKey(playerId))
+        {
+            var entry = _castTimerDict[playerId];
+            Logger.Log($"GetInterrupted {playerId} == {entry.WasInterrupted}");
+            return entry.WasInterrupted;
+        }
+        return false;
     }
 }

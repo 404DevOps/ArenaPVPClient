@@ -1,10 +1,13 @@
 using Assets.ArenaPVP.Scripts.Helpers;
+using Assets.ArenaPVP.Scripts.Models.Enums;
 using Assets.Scripts.Enums;
 using FishNet;
 using GameKit.Dependencies.Utilities;
 using System;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
+using static UnityEngine.UI.Image;
 using Logger = Assets.Scripts.Helpers.Logger;
 
 [Serializable]
@@ -14,26 +17,16 @@ public abstract class AbilityBase : ScriptableObject
     public AbilityInfo AbilityInfo;
     public AbilityTargetType TargetingType;
 
+    public AuraBase[] ApplyAuras;
+
     public bool NeedLineOfSight;
     public bool NeedTargetInFront;
 
-    private bool _wasInterrupted;
-    private int _ownerId;
-
-    //TODO: make ServerCharacter owner and target
     public void TryUseAbility(Player origin, Player target)
     {
-        _wasInterrupted = false;
-        _ownerId = origin.Id;
-
         AbilityExecutor.Instance.TryUseAbilityClient(new UseAbilityArgs(Id, origin, target));
     }
 
-    //private void WasInterrupted(int ownerId)
-    //{
-    //    if (_ownerId != ownerId) return;
-    //    _wasInterrupted = true;
-    //}
     public bool CanBeUsed(Player owner, Player target)
     {
         bool canbeUse = true;
@@ -104,7 +97,7 @@ public abstract class AbilityBase : ScriptableObject
     }
     private bool IsAlreadyCasting(int ownerId)
     {
-        if (CastManager.Instance.Contains(ownerId, Id) && CastManager.Instance.GetRemainingCastTime(ownerId, Id) > 0)
+        if (CastManager.Instance.Contains(ownerId, Id) && CastManager.Instance.GetRemainingCastTime(ownerId) > 0)
         {
             return true;
         }
@@ -175,20 +168,51 @@ public abstract class AbilityBase : ScriptableObject
 
         return false;
     }
-    internal virtual void UseServer(Player owner, Player target) 
+
+    /// <summary>
+    /// Checks if Instance is Server, then Applies "OnCastFinished" Auras (anything additional should be in override)
+    /// </summary>
+    internal virtual void UseServer(Player origin, Player target) 
     {
         if (!InstanceFinder.IsServerStarted)
             throw new Exception("Tried execute Server function from Client");
+
+        if (ApplyAuras != null)
+        {
+            foreach (var aura in ApplyAuras.Where(a => a.AuraApplyTiming == AuraApplyTiming.OnCastFinished))
+            {
+                if (aura.AuraTarget == AuraTargetType.Player)
+                    aura.Apply(origin, origin);
+                else if (aura.AuraTarget == AuraTargetType.Target)
+                    aura.Apply(origin, target);
+            }
+        }
     }
-    internal virtual void UseClient(Player owner, Player target)
+
+    /// <summary>
+    /// All Animations, Sounds and Particles should be instantiated here.
+    /// </summary>
+    internal virtual void UseClient(Player origin, Player target)
     {
         if (!InstanceFinder.IsClientStarted)
             throw new Exception("Tried execute Client function from Server");
     }
-    internal virtual void ApplyEffectsServer(Player owner, Player target)
+
+    /// <summary>
+    /// Checks if Instance is Server, then Applies "OnHit" Auras (anything additional such as Heal/Damage application should be in override)
+    /// </summary>
+    internal virtual void ApplyEffectsServer(Player origin, Player target)
     {
         if (!InstanceFinder.IsServerStarted)
             throw new Exception("Tried execute Server function from Client");
+
+        foreach (var aura in ApplyAuras.Where(a => a.AuraApplyTiming == AuraApplyTiming.OnHit))
+        {
+            if (aura.AuraTarget == AuraTargetType.Player)
+                aura.Apply(origin, origin);
+            else if (aura.AuraTarget == AuraTargetType.Target)
+                aura.Apply(origin, target);
+        }
     }
 }
 

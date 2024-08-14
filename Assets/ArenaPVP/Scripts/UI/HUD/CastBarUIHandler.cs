@@ -20,6 +20,7 @@ public class CastBarUIHandler : MonoBehaviour
     public Player Player;
 
     private bool _isCasting;
+    private float _remainingCastTime;
     [SerializeField] private bool _isMainCastBar;
 
     // Start is called before the first frame update
@@ -60,14 +61,14 @@ public class CastBarUIHandler : MonoBehaviour
             return;
 
         var ability = AbilityStorage.GetAbility(abilityId);
-
-        this.Ability = ability;
+        Ability = ability;
         Fill.fillAmount = 0;
         Fill.color = CastbarColor;
         Icon.sprite = Ability.AbilityInfo.Icon;
         AbilityNameText.text = Ability.AbilityInfo.Name;
         CurrentCastTime.text = "0";
         MaxCastTime.text = "/ " + Ability.AbilityInfo.CastTime.ToString();
+        _remainingCastTime = Ability.AbilityInfo.CastTime;
         _isCasting = true;
         CastBarParent.SetActive(true);
     }
@@ -87,6 +88,7 @@ public class CastBarUIHandler : MonoBehaviour
         if (ownerId != Player.Id)
             return;
 
+        _remainingCastTime = 0;
         Fill.fillAmount = 1;
         Fill.color = Color.green;
         AbilityNameText.text = "Complete";
@@ -108,12 +110,12 @@ public class CastBarUIHandler : MonoBehaviour
         {
             if (_isCasting)
             {
-                float remainingCastTime = CastManager.Instance.GetRemainingCastTime(Player.Id, Ability.Id);
-                if (remainingCastTime > 0)
+                _remainingCastTime -= Time.deltaTime;
+                if (_remainingCastTime > 0)
                 {
-                    var percentage = remainingCastTime / Ability.AbilityInfo.CastTime;
+                    var percentage = _remainingCastTime / Ability.AbilityInfo.CastTime;
                     Fill.fillAmount = 1 - percentage;
-                    CurrentCastTime.text = remainingCastTime.ToString("0.0");
+                    CurrentCastTime.text = _remainingCastTime.ToString("0.0");
                 }
             }
         }

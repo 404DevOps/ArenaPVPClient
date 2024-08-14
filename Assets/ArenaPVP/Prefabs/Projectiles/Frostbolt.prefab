@@ -120,7 +120,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Origin: {fileID: 0}
-  MoveSpeed: 200
+  MoveSpeed: 500
   LayerMask:
     serializedVersion: 2
     m_Bits: 192

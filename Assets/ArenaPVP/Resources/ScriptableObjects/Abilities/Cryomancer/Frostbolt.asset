@@ -17,7 +17,7 @@ MonoBehaviour:
     Name: Frostbolt
     Description: Hurls a bolt of Ice towards the Target, dealing $DAMAGE$ spell damage
       and slowing the Target by 20% for 20 seconds
-    CastTime: 0.2
+    CastTime: 3
     Cooldown: 0
     ResourceCost: 20
     Range: 30
@@ -27,9 +27,9 @@ MonoBehaviour:
     ClassType: 2
     AbilityType: 0
   TargetingType: 3
-  NeedLineOfSight: 1
-  NeedTargetInFront: 1
-  ProjectilePrefab: {fileID: 7151622442908913835, guid: 2ec56a7db9e24454babab573b49bbad9, type: 3}
   ApplyAuras:
   - {fileID: 11400000, guid: ab384e3e7018254449ca08ebbfa43a46, type: 2}
   - {fileID: 11400000, guid: 195c20ae620d2674582fb1814eea8c6c, type: 2}
+  NeedLineOfSight: 1
+  NeedTargetInFront: 1
+  ProjectileIdentifier: 0

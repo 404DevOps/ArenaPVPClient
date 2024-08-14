@@ -34,6 +34,8 @@ public class ActionSlot : MonoBehaviour, IDropHandler
     private AbilityUIDisplay _abilityDisplay;
     public Action<int, AbilityBase> OnAbilityChanged;
 
+    private float _remainingCooldown = 0;
+
     private void Update()
     {
         if (_player == null)
@@ -61,6 +63,7 @@ public class ActionSlot : MonoBehaviour, IDropHandler
             _isOnCooldown = true;
             Swipe.gameObject.SetActive(true);
             CooldownText.gameObject.SetActive(true);
+            _remainingCooldown = Ability.AbilityInfo.Cooldown;
         }
     }
     private void ShowCooldown(int ownerId)
@@ -69,18 +72,18 @@ public class ActionSlot : MonoBehaviour, IDropHandler
         {
             Swipe.gameObject.SetActive(false);
             CooldownText.gameObject.SetActive(false);
+            return;
         }
 
         if (_isOnCooldown)
         {
             var identifier = new AbilityCooldownInfo(ownerId, Ability.Id);
-            var remainingCooldown = CooldownManager.Instance.GetRemainingCooldown(identifier);
+            _remainingCooldown -= Time.deltaTime;
 
-            if (CooldownManager.Instance.Contains(identifier) && remainingCooldown < 0)
+            if (CooldownManager.Instance.Contains(identifier) && _remainingCooldown > 0)
             {
-                var absCd = Mathf.Abs(remainingCooldown);
-                CooldownText.text = (Mathf.Ceil(absCd)).ToString();
-                var cdPercentage = (absCd / Ability.AbilityInfo.Cooldown);
+                CooldownText.text = (Mathf.Ceil(_remainingCooldown)).ToString();
+                var cdPercentage = _remainingCooldown / Ability.AbilityInfo.Cooldown;
                 Swipe.fillAmount = cdPercentage;
             }
             else
@@ -90,6 +93,7 @@ public class ActionSlot : MonoBehaviour, IDropHandler
         }
         if (!_isOnCooldown)
         {
+            _remainingCooldown = 0;
             Swipe.fillAmount = 0;
             Swipe.gameObject.SetActive(false);
             CooldownText.gameObject.SetActive(false);

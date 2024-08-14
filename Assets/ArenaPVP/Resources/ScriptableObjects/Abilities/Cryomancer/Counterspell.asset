@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d367d07c6c60324ca3d31bc56f95ed1, type: 3}
+  m_Name: Counterspell
+  m_EditorClassIdentifier: 
+  Id: 11002
+  AbilityInfo:
+    Name: Counterspell
+    Description: Counters target player's current Cast.
+    CastTime: 0
+    Cooldown: 10
+    ResourceCost: 50
+    Range: 30
+    Icon: {fileID: 21300000, guid: bc894b40f78a8124480df3a9a3f41f33, type: 3}
+    DamageType: 2
+    Damage: 0
+    ClassType: 2
+    AbilityType: 0
+  TargetingType: 3
+  ApplyAuras: []
+  NeedLineOfSight: 1
+  NeedTargetInFront: 1

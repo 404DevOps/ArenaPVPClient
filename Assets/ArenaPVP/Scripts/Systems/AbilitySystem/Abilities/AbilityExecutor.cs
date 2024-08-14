@@ -3,6 +3,7 @@ using FishNet.CodeGenerating;
 using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.Playables;
@@ -63,7 +64,8 @@ public class AbilityExecutor : NetworkBehaviour
                 
                 foreach (var conn in _nob.Observers)
                 {
-                    OnUseAbilityTargetRpc(conn, args);
+                    if (conn != sender)
+                        OnUseAbilityTargetRpc(conn, args);
                 }
             }
         }
@@ -74,8 +76,14 @@ public class AbilityExecutor : NetworkBehaviour
     {
         var ability = AbilityStorage.GetAbility(args.AbilityId);
 
-        if(ability.AbilityInfo.Cooldown > 0)
+        if (ability.AbilityInfo.Cooldown > 0)
+        {
             CooldownManager.Instance.AddOrUpdate(new AbilityCooldownInfo(args.Origin.Id, ability.Id, ability.AbilityInfo.Cooldown));
+            foreach (var conn in _nob.Observers)
+            {
+                OnCooldownStartedTargetRpc(conn, args);
+            }
+        }
         if (ability.AbilityInfo.ResourceCost > 0)
             args.Origin.GetComponent<PlayerResource>().UpdateResourceServer(new ResourceChangedEventArgs() { Player = args.Origin, ResourceChangeAmount = -ability.AbilityInfo.ResourceCost });
 
@@ -85,50 +93,62 @@ public class AbilityExecutor : NetworkBehaviour
     [Server]
     IEnumerator CastTimer(UseAbilityArgs args, NetworkConnection sender)
     {
-        var wasInterrupted = false;
         var ability = AbilityStorage.GetAbility(args.AbilityId);
-
-        if (wasInterrupted)
-        {
-            foreach (var conn in _nob.Observers)
-            {
-                OnCastInterruptedTargetRpc(conn, args);
-            }
-            Logger.Log($"Ability {ability.AbilityInfo.Name} was Interrupted while casting.");
-            yield break;
-        }
-
         //wait till casttimer hit 0
-        yield return new WaitUntil(() => CastManager.Instance.GetRemainingCastTime(args.Origin.Id, args.AbilityId) <= 0);
-        CastManager.Instance.Remove(args.Origin.Id);
+        yield return new WaitUntil(() => CastManager.Instance.GetRemainingCastTime(args.Origin.Id) <= 0 || CastManager.Instance.GetInterrupted(args.Origin.Id) == true);
 
-        //check line of sight again for non-area effects, automatically interrupt if LoS is not given anymore
-        if (ability.AbilityInfo.AbilityType != AbilityType.AreaOfEffect && (!ability.IsInFront(args.Origin.transform, args.Target.transform) || !ability.IsLineOfSight(args.Origin.transform, args.Target.transform)))
+        //enemy interrupt
+        if (CastManager.Instance.GetInterrupted(args.Origin.Id) == true)
         {
-            wasInterrupted = true;
+            SendClientInterrupt(args, sender);
         }
-        if (!wasInterrupted)
+        //moved to invalid position during cast results in interrupt aswell
+        else if(ability.AbilityInfo.AbilityType != AbilityType.AreaOfEffect && (!ability.IsInFront(args.Origin.transform, args.Target.transform) || !ability.IsLineOfSight(args.Origin.transform, args.Target.transform)))
+        {
+            SendClientInterrupt(args, sender);
+        }
+        else
         {
             UseAbilityWithCooldownAndResource(args, sender);
 
             foreach (var conn in _nob.Observers)
             {
                 OnCastCompletedTargetRpc(conn, args);
-                OnUseAbilityTargetRpc(conn, args);
+                if (conn != sender)
+                    OnUseAbilityTargetRpc(conn, args);
             }
+        }
+
+        CastManager.Instance.Remove(args.Origin.Id);
+    }
+
+    [Server]
+    private void SendClientInterrupt(UseAbilityArgs args, NetworkConnection sender)
+    {
+        foreach (var conn in _nob.Observers)
+        {
+            OnCastInterruptedTargetRpc(conn, args, conn == sender);
         }
     }
 
     [TargetRpc]
     public void OnCastCompletedTargetRpc(NetworkConnection conn, UseAbilityArgs args)
     {
+        
         GameEvents.OnCastCompleted.Invoke(args.Origin.Id);
+    }
+    [TargetRpc]
+    public void OnCooldownStartedTargetRpc(NetworkConnection conn, UseAbilityArgs args)
+    {
+        GameEvents.OnCooldownStarted.Invoke(args.Origin.Id, args.AbilityId);
     }
 
     [TargetRpc]
-    public void OnCastInterruptedTargetRpc(NetworkConnection conn, UseAbilityArgs args)
+    public void OnCastInterruptedTargetRpc(NetworkConnection conn, UseAbilityArgs args, bool isSender = false)
     {
         GameEvents.OnCastInterrupted.Invoke(args.Origin.Id);
+        if (isSender)
+            UIEvents.OnShowInformationPopup.Invoke("Interrupted");
     }
 
     [TargetRpc]

@@ -21,10 +21,11 @@ public class AbilityTooltipUIDisplay : TooltipBaseUIDisplay
         var player = FindObjectsOfType<Player>().FirstOrDefault(p => p.IsOwnedByMe);
         Name.text = AbilityInfo.Name;
         Description.text = AbilityInfo.Description.Replace("$DAMAGE$", DamageCalculator.GetDamageAfterPowerModifiers(player, AbilityInfo.Damage, AbilityInfo.DamageType).ToString());
-        Cooldown.text = AbilityInfo.Cooldown.ToString() + "sec Cooldown";
+        Cooldown.text = AbilityInfo.Cooldown > 0 ? AbilityInfo.Cooldown.ToString() + "sec Cooldown" : "";
         CastTime.text = AbilityInfo.CastTime == 0 ? "Instant" : AbilityInfo.CastTime.ToString() + "sec Cast";
-        Range.text = AbilityInfo.Range >= 5 ? "Melee Range" : AbilityInfo.Range.ToString() + "yd Range";
+        Range.text = AbilityInfo.Range <= 5 ? "Melee Range" : AbilityInfo.Range.ToString() + "yd Range";
         Cost.text = AbilityInfo.ResourceCost == 0 ? "" : AbilityInfo.ResourceCost.ToString() + " " + GetResourceName();
+
         StartCoroutine(WaitForFrame());
     }
 

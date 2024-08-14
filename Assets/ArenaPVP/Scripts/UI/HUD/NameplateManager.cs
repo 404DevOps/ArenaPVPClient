@@ -99,6 +99,9 @@ public class NameplateManager : MonoBehaviour
         var nameplateHandler = nameplate.GetComponent<NameplateUIHandler>();
         nameplateHandler.Player = player;
 
+        var castBarHandler = nameplate.GetComponentInChildren<CastBarUIHandler>();
+        castBarHandler.Player = player;
+
         nameplate.transform.SetParent(_canvas);
         nameplate.SetActive(true);
         Destroy(go);
@@ -128,19 +131,18 @@ public class NameplateManager : MonoBehaviour
                 } 
             }
         }
-        else 
-        {
-            InitializeNameplates();
-            _firstLoad = false;
-        }
+        _firstLoad = false;
     }
 
     public void OnEnable()
     {
+        GameEvents.OnPlayerInitialized.AddListener(InstatiateNameplate);
         UIEvents.OnSettingsLoaded.AddListener(OnSettingsLoaded);
     }
+
     public void OnDisable()
     {
+        GameEvents.OnPlayerInitialized.RemoveListener(InstatiateNameplate);
         UIEvents.OnSettingsLoaded.RemoveListener(OnSettingsLoaded);
     }
 }

@@ -11,21 +11,10 @@ using Logger = Assets.Scripts.Helpers.Logger;
 public class TargetedProjectileAbility : AbilityBase
 {
     public ProjectileIdentifier ProjectileIdentifier;
-    public AuraBase[] ApplyAuras;
 
     internal override void UseServer(Player origin, Player target)
     {
-        base.UseServer(origin, target);
-        if (ApplyAuras != null)
-        {
-            foreach (var aura in ApplyAuras.Where(a => a.AuraApplyTiming == AuraApplyTiming.OnCastFinished))
-            {
-                if(aura.AuraTarget == AuraTargetType.Player)
-                    aura.Apply(origin, origin);
-                else if (aura.AuraTarget == AuraTargetType.Target)
-                    aura.Apply(origin, target);
-            }
-        }
+        base.UseServer(origin, target); 
     }
     internal override void UseClient(Player origin, Player target)
     {
@@ -37,8 +26,6 @@ public class TargetedProjectileAbility : AbilityBase
     {
         base.ApplyEffectsServer(origin, target);
 
-        if(InstanceFinder.IsServerStarted)
-        {
             var args = new HealthChangedEventArgs()
             {
                 Player = target.GetComponent<Player>(),
@@ -49,14 +36,5 @@ public class TargetedProjectileAbility : AbilityBase
                 AbilityId = Id
             };
             target.GetComponent<PlayerHealth>().UpdateHealthServer(args);
-
-            foreach (var aura in ApplyAuras.Where(a => a.AuraApplyTiming == AuraApplyTiming.OnHit))
-            {
-                if (aura.AuraTarget == AuraTargetType.Player)
-                    aura.Apply(origin, origin);
-                else if (aura.AuraTarget == AuraTargetType.Target)
-                    aura.Apply(origin, target);
-            }
-        }
     }
 }

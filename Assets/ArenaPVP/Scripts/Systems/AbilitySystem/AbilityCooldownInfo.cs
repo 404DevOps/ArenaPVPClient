@@ -16,12 +16,14 @@ public struct AbilityCooldownInfo
 
 public struct AbilityCastInfo
 {
-    public AbilityCastInfo(int abilityId, float castDuration)
+    public AbilityCastInfo(int abilityId, float castDuration, bool interrupted = false)
     {
         this.AbilityId = abilityId;
         this.CastTimeRemaining = castDuration;
+        this.WasInterrupted = interrupted;
     }
 
     public int AbilityId;
     public float CastTimeRemaining;
+    public bool WasInterrupted;
 }

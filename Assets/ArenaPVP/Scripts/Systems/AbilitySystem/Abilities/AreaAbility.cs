@@ -8,12 +8,11 @@ using Logger = Assets.Scripts.Helpers.Logger;
 [CreateAssetMenu(menuName = "Abilities/AreaAbility", fileName = "AreaAbility")]
 public class AreaAbility : AbilityBase
 {
-    public AuraBase[] ApplyAuras;
     private List<Player> _targets;
     private Player _owner;
     [SerializeField] private AreaSelectorBase _areaSelector;
 
-    internal override void UseServer(Player origin, Player target)
+    internal override void UseServer(Player origin, Player target = null)
     {
         if (InstanceFinder.IsServerStarted)
         {
@@ -45,11 +44,6 @@ public class AreaAbility : AbilityBase
             AbilityId = Id
         };
 
-        foreach (var aura in ApplyAuras)
-        {
-            aura.Apply(_owner, target);
-        }
-
-        GameEvents.OnPlayerHealthChanged.Invoke(args);
+        target.GetComponent<PlayerHealth>().UpdateHealthServer(args);
     }
 }
