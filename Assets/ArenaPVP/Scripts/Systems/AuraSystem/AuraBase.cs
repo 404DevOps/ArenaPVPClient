@@ -26,44 +26,48 @@ public class AuraBase : ScriptableObject
     public List<StatModifier> StatModifiers;
     public bool isDebuff;
     private int _auraId;
-    private Player _applyTo;
 
     public int MaxStacks;
-
 
 
     public void Apply(Player owner, Player target) 
     {
         if (InstanceFinder.IsServerStarted)
         {
+            Player applyTo;
             switch (AuraTarget)
             {
                 case AuraTargetType.Player:
-                    _applyTo = owner;
+                    applyTo = owner;
                     break;
                 case AuraTargetType.Target:
-                    _applyTo = target;
+                    applyTo = target;
                     break;
                 default: throw new ArgumentOutOfRangeException();
             }
 
-            var stackAmountBeforeApplyAura = AuraManager.Instance.GetStackAmount(_applyTo.Id, Id);
+            var stackAmountBeforeApplyAura = AuraManager.Instance.GetStackAmount(applyTo.Id, Id);
 
-            _auraId = AuraManager.Instance.AddAura(owner, _applyTo, this); //will stack if possible
+            _auraId = AuraManager.Instance.AddAura(owner, applyTo, this); //will stack if possible
 
             if (stackAmountBeforeApplyAura < MaxStacks)
             {
                 foreach (var statMod in StatModifiers)
                 {
                     statMod.SourceAuraId = _auraId;
-                    _applyTo.Stats.Mediator.AddModifier(statMod);
+                    applyTo.GetComponent<PlayerStats>().Mediator.AddModifier(statMod);
+                    Logger.Log($"Applied {Name} Aura to Player with ID {applyTo.Id}");
                 }
             }
         }
     }
-    public void Fade() 
+    public void Fade(Player player, int auraId) 
     {
-        _applyTo.Stats.Mediator.RemoveAuraModifiers(_auraId);  
+        if (InstanceFinder.IsServerStarted)
+        {
+            player.GetComponent<PlayerStats>().Mediator.RemoveAuraModifiers(auraId);
+            Logger.Log($"Applied {Name} Aura to Player with ID {player.Id}");
+        }
     }
 }
 public enum AuraTargetType

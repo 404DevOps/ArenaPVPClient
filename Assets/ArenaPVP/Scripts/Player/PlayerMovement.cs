@@ -23,7 +23,7 @@ public class PlayerMovement: NetworkBehaviour
     #endregion
     #region References
 
-    private Player _player;
+    private PlayerStats _stats;
     private float _rotation;
     private Vector3 _currentDirection;
     private CharacterController _characterController;
@@ -41,11 +41,11 @@ public class PlayerMovement: NetworkBehaviour
         base.OnStartClient();
         if (base.IsOwner)
         {
-            _player = GetComponent<Player>();
-
             _characterController = GetComponent<CharacterController>();
             _settings = FindObjectOfType<PlayerConfiguration>();
+            _stats = GetComponent<PlayerStats>();
             _controls = _settings.Settings.Controls;
+            GameEvents.OnPlayerStatsInitialized.AddListener(OnStatsInitialized);
         }
         else 
         {
@@ -53,10 +53,21 @@ public class PlayerMovement: NetworkBehaviour
         }
     }
 
+    public void OnStatsInitialized(Player player)
+    {
+        if (GetComponent<Player>().Id == player.Id) 
+        {
+            _stats = player.GetComponent<PlayerStats>();
+            GameEvents.OnPlayerStatsInitialized.RemoveListener(OnStatsInitialized);
+        }     
+    }
+
     // Update is called once per frame
     void Update()
     {
         if (!base.IsOwner)
+            return;
+        if (_stats == null)
             return;
         //if (!base.IsOwner)
         //    return;
@@ -95,8 +106,10 @@ public class PlayerMovement: NetworkBehaviour
     {
         if (!base.IsOwner)
             return;
+        if (_stats == null)
+            return;
 
-        _characterController.Move(new Vector3(_currentDirection.x * _walkSpeed, _velocityY, _currentDirection.z * _walkSpeed) * Time.deltaTime * _player.Stats.MovementSpeed);  
+        _characterController.Move(new Vector3(_currentDirection.x * _walkSpeed, _velocityY, _currentDirection.z * _walkSpeed) * Time.deltaTime * _stats.MovementSpeed);  
     }
 
     private void HandleJump()

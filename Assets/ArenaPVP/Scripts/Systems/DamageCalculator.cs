@@ -15,11 +15,11 @@ public static class DamageCalculator
     public static float GetDamageAfterPowerModifiers(Player source, float abilityBaseDamage, DamageType damageType) 
     {
         float result = 0;
-
+        var playerStats = source.GetComponent<PlayerStats>();
         switch (damageType) 
         {
-            case DamageType.Magic: result = source.Stats.Spellpower + abilityBaseDamage; break;
-            case DamageType.Physical: result = source.Stats.Attackpower + abilityBaseDamage; break;
+            case DamageType.Magic: result = playerStats.Spellpower + abilityBaseDamage; break;
+            case DamageType.Physical: result = playerStats.Attackpower + abilityBaseDamage; break;
             default: throw new ArgumentOutOfRangeException();
         }
 
@@ -29,11 +29,12 @@ public static class DamageCalculator
     public static float GetDamageAfterDefenseModifiers(Player target, float damageAfterPower, DamageType damageType)
     {
         float result = 0;
+        var playerStats = target.GetComponent<PlayerStats>();
 
         switch (damageType)
         {
-            case DamageType.Magic: result = damageAfterPower - target.Stats.SpellResistance; break;
-            case DamageType.Physical: result = damageAfterPower - target.Stats.Armor; break;
+            case DamageType.Magic: result = damageAfterPower - playerStats.SpellResistance; break;
+            case DamageType.Physical: result = damageAfterPower - playerStats.Armor; break;
             default: throw new ArgumentOutOfRangeException();
         }
 

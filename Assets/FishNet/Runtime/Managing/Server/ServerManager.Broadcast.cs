@@ -345,7 +345,6 @@ namespace FishNet.Managing.Server
                 return;
             }
         }
-
     }
 
 

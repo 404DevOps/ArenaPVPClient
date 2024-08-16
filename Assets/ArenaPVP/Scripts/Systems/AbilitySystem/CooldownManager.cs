@@ -93,6 +93,11 @@ public class CooldownManager : NetworkBehaviour
     {
         return _abilityCooldownDictionary.ContainsKey(identifier);
     }
+
+    private void OnDisable()
+    {
+        _abilityCooldownDictionary.Clear();
+    }
 }
 
 

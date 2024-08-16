@@ -29,7 +29,7 @@ public class ClassStatMapping : ScriptableObject
             return pair.Stats;
         }
 
-        throw new ArgumentOutOfRangeException();
+        throw new ArgumentOutOfRangeException($"Didnt find BaseStats for {classType.ToString()}");
     }
 }
 

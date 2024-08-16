@@ -131,4 +131,9 @@ public class CastManager : NetworkBehaviour
         }
         return false;
     }
+
+    private void OnDisable()
+    {
+        _castTimerDict.Clear();
+    }
 }

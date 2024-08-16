@@ -8,20 +8,18 @@ public class PlayerResource : NetworkBehaviour
     public readonly SyncVar<float> MaxResource = new SyncVar<float>();
     public readonly SyncVar<float> CurrentResource = new SyncVar<float>();
 
-    public Player Player;
+    public PlayerStats Stats;
 
-    void Awake()
+    public override void OnStartServer()
     {
-        Player = GetComponent<Player>();
-        MaxResource.Value = Player.Stats.Resource;
-        CurrentResource.Value = Player.Stats.Resource;
+        Stats = GetComponent<PlayerStats>();
+        MaxResource.Value = Stats.MaxResource;
+        CurrentResource.Value = Stats.MaxResource;
     }
 
     [Server]
     public void UpdateResourceServer(ResourceChangedEventArgs args)
     {
-        Logger.Log("UpdateResource Server called.");
-
         CurrentResource.Value += args.ResourceChangeAmount;
         if (CurrentResource.Value > MaxResource.Value)
             CurrentResource.Value = MaxResource.Value;

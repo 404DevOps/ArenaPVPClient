@@ -5,6 +5,7 @@ using FishNet.Object.Synchronizing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using Logger = Assets.Scripts.Helpers.Logger;
 
@@ -99,7 +100,7 @@ public class AuraManager : NetworkBehaviour
     private void RemoveAura(int playerId, int auraIndex)
     {
         var playeEntry = _playerAurasDict[playerId];
-        AbilityStorage.GetAura(playeEntry[auraIndex].AuraId).Fade();
+        AbilityStorage.GetAura(playeEntry[auraIndex].AuraId).Fade(playeEntry[auraIndex].AppliedTo, playeEntry[auraIndex].AuraId);
         AuraRemovedClient(playerId, playeEntry[auraIndex]);
 
         playeEntry.RemoveAt(auraIndex);
@@ -185,7 +186,14 @@ public class AuraManager : NetworkBehaviour
         }
         return 0;
     }
+
+    private void OnDisable()
+    {
+        _playerAurasDict.Clear();
+    }
 }
+
+
 
 [Serializable]
 public class AuraInfo

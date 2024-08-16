@@ -181,10 +181,7 @@ public abstract class AbilityBase : ScriptableObject
         {
             foreach (var aura in ApplyAuras.Where(a => a.AuraApplyTiming == AuraApplyTiming.OnCastFinished))
             {
-                if (aura.AuraTarget == AuraTargetType.Player)
-                    aura.Apply(origin, origin);
-                else if (aura.AuraTarget == AuraTargetType.Target)
-                    aura.Apply(origin, target);
+                aura.Apply(origin, origin);
             }
         }
     }
@@ -208,10 +205,7 @@ public abstract class AbilityBase : ScriptableObject
 
         foreach (var aura in ApplyAuras.Where(a => a.AuraApplyTiming == AuraApplyTiming.OnHit))
         {
-            if (aura.AuraTarget == AuraTargetType.Player)
-                aura.Apply(origin, origin);
-            else if (aura.AuraTarget == AuraTargetType.Target)
-                aura.Apply(origin, target);
+            aura.Apply(origin, target);
         }
     }
 }

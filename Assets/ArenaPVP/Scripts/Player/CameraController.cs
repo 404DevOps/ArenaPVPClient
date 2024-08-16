@@ -1,4 +1,5 @@
 using Assets.Scripts.Enums;
+using FishNet;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -42,6 +43,10 @@ public class CameraController: MonoBehaviour
 
     void OnPlayerInitialized(Player player)
     {
+        if(!InstanceFinder.IsClientStarted)
+            return;
+
+
         if (player.IsOwnedByMe)
         {
             mainCam = Camera.main;

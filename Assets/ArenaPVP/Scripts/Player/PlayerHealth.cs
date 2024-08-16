@@ -11,7 +11,7 @@ public class PlayerHealth : NetworkBehaviour
     [SerializeField][AllowMutableSyncType] public  SyncVar<float> MaxHealth = new SyncVar<float>();
     [SerializeField][AllowMutableSyncType] public  SyncVar<float> CurrentHealth = new SyncVar<float>();
 
-    public Player Player;
+    public PlayerStats Stats;
 
     [Server]
     public void UpdateHealthServer(HealthChangedEventArgs args)
@@ -29,10 +29,11 @@ public class PlayerHealth : NetworkBehaviour
         GameEvents.OnPlayerHealthChanged.Invoke(args);
     }
 
-    private void Awake()
+    public override void OnStartServer()
     {
-        Player = GetComponent<Player>();
-        MaxHealth.Value = Player.Stats.Health;
-        CurrentHealth.Value = Player.Stats.Health;
+        base.OnStartServer();
+        Stats = GetComponent<PlayerStats>();
+        MaxHealth.Value = Stats.MaxHealth;
+        CurrentHealth.Value = Stats.MaxHealth;
     }
 }
