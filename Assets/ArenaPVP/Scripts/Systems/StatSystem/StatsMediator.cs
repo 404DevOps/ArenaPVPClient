@@ -1,34 +1,43 @@
 using Assets.ArenaPVP.Scripts.Models.Enums;
+using FishNet.CodeGenerating;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
+using UnityEngine;
+using Logger = Assets.Scripts.Helpers.Logger;
 
 public class StatsMediator : NetworkBehaviour
 {
-    readonly SyncList<StatModifier> modifiers = new();
+    [AllowMutableSyncType]
+    [SerializeField]
+    private SyncList<StatModifier> modifiers = new();
 
-    public event EventHandler<StatQuery> Queries;
-    public void PerformQuery(object sender, StatQuery query) => Queries?.Invoke(sender, query);
-
-    [Server]
-    public void AddModifier(StatModifier modifier)
+    public void PerformQuery(object sender, StatQuery query) 
     {
-        modifiers.Add(modifier);
-        Queries += modifier.Handle;
+        foreach (StatModifier mod in modifiers) 
+        {
+            query.Value += mod.Modify(query);
+        }
+
     }
 
     [Server]
-    public void RemoveAuraModifiers(int auraId)
+    public void AddModifierServer(StatModifier modifier)
+    {
+        modifiers.Add(modifier);
+    }
+
+    [Server]
+    public void RemoveModifiersServer(int auraId)
     {
         for (int i = 0; i < modifiers.Count; i++)
         {
             var node = modifiers[i];
             if (node.SourceAuraId == auraId)
             {
-                Queries -= node.Handle;
                 modifiers.RemoveAt(i);
                 node.Dispose();
                 if (i > 0)
@@ -40,6 +49,7 @@ public class StatsMediator : NetworkBehaviour
     }
 }
 
+[Serializable]
 public class StatQuery
 {
     public readonly StatType StatType;

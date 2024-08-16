@@ -100,7 +100,7 @@ public class AuraManager : NetworkBehaviour
     private void RemoveAura(int playerId, int auraIndex)
     {
         var playeEntry = _playerAurasDict[playerId];
-        AbilityStorage.GetAura(playeEntry[auraIndex].AuraId).Fade(playeEntry[auraIndex].AppliedTo, playeEntry[auraIndex].AuraId);
+        AbilityStorage.GetAura(playeEntry[auraIndex].AuraId).Fade(playeEntry[auraIndex].AppliedTo, playeEntry[auraIndex].AuraInstanceId);
         AuraRemovedClient(playerId, playeEntry[auraIndex]);
 
         playeEntry.RemoveAt(auraIndex);

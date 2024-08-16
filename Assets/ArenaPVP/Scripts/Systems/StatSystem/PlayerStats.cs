@@ -8,10 +8,12 @@ using UnityEditor;
 using UnityEngine.Rendering;
 using FishNet.Object.Synchronizing;
 using FishNet.Demo.AdditiveScenes;
+using FishNet.CodeGenerating;
 
 public class PlayerStats : NetworkBehaviour
 {
     private StatsMediator _mediator;
+    [AllowMutableSyncType]
     private readonly SyncVar<BaseStats> _baseStats = new SyncVar<BaseStats>();
     public StatsMediator Mediator => _mediator;
 
@@ -45,8 +47,7 @@ public class PlayerStats : NetworkBehaviour
     }
     public float MovementSpeed
     {
-        get
-        {
+        get {
             var q = new StatQuery(StatType.MovementSpeed, _baseStats.Value.MovementSpeed);
             _mediator.PerformQuery(this, q);
             return q.Value;

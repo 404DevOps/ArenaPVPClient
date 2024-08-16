@@ -55,7 +55,7 @@ public class AuraBase : ScriptableObject
                 foreach (var statMod in StatModifiers)
                 {
                     statMod.SourceAuraId = _auraId;
-                    applyTo.GetComponent<PlayerStats>().Mediator.AddModifier(statMod);
+                    applyTo.GetComponent<StatsMediator>().AddModifierServer(statMod);
                     Logger.Log($"Applied {Name} Aura to Player with ID {applyTo.Id}");
                 }
             }
@@ -65,7 +65,7 @@ public class AuraBase : ScriptableObject
     {
         if (InstanceFinder.IsServerStarted)
         {
-            player.GetComponent<PlayerStats>().Mediator.RemoveAuraModifiers(auraId);
+            player.GetComponent<StatsMediator>().RemoveModifiersServer(auraId);
             Logger.Log($"Applied {Name} Aura to Player with ID {player.Id}");
         }
     }
