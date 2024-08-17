@@ -2,7 +2,7 @@ using FishNet;
 using GameKit.Dependencies.Utilities;
 using System;
 using UnityEngine;
-using Logger = Assets.Scripts.Helpers.Logger;
+using Logger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 
 public abstract class ProjectileBase : MonoBehaviour
 {

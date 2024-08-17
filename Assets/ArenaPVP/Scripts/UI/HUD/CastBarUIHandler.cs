@@ -5,6 +5,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using ArenaLogger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 
 public class CastBarUIHandler : MonoBehaviour
 {
@@ -21,6 +22,8 @@ public class CastBarUIHandler : MonoBehaviour
 
     private bool _isCasting;
     private float _remainingCastTime;
+    private uint _currentCastId;
+    private bool _newCastStarted;
     [SerializeField] private bool _isMainCastBar;
 
     // Start is called before the first frame update
@@ -55,12 +58,13 @@ public class CastBarUIHandler : MonoBehaviour
         GameEvents.OnCastCompleted.RemoveListener(OnCastCompleted);
     }
 
-    public void OnCastStarted(int ownerId, int abilityId)
+    public void OnCastStarted(CastEventArgs args) //int ownerId, int abilityId)
     {
-        if (ownerId != Player.Id)
+        if (args.OwnerId != Player.Id)
             return;
 
-        var ability = AbilityStorage.GetAbility(abilityId);
+        var ability = AbilityStorage.GetAbility(args.AbilityId);
+        _currentCastId = args.CastId;
         Ability = ability;
         Fill.fillAmount = 0;
         Fill.color = CastbarColor;
@@ -71,21 +75,26 @@ public class CastBarUIHandler : MonoBehaviour
         _remainingCastTime = Ability.AbilityInfo.CastTime;
         _isCasting = true;
         CastBarParent.SetActive(true);
+        _newCastStarted = true;
     }
-    public void OnCastInterrupted(int ownerId)
+    public void OnCastInterrupted(AbilityCastInfo args)
     {
-        if (ownerId != Player.Id)
+        if (args.OwnerId != Player.Id || args.CastId != _currentCastId)
             return;
 
         Fill.fillAmount = 1;
         Fill.color = Color.red;
         AbilityNameText.text = "Interrupted";
         CurrentCastTime.text = "0";
+        _isCasting = false;
+        _newCastStarted = false;
         StartCoroutine(SetInvisibleAfterTime(0.3f));
+  
     }
-    public void OnCastCompleted(int ownerId)
+    public void OnCastCompleted(CastEventArgs args)
     {
-        if (ownerId != Player.Id)
+        ArenaLogger.Log($"Completed Cast with Id={args.CastId}, CurrentCastId={_currentCastId}");
+        if (args.OwnerId != Player.Id || args.CastId != _currentCastId)
             return;
 
         _remainingCastTime = 0;
@@ -93,15 +102,19 @@ public class CastBarUIHandler : MonoBehaviour
         Fill.color = Color.green;
         AbilityNameText.text = "Complete";
         CurrentCastTime.text = Ability?.AbilityInfo?.CastTime.ToString("0.0");
+        _newCastStarted = false;
         StartCoroutine(SetInvisibleAfterTime(0.3f));
     }
 
     IEnumerator SetInvisibleAfterTime(float seconds)
     {
         yield return new WaitForSeconds(seconds);
-        _isCasting = false;
-        Ability = null;
-        CastBarParent.SetActive(false);
+        if (!_newCastStarted)
+        {
+            _isCasting = false;
+            Ability = null;
+            CastBarParent.SetActive(false);
+        }
     }
 
     void Update()

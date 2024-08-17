@@ -1,3 +1,4 @@
+using Assets.ArenaPVP.Scripts.Models.Enums;
 using FishNet;
 using FishNet.CodeGenerating;
 using FishNet.Object;
@@ -8,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using Logger = Assets.Scripts.Helpers.Logger;
+using ArenaLogger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 
 public class CastManager : NetworkBehaviour
 {
@@ -36,9 +37,9 @@ public class CastManager : NetworkBehaviour
     }
 
     [ObserversRpc]
-    private void OnCastStartedClient(int ownerId, int abilityId)
+    private void OnCastStartedClient(CastEventArgs args)
     {
-        GameEvents.OnCastStarted.Invoke(ownerId, abilityId);
+        GameEvents.OnCastStarted.Invoke(args);
     }
 
     [Server]
@@ -50,7 +51,7 @@ public class CastManager : NetworkBehaviour
             if (entry.Value.CastTimeRemaining > 0f && !entry.Value.WasInterrupted)
             {
                 var newValue = entry.Value.CastTimeRemaining - Time.deltaTime;
-                _castTimerDict[entry.Key] = new AbilityCastInfo(entry.Value.AbilityId, newValue);
+                _castTimerDict[entry.Key] = new AbilityCastInfo(entry.Key, entry.Value.AbilityId, newValue, entry.Value.CastId);
             }
         }
     }
@@ -67,15 +68,15 @@ public class CastManager : NetworkBehaviour
             _castTimerDict.Add(owner, castInfo);
         }
 
-        OnCastStartedClient(owner, castInfo.AbilityId);
+        OnCastStartedClient(new CastEventArgs(owner, castInfo.AbilityId, castInfo.CastId));
     }
-    public AbilityCastInfo? GetCastInfo(int owner)
+    public AbilityCastInfo GetCastInfo(int owner)
     {
         if (_castTimerDict.ContainsKey(owner))
         {
             return _castTimerDict[owner];
         }
-        return null;
+        return AbilityCastInfo.Null;
     }
     public bool Contains(int owner, int abilityId)
     {
@@ -104,15 +105,15 @@ public class CastManager : NetworkBehaviour
     }
 
     [Server]
-    internal void InterruptPlayer(int playerId)
+    internal void InterruptPlayer(int playerId, InterruptType reason)
     {
         if (_castTimerDict.ContainsKey(playerId))
         {
             var entry = _castTimerDict[playerId];
             entry.WasInterrupted = true;
-            _castTimerDict[playerId] = new AbilityCastInfo(entry.AbilityId, entry.CastTimeRemaining, true);
+            _castTimerDict[playerId] = new AbilityCastInfo(playerId, entry.AbilityId, entry.CastTimeRemaining, entry.CastId, true, reason);
 
-            Logger.Log($"Player {playerId} was interrupted. Entry: {_castTimerDict[playerId].WasInterrupted}");
+            ArenaLogger.Log($"Player {playerId} was interrupted. Entry: {_castTimerDict[playerId].WasInterrupted}");
         }
     }
     public void StartCastCoroutine(IEnumerator coroutine)
@@ -126,7 +127,6 @@ public class CastManager : NetworkBehaviour
         if (_castTimerDict.ContainsKey(playerId))
         {
             var entry = _castTimerDict[playerId];
-            Logger.Log($"GetInterrupted {playerId} == {entry.WasInterrupted}");
             return entry.WasInterrupted;
         }
         return false;

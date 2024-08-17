@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using UnityEngine;
-using Logger = Assets.Scripts.Helpers.Logger;
+using ArenaLogger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 
 public class ProjectileSpawner : NetworkBehaviour
 {
@@ -33,7 +33,7 @@ public class ProjectileSpawner : NetworkBehaviour
 
     public void ClientFireTargeted(FireTargetedProjectileArgs args)
     {
-        Logger.Log("ObserverFireTargeted Client");
+        ArenaLogger.Log("ObserverFireTargeted Client");
         SpawnProjectile(args, 0f);
         ServerFireTargeted(args, base.TimeManager.Tick);
     }
@@ -41,7 +41,7 @@ public class ProjectileSpawner : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void ServerFireTargeted(FireTargetedProjectileArgs args, uint tick, NetworkConnection sender = null)
     {
-        Logger.Log("ServerFireTargeted called");
+        ArenaLogger.Log("ServerFireTargeted called");
         float passedTime = (float)base.TimeManager.TimePassed(tick, false);
         passedTime = Mathf.Min(MAX_PASSED_TIME / 2f, passedTime);
         SpawnProjectile(args, passedTime);
@@ -56,7 +56,7 @@ public class ProjectileSpawner : NetworkBehaviour
     [TargetRpc]
     private void ObserverFireTargeted(NetworkConnection target, FireTargetedProjectileArgs args, uint tick)
     {
-        Logger.Log("ObserverFireTargeted Client");
+        ArenaLogger.Log("ObserverFireTargeted Client");
         float passedTime = (float)base.TimeManager.TimePassed(tick, false);
         passedTime = Mathf.Min(MAX_PASSED_TIME, passedTime);
 

@@ -1,18 +1,14 @@
-using System;
 using System.Linq;
-using Unity.VisualScripting;
-using UnityEditor;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Assets.Scripts.Enums;
-using TMPro;
 
 public class ControlsMenuUIScript : MonoBehaviour
 {
     public Button closeButton;
     public Button resetDefaultsButton;
 
-    PlayerConfiguration settings;
+    PlayerConfiguration _settings;
 
     public GameObject AdjustRebindInputPrefab;
     public Transform ActionSlotFrame;
@@ -30,14 +26,14 @@ public class ControlsMenuUIScript : MonoBehaviour
     {
         closeButton.onClick.AddListener(CloseMenu);
         resetDefaultsButton.onClick.AddListener(ResetDefaultControls);
-        settings = FindObjectOfType<PlayerConfiguration>();
+        _settings = FindObjectOfType<PlayerConfiguration>();
         InitializeActionSlotFrame();
     }
 
     private void InitializeActionSlotFrame()
     {
         int i = 0;
-        foreach (var action in settings.Settings.Controls.AbilityKeybinds)
+        foreach (var action in _settings.Settings.Controls.AbilityKeybinds)
         { 
             var gO = Instantiate(AdjustRebindInputPrefab, ActionSlotFrame);
             var inputs = gO.GetComponentsInChildren<KeybindInputHandler>();
@@ -59,7 +55,7 @@ public class ControlsMenuUIScript : MonoBehaviour
     }
     public void ResetDefaultControls()
     {
-        settings.ResetKeybinds();
+        _settings.ResetKeybinds();
         var inputHandlers = GetComponentsInChildren<KeybindInputHandler>();
         foreach (var inputHandler in inputHandlers)
         {

@@ -1,7 +1,7 @@
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using UnityEngine;
-using Logger = Assets.Scripts.Helpers.Logger;
+using Logger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 
 public class PlayerResource : NetworkBehaviour
 {

@@ -1,4 +1,4 @@
-using Assets.Scripts.Enums;
+using Assets.ArenaPVP.Scripts.Enums;
 using FishNet;
 using System;
 using System.Collections;

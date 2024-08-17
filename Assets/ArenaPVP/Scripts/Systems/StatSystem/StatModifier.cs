@@ -1,7 +1,7 @@
 using Assets.ArenaPVP.Scripts.Models.Enums;
 using System;
 using UnityEngine;
-using Logger = Assets.Scripts.Helpers.Logger;
+using Logger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 
 [Serializable]
 public class StatModifier : IDisposable

@@ -4,7 +4,7 @@ using FishNet.Object.Synchronizing;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Logger = Assets.Scripts.Helpers.Logger;
+using Logger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 
 public class PlayerHealth : NetworkBehaviour
 {

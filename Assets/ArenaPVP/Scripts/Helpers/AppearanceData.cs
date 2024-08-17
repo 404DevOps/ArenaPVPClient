@@ -1,5 +1,5 @@
+using Assets.ArenaPVP.Scripts.Enums;
 using Assets.ArenaPVP.Scripts.Models.Enums;
-using Assets.Scripts.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;

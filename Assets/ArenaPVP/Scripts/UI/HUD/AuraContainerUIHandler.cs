@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Logger = Assets.Scripts.Helpers.Logger;
+using ArenaLogger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 
 public class AuraContainerUIHandler : MonoBehaviour
 {
@@ -53,7 +53,7 @@ public class AuraContainerUIHandler : MonoBehaviour
         if (ownerId != OwnerId)
             return;
 
-        Logger.Log("On Aura Applied called.");
+        ArenaLogger.Log("On Aura Applied called.");
 
         AddAura(aura);
     }
@@ -71,7 +71,7 @@ public class AuraContainerUIHandler : MonoBehaviour
             }
         }
 
-        Logger.Log("Tried remove expired Aura: Success = " + auraFoundAndRemoved);
+        ArenaLogger.Log("Tried remove expired Aura: Success = " + auraFoundAndRemoved);
     }
 
     private void AddAura(AuraInfo auraInfo)

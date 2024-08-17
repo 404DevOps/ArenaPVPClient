@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
-using Logger = Assets.Scripts.Helpers.Logger;
+using Logger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 
 public class FloatingText : MonoBehaviour
 {

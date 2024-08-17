@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using Logger = Assets.Scripts.Helpers.Logger;
+using Logger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 
 public class StatsMediator : NetworkBehaviour
 {
@@ -21,7 +21,6 @@ public class StatsMediator : NetworkBehaviour
         {
             query.Value += mod.Modify(query);
         }
-
     }
 
     [Server]

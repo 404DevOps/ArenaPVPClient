@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
-using Logger = Assets.Scripts.Helpers.Logger;
+using ArenaLogger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 
 public class AuraManager : NetworkBehaviour
 {
@@ -77,7 +77,7 @@ public class AuraManager : NetworkBehaviour
                     existingAura.RemainingDuration = aura.Duration;
                     playerEntry[auraIndex] = existingAura;
                     _playerAurasDict[target.Id] = playerEntry; //set variable back to dict so it syncs
-                    Logger.Log("Server: Refreshed Aura Duration of Aura. Id " + playerEntry[auraIndex].AuraInstanceId);
+                    ArenaLogger.Log("Server: Refreshed Aura Duration of Aura. Id " + playerEntry[auraIndex].AuraInstanceId);
                 }
                 return playerEntry[auraIndex].AuraInstanceId;
             }

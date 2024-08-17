@@ -1,13 +1,8 @@
+using Assets.ArenaPVP.Scripts.Enums;
 using Assets.ArenaPVP.Scripts.Helpers;
-using Assets.Scripts.Enums;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
-using UnityEditor.EventSystems;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class TargetingSystem : MonoBehaviour
 {

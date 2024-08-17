@@ -2,7 +2,7 @@ using FishNet;
 using GameKit.Dependencies.Utilities;
 using System;
 using UnityEngine;
-using Logger = Assets.Scripts.Helpers.Logger;
+using ArenaLogger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 
 public class ProjectileTargeted : ProjectileBase
 {
@@ -55,13 +55,13 @@ public class ProjectileTargeted : ProjectileBase
         {
             if (InstanceFinder.IsClientStarted)
             {
-                Logger.Log($"Projectile Client hit.");
+                ArenaLogger.Log($"Projectile Client hit.");
                 //Show VFX.
                 //Play Audio.
             }
             if (InstanceFinder.IsServerStarted)
             {
-                Logger.Log($"Projectile Server hit.");
+                ArenaLogger.Log($"Projectile Server hit.");
                 AbilityStorage.GetAbility(_abilityId).ApplyEffectsServer(Origin,Target);
             }
 

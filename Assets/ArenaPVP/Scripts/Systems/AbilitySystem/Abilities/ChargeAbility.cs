@@ -1,4 +1,4 @@
-using Assets.Scripts.Enums;
+using Assets.ArenaPVP.Scripts.Enums;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;

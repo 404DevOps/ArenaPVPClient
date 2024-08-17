@@ -1,11 +1,5 @@
-using Assets.Scripts.Enums;
+using Assets.ArenaPVP.Scripts.Enums;
 using FishNet.Object;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using FishNet.Connection;
-using FishNet;
-using UnityEditor.MemoryProfiler;
 
 public class Player : NetworkBehaviour
 {

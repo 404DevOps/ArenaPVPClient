@@ -1,6 +1,6 @@
 using System;
 using UnityEditorInternal;
-using Logger = Assets.Scripts.Helpers.Logger;
+using ArenaLogger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 using UnityEngine;
 using FishNet.Object;
 using FishNet.Connection;
@@ -119,7 +119,7 @@ public class PlayerMovement: NetworkBehaviour
 
         if (_controls.jump.IsKeyDown())
         {
-            Logger.Log("Jump Pressed");
+            ArenaLogger.Log("Jump Pressed");
             _velocityY += _jumpForce;
         }
     }

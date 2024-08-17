@@ -5,9 +5,11 @@ using UnityEngine;
 
 public static class GameEvents
 {
-    public static readonly Event<int, int> OnCastStarted = new Event<int, int>();
-    public static readonly Event<int> OnCastInterrupted = new Event<int>();
-    public static readonly Event<int> OnCastCompleted = new Event<int>(); //ended regularly
+    public static readonly Event<CastEventArgs> OnCastStarted = new Event<CastEventArgs>();
+    public static readonly Event<AbilityCastInfo> OnCastInterrupted = new Event<AbilityCastInfo>();
+    public static readonly Event<CastEventArgs> OnCastCompleted = new Event<CastEventArgs>(); //ended regularly
+
+    public static readonly Event<int, float> OnGCDStarted = new Event<int, float>();
 
     public static readonly Event<int, int> OnCooldownStarted = new Event<int, int>(); //playerId, AbilityId
     public static readonly Event<HealthChangedEventArgs> OnPlayerHealthChanged = new Event<HealthChangedEventArgs>();

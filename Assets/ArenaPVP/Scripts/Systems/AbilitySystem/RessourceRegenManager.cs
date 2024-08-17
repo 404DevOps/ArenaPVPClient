@@ -1,4 +1,4 @@
-using Assets.Scripts.Enums;
+using Assets.ArenaPVP.Scripts.Enums;
 using FishNet;
 using FishNet.Connection;
 using FishNet.Object;
@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using static UnityEngine.EventSystems.EventTrigger;
-using Logger = Assets.Scripts.Helpers.Logger;
+using Logger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 
 public class RessourceRegenManager : NetworkBehaviour
 {
@@ -29,7 +29,7 @@ public class RessourceRegenManager : NetworkBehaviour
     }
     public override void OnStartClient()
     {
-        this.enabled = false;
+        this.gameObject.SetActive(false);
     }
 
     [Server]
@@ -39,17 +39,19 @@ public class RessourceRegenManager : NetworkBehaviour
         _playerResourceDict.Add(player, resourceType);
     }
 
-    [Server]
     private void Update()
     {
-        _timer += Time.deltaTime;
-        if (_timer >= TickInterval)
+        if (InstanceFinder.IsServerStarted)
         {
-            foreach (var entry in _playerResourceDict)
+            _timer += Time.deltaTime;
+            if (_timer >= TickInterval)
             {
-                entry.Key.GetComponent<PlayerResource>().UpdateResourceServer(new ResourceChangedEventArgs() { Player = entry.Key, ResourceChangeAmount = entry.Key.GetComponent<PlayerStats>().ResourceRegenerationRate });
+                foreach (var entry in _playerResourceDict)
+                {
+                    entry.Key.GetComponent<PlayerResource>().UpdateResourceServer(new ResourceChangedEventArgs() { Player = entry.Key, ResourceChangeAmount = entry.Key.GetComponent<PlayerStats>().ResourceRegenerationRate });
+                }
+                _timer = 0;
             }
-            _timer = 0;
         }
     }
 }

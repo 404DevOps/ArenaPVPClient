@@ -1,15 +1,10 @@
+using Assets.ArenaPVP.Scripts.Enums;
+using Assets.ArenaPVP.Scripts.Helpers;
 using Assets.ArenaPVP.Scripts.Models.Enums;
-using Assets.Scripts.Enums;
 using FishNet;
-using MonoFN.Cecil;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static UnityEngine.GraphicsBuffer;
-using static UnityEngine.UI.GridLayoutGroup;
-using Logger = Assets.Scripts.Helpers.Logger;
 
 [Serializable]
 [CreateAssetMenu(fileName = "NewAura", menuName = "Auras/New Aura")]
@@ -56,7 +51,7 @@ public class AuraBase : ScriptableObject
                 {
                     statMod.SourceAuraId = _auraId;
                     applyTo.GetComponent<StatsMediator>().AddModifierServer(statMod);
-                    Logger.Log($"Applied {Name} Aura to Player with ID {applyTo.Id}");
+                    ArenaLogger.Log($"Applied {Name} Aura to Player with ID {applyTo.Id}");
                 }
             }
         }
@@ -66,7 +61,7 @@ public class AuraBase : ScriptableObject
         if (InstanceFinder.IsServerStarted)
         {
             player.GetComponent<StatsMediator>().RemoveModifiersServer(auraId);
-            Logger.Log($"Applied {Name} Aura to Player with ID {player.Id}");
+            ArenaLogger.Log($"Applied {Name} Aura to Player with ID {player.Id}");
         }
     }
 }

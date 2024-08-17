@@ -5,7 +5,7 @@ using GameKit.Dependencies.Utilities.ObjectPooling.Examples;
 using System.Linq;
 using UnityEngine;
 using static UnityEngine.UI.Image;
-using Logger = Assets.Scripts.Helpers.Logger;
+using Logger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 
 [CreateAssetMenu(menuName = "Abilities/ProjectileAbility", fileName = "ProjectileAbility")]
 public class TargetedProjectileAbility : AbilityBase

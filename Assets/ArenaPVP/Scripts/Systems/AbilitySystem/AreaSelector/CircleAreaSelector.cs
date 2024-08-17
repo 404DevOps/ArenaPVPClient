@@ -1,7 +1,7 @@
 using FishNet;
 using System.Collections.Generic;
 using UnityEngine;
-using Logger = Assets.Scripts.Helpers.Logger;
+using ArenaLogger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 
 
 [CreateAssetMenu(fileName = "CircleAreaSelector", menuName = "AreaSelector/CircleAreaSelector")]
@@ -28,7 +28,7 @@ public class CircleAreaSelector : AreaSelectorBase
                     playersInArea.Add(player);
                 }
             }
-            Logger.Log($"Found {playersInArea.Count} Targets in Area.");
+            ArenaLogger.Log($"Found {playersInArea.Count} Targets in Area.");
             return playersInArea;
         }
         else 

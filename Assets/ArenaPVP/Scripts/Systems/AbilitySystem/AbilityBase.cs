@@ -1,6 +1,6 @@
 using Assets.ArenaPVP.Scripts.Helpers;
 using Assets.ArenaPVP.Scripts.Models.Enums;
-using Assets.Scripts.Enums;
+using Assets.ArenaPVP.Scripts.Enums;
 using FishNet;
 using GameKit.Dependencies.Utilities;
 using System;
@@ -8,7 +8,7 @@ using System.Collections;
 using System.Linq;
 using UnityEngine;
 using static UnityEngine.UI.Image;
-using Logger = Assets.Scripts.Helpers.Logger;
+using ArenaLogger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 
 [Serializable]
 public abstract class AbilityBase : ScriptableObject
@@ -24,13 +24,20 @@ public abstract class AbilityBase : ScriptableObject
 
     public void TryUseAbility(Player origin, Player target)
     {
-        AbilityExecutor.Instance.TryUseAbilityClient(new UseAbilityArgs(Id, origin, target));
+        AbilityExecutor.Instance.TryUseAbilityClient(new UseAbilityArgs(Id, origin, target, InstanceFinder.TimeManager.Tick));
     }
 
     public bool CanBeUsed(Player owner, Player target)
     {
         bool canbeUse = true;
 
+        if (!IsGCDReady(owner.Id))
+        {
+            if (InstanceFinder.IsClientStarted)
+                UIEvents.OnShowInformationPopup.Invoke("This ability is not ready yet");
+
+            return false;
+        }
         if (!IsCooldownReady(owner.Id)) 
         {
             if(InstanceFinder.IsClientStarted)
@@ -40,7 +47,7 @@ public abstract class AbilityBase : ScriptableObject
         }
         if (IsAlreadyCasting(owner.Id))
         {
-            Logger.Log("Already casting.");
+            ArenaLogger.Log("Already casting.");
             return false;
         }
         if (!HasEnoughResource(owner))
@@ -112,6 +119,21 @@ public abstract class AbilityBase : ScriptableObject
             return true;
         }
         else if (CooldownManager.Instance.GetRemainingCooldown(abilityWithOwner) <= 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    private bool IsGCDReady(int ownerId)
+    {
+        if (AbilityInfo.IgnoreGCD)
+        {
+            return true;
+        }
+        if (!GCDManager.Instance.IsOnGCD(ownerId))
         {
             return true;
         }
@@ -228,6 +250,8 @@ public class AbilityInfo
 
     public CharacterClassType ClassType;
     public AbilityType AbilityType;
+
+    public bool IgnoreGCD;
 }
 
 public enum AbilityType

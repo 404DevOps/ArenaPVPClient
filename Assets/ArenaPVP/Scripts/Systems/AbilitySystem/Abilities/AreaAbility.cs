@@ -3,7 +3,7 @@ using GameKit.Dependencies.Utilities.ObjectPooling.Examples;
 using System.Collections.Generic;
 using UnityEngine;
 using static UnityEngine.GraphicsBuffer;
-using Logger = Assets.Scripts.Helpers.Logger;
+using Logger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 
 [CreateAssetMenu(menuName = "Abilities/AreaAbility", fileName = "AreaAbility")]
 public class AreaAbility : AbilityBase

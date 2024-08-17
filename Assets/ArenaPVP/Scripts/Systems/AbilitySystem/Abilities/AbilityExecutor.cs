@@ -1,16 +1,7 @@
-using FishNet;
-using FishNet.CodeGenerating;
 using FishNet.Connection;
 using FishNet.Object;
-using FishNet.Object.Synchronizing;
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Playables;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
-using static UnityEngine.UI.Image;
-using Logger = Assets.Scripts.Helpers.Logger;
 
 public class AbilityExecutor : NetworkBehaviour
 {
@@ -50,12 +41,15 @@ public class AbilityExecutor : NetworkBehaviour
     public void TryUseAbilityServer(UseAbilityArgs args, NetworkConnection sender = null)
     {
         var ability = AbilityStorage.GetAbility(args.AbilityId);
+        args.CastId = TimeManager.LocalTick;
         if (ability.CanBeUsed(args.Origin, args.Target))
         {
+            GCDManager.Instance.AddOrUpdate(args.Origin.Id);
+
             if (ability.AbilityInfo.CastTime > 0)
             {
                 //GameEvents.OnCastInterrupted.AddListener(WasInterrupted);
-                CastManager.Instance.AddOrUpdate(args.Origin.Id, new AbilityCastInfo(ability.Id, ability.AbilityInfo.CastTime));
+                CastManager.Instance.AddOrUpdate(args.Origin.Id, new AbilityCastInfo(args.Origin.Id, ability.Id, ability.AbilityInfo.CastTime, args.CastId));
                 CastManager.Instance.StartCastCoroutine(CastTimer(args, sender));
             }
             else
@@ -97,15 +91,16 @@ public class AbilityExecutor : NetworkBehaviour
         //wait till casttimer hit 0
         yield return new WaitUntil(() => CastManager.Instance.GetRemainingCastTime(args.Origin.Id) <= 0 || CastManager.Instance.GetInterrupted(args.Origin.Id) == true);
 
+        var castInfo = CastManager.Instance.GetCastInfo(args.Origin.Id);
         //enemy interrupt
         if (CastManager.Instance.GetInterrupted(args.Origin.Id) == true)
         {
-            SendClientInterrupt(args, sender);
+            SendClientInterrupt(castInfo, sender);
         }
         //moved to invalid position during cast results in interrupt aswell
         else if(ability.AbilityInfo.AbilityType != AbilityType.AreaOfEffect && (!ability.IsInFront(args.Origin.transform, args.Target.transform) || !ability.IsLineOfSight(args.Origin.transform, args.Target.transform)))
         {
-            SendClientInterrupt(args, sender);
+            SendClientInterrupt(castInfo, sender);
         }
         else
         {
@@ -123,7 +118,7 @@ public class AbilityExecutor : NetworkBehaviour
     }
 
     [Server]
-    private void SendClientInterrupt(UseAbilityArgs args, NetworkConnection sender)
+    private void SendClientInterrupt(AbilityCastInfo args, NetworkConnection sender)
     {
         foreach (var conn in _nob.Observers)
         {
@@ -134,8 +129,7 @@ public class AbilityExecutor : NetworkBehaviour
     [TargetRpc]
     public void OnCastCompletedTargetRpc(NetworkConnection conn, UseAbilityArgs args)
     {
-        
-        GameEvents.OnCastCompleted.Invoke(args.Origin.Id);
+        GameEvents.OnCastCompleted.Invoke(new CastEventArgs(args.Origin.Id, args.AbilityId, args.CastId));
     }
     [TargetRpc]
     public void OnCooldownStartedTargetRpc(NetworkConnection conn, UseAbilityArgs args)
@@ -144,9 +138,9 @@ public class AbilityExecutor : NetworkBehaviour
     }
 
     [TargetRpc]
-    public void OnCastInterruptedTargetRpc(NetworkConnection conn, UseAbilityArgs args, bool isSender = false)
+    public void OnCastInterruptedTargetRpc(NetworkConnection conn, AbilityCastInfo args, bool isSender = false)
     {
-        GameEvents.OnCastInterrupted.Invoke(args.Origin.Id);
+        GameEvents.OnCastInterrupted.Invoke(args);
         if (isSender)
             UIEvents.OnShowInformationPopup.Invoke("Interrupted");
     }
@@ -161,13 +155,15 @@ public class AbilityExecutor : NetworkBehaviour
 
 public struct UseAbilityArgs 
 {
-    public UseAbilityArgs(int abilityId, Player origin, Player target) 
+    public UseAbilityArgs(int abilityId, Player origin, Player target, uint castId) 
     {
         AbilityId = abilityId;
         Origin = origin;
         Target = target;
+        CastId = castId;
     }
     public int AbilityId;
     public Player Origin;
     public Player Target;
+    public uint CastId;
 }

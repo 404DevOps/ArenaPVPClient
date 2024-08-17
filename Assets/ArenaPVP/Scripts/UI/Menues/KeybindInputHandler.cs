@@ -1,5 +1,5 @@
-using Assets.Scripts.Enums;
-using Assets.Scripts.Helpers;
+using Assets.ArenaPVP.Scripts.Enums;
+using Assets.ArenaPVP.Scripts.Helpers;
 using OpenCover.Framework.Model;
 using System;
 using System.Collections.Generic;
@@ -20,15 +20,14 @@ public class KeybindInputHandler : MonoBehaviour, IPointerClickHandler
     GeneralSettings settings;
     public string actionToRebind;
 
-    private float flashDuration = 3f;
-    private float Timer = 0f;
-    private float delay = 0.1f;
+    private float _flashDuration = 3f;
+    private float _timer = 0f;
+    private float _delay = 0.1f;
 
     [HideInInspector] public bool IsInputListenerActive;
     [HideInInspector] public bool isAbilityKeybind = false;
 
-    private KeyCode[] pressedKeys = new KeyCode[2];
-
+    private KeyCode[] _pressedKeys = new KeyCode[2];
 
     // Start is called before the first frame update
     void Start()
@@ -69,13 +68,13 @@ public class KeybindInputHandler : MonoBehaviour, IPointerClickHandler
     {
         if (IsInputListenerActive)
         {
-            Timer += Time.deltaTime;
-            if (Timer < delay)
+            _timer += Time.deltaTime;
+            if (_timer < _delay)
                 return;
             
-            if (Timer >= flashDuration || (pressedKeys[0] != KeyCode.None && Input.GetKeyUp(pressedKeys[0])))
+            if (_timer >= _flashDuration || (_pressedKeys[0] != KeyCode.None && Input.GetKeyUp(_pressedKeys[0])))
             {
-                SaveNewKeybind(pressedKeys);
+                SaveNewKeybind(_pressedKeys);
                 ResetBox();
             }
             if (Input.anyKey)
@@ -91,18 +90,18 @@ public class KeybindInputHandler : MonoBehaviour, IPointerClickHandler
                     if (Input.GetKey(KeyCode.Backspace))
                     {
                         ResetBox();
-                        SaveNewKeybind(pressedKeys);
+                        SaveNewKeybind(_pressedKeys);
                         return;
                     }
                     if (Input.GetKey(code) && IsAllowedKey(code))
                     {
-                        if(pressedKeys[0] == KeyCode.None)
-                            pressedKeys[0] = code;
-                        else if(code != pressedKeys[0])
+                        if(_pressedKeys[0] == KeyCode.None)
+                            _pressedKeys[0] = code;
+                        else if(code != _pressedKeys[0])
                         {
-                            pressedKeys[1] = code;
-                            Debug.Log(pressedKeys);
-                            SaveNewKeybind(pressedKeys);
+                            _pressedKeys[1] = code;
+                            Debug.Log(_pressedKeys);
+                            SaveNewKeybind(_pressedKeys);
                             ResetBox();
                             break;
                         }    
@@ -154,7 +153,7 @@ public class KeybindInputHandler : MonoBehaviour, IPointerClickHandler
     {
         UIEvents.OnNewKeyBindInputSelected.Invoke();
         IsInputListenerActive = true;
-        Timer = 0;
+        _timer = 0;
         box.color = Color.yellow;
     }
 
@@ -162,6 +161,6 @@ public class KeybindInputHandler : MonoBehaviour, IPointerClickHandler
     {
         box.color = Color.white;
         IsInputListenerActive = false;
-        pressedKeys = new KeyCode[2];
+        _pressedKeys = new KeyCode[2];
     }
 }

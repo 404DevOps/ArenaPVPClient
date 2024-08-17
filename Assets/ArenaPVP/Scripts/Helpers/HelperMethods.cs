@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Assets.Scripts.Helpers
+namespace Assets.ArenaPVP.Scripts.Helpers
 {
     public class HelperMethods
     {

@@ -6,9 +6,9 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Assets.Scripts.Helpers
+namespace Assets.ArenaPVP.Scripts.Helpers
 {
-    public static class Logger
+    public static class ArenaLogger
     {
         public static void Log(string message)
         {

@@ -1,16 +1,10 @@
-using Assets.Scripts.Helpers;
+using Assets.ArenaPVP.Scripts.Helpers;
+using Assets.ArenaPVP.Scripts.Models.Enums;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using TMPro;
-using Unity.PlasticSCM.Editor.WebApi;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Rendering;
 using UnityEngine.UI;
-using Logger = Assets.Scripts.Helpers.Logger;
 
 public class ActionSlot : MonoBehaviour, IDropHandler
 {
@@ -28,13 +22,13 @@ public class ActionSlot : MonoBehaviour, IDropHandler
     private float _flashTime = 0.05f;
     private float _flashTimePassed = 0f;
     private bool _flashTimerStarted = false;
-    private bool _isOnCooldown = false;
 
     private Player _player;
     private AbilityUIDisplay _abilityDisplay;
     public Action<int, AbilityBase> OnAbilityChanged;
 
     private float _remainingCooldown = 0;
+    private float _remainingGCD = 0;
 
     private void Update()
     {
@@ -52,20 +46,19 @@ public class ActionSlot : MonoBehaviour, IDropHandler
                 _flashTime = Ability.AbilityInfo.CastTime - _flashTimePassed;
             }
         }
+        UpdateCooldownTimers();
         ResetActionSlotFlash();
         ShowCooldown(_player.Id);
     }
 
-    private void StartCooldown(int ownerId, int abilityId)
+    private void UpdateCooldownTimers()
     {
-        if (_player.Id == ownerId && Ability.Id == abilityId)
-        {
-            _isOnCooldown = true;
-            Swipe.gameObject.SetActive(true);
-            CooldownText.gameObject.SetActive(true);
-            _remainingCooldown = Ability.AbilityInfo.Cooldown;
-        }
+        if(_remainingCooldown > 0f)
+            _remainingCooldown -= Time.deltaTime;
+        if(_remainingGCD > 0f)
+            _remainingGCD -= Time.deltaTime;
     }
+
     private void ShowCooldown(int ownerId)
     {
         if (Ability == null)
@@ -74,26 +67,25 @@ public class ActionSlot : MonoBehaviour, IDropHandler
             CooldownText.gameObject.SetActive(false);
             return;
         }
-
-        if (_isOnCooldown)
+        //give regular cooldown visualisation priority over gcd
+        if (_remainingCooldown > 0 && _remainingCooldown > _remainingGCD)
         {
             var identifier = new AbilityCooldownInfo(ownerId, Ability.Id);
-            _remainingCooldown -= Time.deltaTime;
-
             if (CooldownManager.Instance.Contains(identifier) && _remainingCooldown > 0)
             {
                 CooldownText.text = (Mathf.Ceil(_remainingCooldown)).ToString();
-                var cdPercentage = _remainingCooldown / Ability.AbilityInfo.Cooldown;
-                Swipe.fillAmount = cdPercentage;
-            }
-            else
-            {
-                _isOnCooldown = false;
+                Swipe.fillAmount = _remainingCooldown / Ability.AbilityInfo.Cooldown;
             }
         }
-        if (!_isOnCooldown)
+        //once gcd is longer than regular cooldown just show that and hide timer
+        else if(_remainingGCD > 0f && !Ability.AbilityInfo.IgnoreGCD) 
         {
-            _remainingCooldown = 0;
+            CooldownText.gameObject.SetActive(false);
+            Swipe.fillAmount = _remainingGCD / GCDManager.GCD_TIME;
+            
+        }
+        if(_remainingCooldown <= 0 && _remainingGCD <= 0)
+        {
             Swipe.fillAmount = 0;
             Swipe.gameObject.SetActive(false);
             CooldownText.gameObject.SetActive(false);
@@ -163,7 +155,6 @@ public class ActionSlot : MonoBehaviour, IDropHandler
             }
         }
     }
-
     public void InitializeSlot(Player player)
     {
         _player = player;
@@ -172,6 +163,9 @@ public class ActionSlot : MonoBehaviour, IDropHandler
         {
             _abilityDisplay.Ability = Ability;
             GameEvents.OnCooldownStarted.AddListener(StartCooldown);
+            GameEvents.OnGCDStarted.AddListener(StartGCD);
+            GameEvents.OnCastInterrupted.AddListener(OnCastInterrupted);
+
         }
         KeyBindText.text = HelperMethods.GetKeyBindNameShort(KeyBind.primary);
         _defaultBorderColor = Border.color;
@@ -181,13 +175,45 @@ public class ActionSlot : MonoBehaviour, IDropHandler
         Swipe.fillAmount = 0;
     }
 
+    private void OnCastInterrupted(AbilityCastInfo args)
+    {
+        if (args.OwnerId != _player.OwnerId)
+            return;
+
+        if (args.Reason == InterruptType.Abort)
+        {
+            _remainingGCD = 0;
+        }
+    }
+
+    private void StartCooldown(int ownerId, int abilityId)
+    {
+        if (_player.Id == ownerId && Ability.Id == abilityId)
+        {
+            Swipe.gameObject.SetActive(true);
+            CooldownText.gameObject.SetActive(true);
+            _remainingCooldown = Ability.AbilityInfo.Cooldown;
+        }
+    }
+    private void StartGCD(int ownerId, float gcdDuration)
+    {
+        if (ownerId != _player.Id)
+            return;
+
+        Swipe.gameObject.SetActive(true);
+        _remainingGCD = gcdDuration;
+    }
+
     public void OnDisable()
     {
         GameEvents.OnCooldownStarted.RemoveListener(StartCooldown);
+        GameEvents.OnGCDStarted.RemoveListener(StartGCD);
     }
 
     public void OnMouseUp(PointerEventData eventData)
     {
         FlashActionSlot();
     }
+
+
 }
