@@ -45,7 +45,7 @@ public class FloatingTextManager : MonoBehaviour
     {
         if (player.IsOwnedByMe) return;
 
-        if (!_playerTextContainers.ContainsKey(player.Id) && player.Id != 0)
+        if (!_playerTextContainers.ContainsKey(player.Id))
         {
             var transform = InstantiateContainer(player);
             _playerTextContainers.Add(player.Id, transform);

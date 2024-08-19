@@ -8,20 +8,16 @@ using Logger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 [CreateAssetMenu(menuName = "Abilities/AreaAbility", fileName = "AreaAbility")]
 public class AreaAbility : AbilityBase
 {
-    private List<Player> _targets;
-    private Player _owner;
     [SerializeField] private AreaSelectorBase _areaSelector;
-
     internal override void UseServer(Player origin, Player target = null)
     {
         if (InstanceFinder.IsServerStarted)
         {
-            _targets = _areaSelector.GetTargetsInArea(origin);
-            _owner = origin;
+            var targets = _areaSelector.GetTargetsInArea(origin);
 
-            foreach (var tar in _targets)
+            foreach (var tar in targets)
             {
-                if (tar.IsOwnedByMe)
+                if (tar.Id == origin.Id)
                     continue;
                 //TODO: check if target is enemy or friendly and check TargetingType to match that.
                 if (IsLineOfSight(origin.transform, tar.transform))
@@ -37,8 +33,8 @@ public class AreaAbility : AbilityBase
         var args = new HealthChangedEventArgs()
         {
             Player = target.GetComponent<Player>(),
-            Source = _owner.GetComponent<Player>(),
-            HealthChangeAmount = -DamageCalculator.CalculateDamage(_owner, target, this),
+            Source = origin.GetComponent<Player>(),
+            HealthChangeAmount = -DamageCalculator.CalculateDamage(origin, target, this),
             HealthChangeType = HealthChangeType.Damage,
             DamageType = AbilityInfo.DamageType,
             AbilityId = Id
