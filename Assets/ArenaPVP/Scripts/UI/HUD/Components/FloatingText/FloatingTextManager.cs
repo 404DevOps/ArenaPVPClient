@@ -32,14 +32,7 @@ public class FloatingTextManager : MonoBehaviour
         Destroy(gO);
     }
 
-    void OnDisable()
-    {
-        GameEvents.OnPlayerHealthChanged.RemoveListener(OnPlayerHealthChanged);
-    }
-    void OnEnable()
-    {
-        GameEvents.OnPlayerHealthChanged.AddListener(OnPlayerHealthChanged);
-    }
+
 
     private void TryInitializePlayerTextContainers(Player player)
     {
@@ -51,7 +44,6 @@ public class FloatingTextManager : MonoBehaviour
             _playerTextContainers.Add(player.Id, transform);
         }
     }
-
     private Transform InstantiateContainer(Player player)
     {
         var gO = new GameObject();
@@ -63,5 +55,14 @@ public class FloatingTextManager : MonoBehaviour
         Destroy(gO);
 
         return containerGo.transform;
+    }
+
+    void OnDisable()
+    {
+        GameEvents.OnPlayerHealthChanged.RemoveListener(OnPlayerHealthChanged);
+    }
+    void OnEnable()
+    {
+        GameEvents.OnPlayerHealthChanged.AddListener(OnPlayerHealthChanged);
     }
 }
