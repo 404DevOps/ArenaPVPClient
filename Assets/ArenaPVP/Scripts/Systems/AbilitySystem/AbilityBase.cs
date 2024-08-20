@@ -9,6 +9,7 @@ using System.Linq;
 using UnityEngine;
 using static UnityEngine.UI.Image;
 using ArenaLogger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
+using Assets.ArenaPVP.Scripts.Systems.AbilitySystem;
 
 [Serializable]
 public abstract class AbilityBase : ScriptableObject
@@ -18,6 +19,7 @@ public abstract class AbilityBase : ScriptableObject
     public AbilityTargetType TargetingType;
 
     public AuraBase[] ApplyAuras;
+    public ConditionBase[] Conditions;
 
     public bool NeedLineOfSight;
     public bool NeedTargetInFront;
@@ -60,6 +62,13 @@ public abstract class AbilityBase : ScriptableObject
 
             return false;
         }
+        if (!AreConditionsMet(owner, target))
+        {
+            if (InstanceFinder.IsClientStarted)
+                UIEvents.OnShowInformationPopup.Invoke("Conditions not met.");
+
+            return false;
+        }
         //all checks for AoE abilities should be done at this point, so we can already return and Use() the ability which will select its own targets
         //or none if none meets criteria, but it will go off anyways, without hitting anything.
         if (AbilityInfo.AbilityType == AbilityType.AreaOfEffect) 
@@ -93,6 +102,20 @@ public abstract class AbilityBase : ScriptableObject
         }
 
         return canbeUse;
+    }
+    public bool AreConditionsMet(Player owner, Player target)
+    {
+        if (Conditions == null || Conditions.Length == 0)
+            return true;
+
+        foreach (var condition in Conditions)
+        {
+            var result = condition.IsTrue(owner, target);
+            if (result == false)
+                return false;
+        }
+
+        return true;
     }
     private bool HasEnoughResource(Player owner)
     {

@@ -10,7 +10,6 @@ public class ChargeAbility : AbilityBase
 {
     public float chargeSpeed;
     public float stunDuration;
-
     internal override void UseServer(Player owner, Player target)
     {
         //applyAura(AuraType.Stun, target)
