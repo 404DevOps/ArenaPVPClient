@@ -10,20 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9da4e43a7d07ade4e934602626fa10a3, type: 3}
-  m_Name: ChilledAura
+  m_Name: Frozen
   m_EditorClassIdentifier: 
-  Id: 10000
-  Name: Chilled
-  Description: Reduces Movement Speed by 30%
-  Duration: 20
+  Id: 10002
+  Name: Frozen
+  Description: Stunned
+  Duration: 5
   AuraTarget: 1
-  AuraType: 4
+  AuraType: 1
   AuraApplyTiming: 0
-  Icon: {fileID: 21300000, guid: 9630d91883cce584fa74114783636a1d, type: 3}
-  StatModifiers:
-  - SourceAuraId: 2
-    _statType: 7
-    _operatorType: 4
-    _value: 30
+  Icon: {fileID: 21300000, guid: beaf310d226402044a8cac43795d1424, type: 3}
+  StatModifiers: []
   isDebuff: 1
   MaxStacks: 1

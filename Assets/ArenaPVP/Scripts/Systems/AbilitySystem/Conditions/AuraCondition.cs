@@ -11,7 +11,7 @@ namespace Assets.ArenaPVP.Scripts.Systems.AbilitySystem
     public class AuraCondition : ConditionBase
     {
         public AuraTargetType targetType;
-        public List<int> AuraIds;
+        public List<AuraBase> Auras;
         public bool TrueOnAuraMissing;
         public bool TrueOnAllMatching;
 
@@ -33,10 +33,10 @@ namespace Assets.ArenaPVP.Scripts.Systems.AbilitySystem
             {
                 return false;
             }
-            foreach (var aura in AuraIds)
+            foreach (var aura in Auras)
             {
                 //if only one needs to be on target direct return once match has been found.
-                var auraFound = playerAuras.Any(a => a.AuraId == aura);
+                var auraFound = playerAuras.Any(a => a.AuraId == aura.Id);
 
                 if (auraFound && !TrueOnAllMatching && !TrueOnAuraMissing) //one found, only one needed
                     return true;

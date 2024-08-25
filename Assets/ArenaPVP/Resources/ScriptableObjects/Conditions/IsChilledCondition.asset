@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: IsChilledCondition
   m_EditorClassIdentifier: 
   targetType: 1
-  AuraIds: 10270000
+  Auras:
+  - {fileID: 11400000, guid: ab384e3e7018254449ca08ebbfa43a46, type: 2}
   TrueOnAuraMissing: 0
   TrueOnAllMatching: 0

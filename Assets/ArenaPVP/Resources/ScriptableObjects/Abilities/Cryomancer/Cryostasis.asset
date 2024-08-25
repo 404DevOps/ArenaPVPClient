@@ -17,8 +17,8 @@ MonoBehaviour:
     Name: Cryostasis
     Description: 'Can only be used on Targets with the Chilled Effect active.
 
-      Stun
-      Target Enemy for 3s.'
+      Freezes
+      Target Enemy and stuns them for 3s.'
     CastTime: 0
     Cooldown: 30
     ResourceCost: 90
