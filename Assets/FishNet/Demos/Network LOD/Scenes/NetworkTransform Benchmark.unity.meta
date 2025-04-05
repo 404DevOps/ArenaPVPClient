@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 0f8b5b1fe48d32440a9a29f490ee8a52
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 207815
+  packageName: 'FishNet: Networking Evolved'
+  packageVersion: 4.6.5R
+  assetPath: Assets/FishNet/Demos/Network LOD/Scenes/NetworkTransform Benchmark.unity
+  uploadId: 745580

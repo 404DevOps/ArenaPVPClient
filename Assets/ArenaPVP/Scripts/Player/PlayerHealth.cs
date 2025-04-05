@@ -1,6 +1,7 @@
 using FishNet.CodeGenerating;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,7 +12,7 @@ public class PlayerHealth : NetworkBehaviour
     [SerializeField][AllowMutableSyncType] public  SyncVar<float> MaxHealth = new SyncVar<float>();
     [SerializeField][AllowMutableSyncType] public  SyncVar<float> CurrentHealth = new SyncVar<float>();
 
-    public PlayerStats Stats;
+    private PlayerStats Stats;
 
     [Server]
     public void UpdateHealthServer(HealthChangedEventArgs args)
@@ -19,6 +20,11 @@ public class PlayerHealth : NetworkBehaviour
         CurrentHealth.Value += args.HealthChangeAmount;
         if (CurrentHealth.Value > MaxHealth.Value)
             CurrentHealth.Value = MaxHealth.Value;
+        if (CurrentHealth.Value <= 0)
+        {
+            CurrentHealth.Value = 0;
+            ServerEvents.OnPlayerDied.Invoke(args.Player);
+        }
 
         HealthUpdatedClient(args);
     }
@@ -26,12 +32,14 @@ public class PlayerHealth : NetworkBehaviour
     [ObserversRpc]
     public void HealthUpdatedClient(HealthChangedEventArgs args)
     {
-        GameEvents.OnPlayerHealthChanged.Invoke(args);
+        if(CurrentHealth.Value <= 0)
+            ClientEvents.OnPlayerDied.Invoke(args.Player);
+
+        ClientEvents.OnPlayerHealthChanged.Invoke(args);
     }
 
-    public override void OnStartServer()
+    internal void Initialize()
     {
-        base.OnStartServer();
         Stats = GetComponent<PlayerStats>();
         MaxHealth.Value = Stats.MaxHealth;
         CurrentHealth.Value = Stats.MaxHealth;

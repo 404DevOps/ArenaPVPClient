@@ -13,7 +13,7 @@ public class StatsMediator : NetworkBehaviour
 {
     [AllowMutableSyncType]
     [SerializeField]
-    private SyncList<StatModifier> modifiers = new();
+    private List<StatModifier> modifiers = new();
 
     public void PerformQuery(object sender, StatQuery query) 
     {

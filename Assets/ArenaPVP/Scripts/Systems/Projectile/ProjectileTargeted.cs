@@ -30,7 +30,7 @@ public class ProjectileTargeted : ProjectileBase
 
     internal override void MoveProjectile()
     {
-        _rb.velocity = MoveSpeed * transform.forward * (_delta + _passedTimeDelta);
+        _rb.linearVelocity = MoveSpeed * transform.forward * (_delta + _passedTimeDelta);
 
         _currentRotateSpeed += _rotateIncrement * Time.fixedDeltaTime;
         _currentRotateSpeed = Mathf.Min(_currentRotateSpeed, _rotateMaxSpeed);

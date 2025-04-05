@@ -27,8 +27,16 @@ public class ActionSlot : MonoBehaviour, IDropHandler
     private AbilityUIDisplay _abilityDisplay;
     public Action<int, AbilityBase> OnAbilityChanged;
 
+
     private float _remainingCooldown = 0;
     private float _remainingGCD = 0;
+
+    private TargetingSystem _targetingSystem;
+
+    private void Start()
+    {
+        _targetingSystem = FindAnyObjectByType<TargetingSystem>();
+    }
 
     private void Update()
     {
@@ -37,7 +45,7 @@ public class ActionSlot : MonoBehaviour, IDropHandler
 
         if (KeyBind.IsKeyUp())
         {
-            var target = FindObjectOfType<TargetingSystem>().CurrentTarget?.GetComponent<Player>();
+            var target = _targetingSystem.CurrentTarget?.GetComponent<Player>();
 
             FlashActionSlot();
             if (Ability != null)
@@ -162,9 +170,9 @@ public class ActionSlot : MonoBehaviour, IDropHandler
         if (Ability != null)
         {
             _abilityDisplay.Ability = Ability;
-            GameEvents.OnCooldownStarted.AddListener(StartCooldown);
-            GameEvents.OnGCDStarted.AddListener(StartGCD);
-            GameEvents.OnCastInterrupted.AddListener(OnCastInterrupted);
+            ClientEvents.OnCooldownStarted.AddListener(StartCooldown);
+            ClientEvents.OnGCDStarted.AddListener(StartGCD);
+            ClientEvents.OnCastInterrupted.AddListener(OnCastInterrupted);
 
         }
         KeyBindText.text = HelperMethods.GetKeyBindNameShort(KeyBind.primary);
@@ -206,8 +214,8 @@ public class ActionSlot : MonoBehaviour, IDropHandler
 
     public void OnDisable()
     {
-        GameEvents.OnCooldownStarted.RemoveListener(StartCooldown);
-        GameEvents.OnGCDStarted.RemoveListener(StartGCD);
+        ClientEvents.OnCooldownStarted.RemoveListener(StartCooldown);
+        ClientEvents.OnGCDStarted.RemoveListener(StartGCD);
     }
 
     public void OnMouseUp(PointerEventData eventData)

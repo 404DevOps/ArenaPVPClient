@@ -1,8 +1,8 @@
 ﻿using System;
+using UnityEngine;
 
 namespace GameKit.Dependencies.Utilities
 {
-
     /// <summary>
     /// Unity 2022 has a bug where codegen will not compile when referencing a Queue type,
     /// while also targeting .Net as the framework API.
@@ -61,8 +61,9 @@ namespace GameKit.Dependencies.Utilities
         /// Tries to dequeue the next entry.
         /// </summary>
         /// <param name="result">Dequeued entry.</param>
+        /// <param name="defaultArrayEntry">True to set the array entry as default.</param>
         /// <returns>True if an entry existed to dequeue.</returns>
-        public bool TryDequeue(out T result)
+        public bool TryDequeue(out T result, bool defaultArrayEntry = true)
         {
             if (_written == 0)
             {
@@ -70,20 +71,22 @@ namespace GameKit.Dependencies.Utilities
                 return false;
             }
 
-            result = Dequeue();
+            result = Dequeue(defaultArrayEntry);
             return true;
         }
 
         /// <summary>
         /// Dequeues the next entry.
         /// </summary>
-        /// <returns></returns>
-        public T Dequeue()
+        /// <param name="defaultArrayEntry">True to set the array entry as default.</param>
+        public T Dequeue(bool defaultArrayEntry = true)
         {
             if (_written == 0)
-                throw new Exception($"Queue of type {typeof(T).Name} is empty.");
+                return default;
 
             T result = Collection[_read];
+            if (defaultArrayEntry)
+                Collection[_read] = default;
 
             _written--;
             _read++;
@@ -117,9 +120,21 @@ namespace GameKit.Dependencies.Utilities
         public T Peek()
         {
             if (_written == 0)
-                throw new Exception($"Queue of type {typeof(T).Name} is empty.");
+                throw new($"Queue of type {typeof(T).Name} is empty.");
 
             return Collection[_read];
+        }
+
+        /// <summary>
+        /// Returns an entry at index or default if index is invalid.
+        /// </summary>
+        public T GetIndexOrDefault(int simulatedIndex)
+        {
+            int offset = GetRealIndex(simulatedIndex, allowUnusedBuffer: false, log: false);
+            if (offset != -1 && offset < Collection.Length)
+                return Collection[offset];
+
+            return default;
         }
 
         /// <summary>
@@ -191,13 +206,11 @@ namespace GameKit.Dependencies.Utilities
             }
         }
 
-
-
         /// <summary>
         /// Returns the real index of the collection using a simulated index.
         /// </summary>
         /// <param name="allowUnusedBuffer">True to allow an index be returned from an unused portion of the buffer so long as it is within bounds.</param>
-        private int GetRealIndex(int simulatedIndex, bool allowUnusedBuffer = false)
+        private int GetRealIndex(int simulatedIndex, bool allowUnusedBuffer = false, bool log = true)
         {
             if (simulatedIndex >= Capacity)
             {
@@ -221,11 +234,10 @@ namespace GameKit.Dependencies.Utilities
 
             int ReturnError()
             {
-                UnityEngine.Debug.LogError($"Index {simulatedIndex} is out of range. Collection count is {_written}, Capacity is {Capacity}");
+                if (log)
+                    UnityEngine.Debug.LogError($"Index {simulatedIndex} is out of range. Collection count is {_written}, Capacity is {Capacity}");
                 return -1;
             }
         }
-
     }
-
 }

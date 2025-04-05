@@ -37,7 +37,7 @@ public class AbilityTooltipUIDisplay : TooltipBaseUIDisplay
                 return "Rage";
             case CharacterClassType.Medic:
             case CharacterClassType.Cryomancer:
-            case CharacterClassType.Voidweaver:
+            case CharacterClassType.Pyrohacker:
                 return "Mana";
             case CharacterClassType.Tracker:
                 return "Focus";

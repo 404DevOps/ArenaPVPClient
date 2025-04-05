@@ -1,0 +1,88 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad217e143a1d13d41872f8a9c6f56cac, type: 3}
+  m_Name: AppearanceData
+  m_EditorClassIdentifier: 
+  _classIcons:
+  - ClassType: 1
+    Icon: {fileID: 21300000, guid: 1f13f9ce181c15148a8a7f8f029934d3, type: 3}
+  - ClassType: 2
+    Icon: {fileID: 21300000, guid: 417d1f8e56902d842b7744f0f0501e91, type: 3}
+  - ClassType: 3
+    Icon: {fileID: 21300000, guid: cfecb15f7d9244144bd9cbe1fbea4d35, type: 3}
+  - ClassType: 4
+    Icon: {fileID: 21300000, guid: a96e4c3deb84a194a86375379740947a, type: 3}
+  _classColors:
+  - ClassType: 1
+    MainColor: {r: 0.6320754, g: 0.47030473, b: 0.03875936, a: 1}
+    ResourceColor: {r: 0.7735849, g: 0.025542913, b: 0.025542913, a: 1}
+  - ClassType: 2
+    MainColor: {r: 0.027100407, g: 0.8048847, b: 0.8207547, a: 1}
+    ResourceColor: {r: 0.086507656, g: 0.11903577, b: 0.6792453, a: 1}
+  - ClassType: 3
+    MainColor: {r: 1, g: 1, b: 1, a: 1}
+    ResourceColor: {r: 0.09019608, g: 0.12156863, b: 0.68235296, a: 1}
+  - ClassType: 4
+    MainColor: {r: 0.27211446, g: 0.6792453, b: 0.14417945, a: 1}
+    ResourceColor: {r: 0.509434, g: 0.27371323, b: 0.040850844, a: 1}
+  - ClassType: 5
+    MainColor: {r: 0.54131705, g: 0.017354928, b: 0.735849, a: 1}
+    ResourceColor: {r: 0.09019608, g: 0.12156863, b: 0.68235296, a: 1}
+  - ClassType: 6
+    MainColor: {r: 0.8962264, g: 0.7409632, b: 0.063412234, a: 1}
+    ResourceColor: {r: 0.8396226, g: 0.011881431, b: 0.573725, a: 1}
+  _combatLogColors:
+  - LogType: 0
+    Color: {r: 0.031149892, g: 0.8887376, b: 0.9433962, a: 1}
+  - LogType: 1
+    Color: {r: 0.012904947, g: 0.4751662, b: 0.5471698, a: 1}
+  - LogType: 2
+    Color: {r: 0.6415094, g: 0.033373676, b: 0.027233878, a: 1}
+  - LogType: 4
+    Color: {r: 0.21377735, g: 0.6431373, b: 0.027450994, a: 1}
+  - LogType: 5
+    Color: {r: 1, g: 1, b: 1, a: 1}
+  - LogType: 3
+    Color: {r: 1, g: 1, b: 1, a: 1}
+  _floatingTextColors:
+  - HealthChangedType: 0
+    Color: {r: 0.9716981, g: 0.6844457, b: 0.05958529, a: 0}
+  - HealthChangedType: 1
+    Color: {r: 0.036131967, g: 0.6792453, b: 0, a: 0}
+  _classRessourceDescriptor:
+  - ClassType: 1
+    ResourceType: 1
+    Descriptor: Adrenaline
+  - ClassType: 2
+    ResourceType: 0
+    Descriptor: Mana
+  - ClassType: 3
+    ResourceType: 0
+    Descriptor: Mana
+  - ClassType: 5
+    ResourceType: 0
+    Descriptor: Mana
+  - ClassType: 6
+    ResourceType: 3
+    Descriptor: Energy
+  - ClassType: 4
+    ResourceType: 2
+    Descriptor: Focus
+  _classModels:
+  - ClassType: 2
+    Model: {fileID: 919132149155446097, guid: d687b5524a0069f4dab29f2d042f9f27, type: 3}
+  - ClassType: 5
+    Model: {fileID: 919132149155446097, guid: 8ae3a107e83e9684aae27f55e112c2ce, type: 3}
+  - ClassType: 4
+    Model: {fileID: 919132149155446097, guid: ad2a8a8b1553ef74fa866ee3d2fbff4f, type: 3}
+  - ClassType: 1
+    Model: {fileID: 919132149155446097, guid: 89b1bf437010dc14598f1dbff4c97f28, type: 3}

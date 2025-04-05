@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: cd03c40e068d74042a6b1f8ac520f257
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 207815
+  packageName: 'FishNet: Networking Evolved'
+  packageVersion: 4.6.5R
+  assetPath: Assets/FishNet/Demos/Benchmarks/NetworkTransform/ReadMe.txt
+  uploadId: 745580

@@ -26,9 +26,9 @@ public class UnitFrameUIHandler : MonoBehaviour
         _healthbar = GetComponentInChildren<Healthbar>(true);
         _resourcebar = GetComponentInChildren<Resourcebar>(true);
 
-        GameEvents.OnPlayerInitialized.AddListener(OnPlayerInitialized);
-        GameEvents.OnPlayerHealthChanged.AddListener(OnHealthChanged);
-        GameEvents.OnPlayerResourceChanged.AddListener(OnResourceChanged);
+        ClientEvents.OnPlayerInitialized.AddListener(OnPlayerInitialized);
+        ClientEvents.OnPlayerHealthChanged.AddListener(OnHealthChanged);
+        ClientEvents.OnPlayerResourceChanged.AddListener(OnResourceChanged);
     }
     private void OnDisable()
     {
@@ -36,9 +36,9 @@ public class UnitFrameUIHandler : MonoBehaviour
         {
             UIEvents.OnTargetChanged.RemoveListener(OnTargetChanged);
         }
-        GameEvents.OnPlayerHealthChanged.RemoveListener(OnHealthChanged);
-        GameEvents.OnPlayerInitialized.RemoveListener(OnPlayerInitialized);
-        GameEvents.OnPlayerResourceChanged.RemoveListener(OnResourceChanged);
+        ClientEvents.OnPlayerHealthChanged.RemoveListener(OnHealthChanged);
+        ClientEvents.OnPlayerInitialized.RemoveListener(OnPlayerInitialized);
+        ClientEvents.OnPlayerResourceChanged.RemoveListener(OnResourceChanged);
     }
 
     private void OnPlayerInitialized(Player player)

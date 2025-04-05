@@ -37,7 +37,7 @@ public class GCDManager : NetworkBehaviour
     [ObserversRpc]
     private void OnGCDStartedClient(int ownerId, float duration)
     {
-        GameEvents.OnGCDStarted.Invoke(ownerId, duration);
+        ClientEvents.OnGCDStarted.Invoke(ownerId, duration);
     }
 
     [Server]

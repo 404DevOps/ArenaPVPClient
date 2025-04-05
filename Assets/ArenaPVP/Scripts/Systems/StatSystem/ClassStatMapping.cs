@@ -15,7 +15,7 @@ public class ClassStatMapping : ScriptableObject
     {
         if (_instance == null)
         {
-            _instance = Resources.Load("ScriptableObjects/BaseStats/" + typeof(ClassStatMapping).Name) as ClassStatMapping;
+            _instance = Resources.Load("BaseStats/" + typeof(ClassStatMapping).Name) as ClassStatMapping;
         }
         return _instance;
     }

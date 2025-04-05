@@ -24,7 +24,6 @@ public class CameraController: MonoBehaviour
     public CameraState previousState = CameraState.None;
     public float currentPan, currentTilt = 10, currentDistance = 7;
 
-
     float _dragThreshold = 10f;
     [HideInInspector]
     public bool isDragging = false;
@@ -38,14 +37,11 @@ public class CameraController: MonoBehaviour
 
     private bool _isCamLocked;
 
-    // Start is called before the first frame update
-
 
     void OnPlayerInitialized(Player player)
     {
         if(!InstanceFinder.IsClientStarted)
             return;
-
 
         if (player.IsOwnedByMe)
         {
@@ -60,7 +56,7 @@ public class CameraController: MonoBehaviour
             Tilt.eulerAngles = new Vector3(currentTilt, transform.eulerAngles.y, transform.eulerAngles.z);
             mainCam.transform.position += Tilt.forward * -currentDistance;
 
-            GameEvents.OnPlayerInitialized.RemoveListener(OnPlayerInitialized);
+            ClientEvents.OnPlayerInitialized.RemoveListener(OnPlayerInitialized);
         }
     }
 
@@ -169,12 +165,13 @@ public class CameraController: MonoBehaviour
 
     private void OnEnable()
     {
-        GameEvents.OnPlayerInitialized.AddListener(OnPlayerInitialized);
+        ClientEvents.OnPlayerInitialized.AddListener(OnPlayerInitialized);
         UIEvents.OnAbilityDrag.AddListener(SetCamLock);
         UIEvents.OnMainMenuOpen.AddListener(SetCamLock);
     }
     private void OnDisable()
     {
+        ClientEvents.OnPlayerInitialized.RemoveListener(OnPlayerInitialized);
         UIEvents.OnAbilityDrag.RemoveListener(SetCamLock);
         UIEvents.OnMainMenuOpen.RemoveListener(SetCamLock);
     }

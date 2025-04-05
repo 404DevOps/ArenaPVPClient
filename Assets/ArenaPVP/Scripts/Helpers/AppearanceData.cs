@@ -22,6 +22,8 @@ public class AppearanceData : ScriptableObject
     private List<FloatingTextColorPair> _floatingTextColors = new List<FloatingTextColorPair>();
     [SerializeField]
     private List<ClassRessourceDescPair> _classRessourceDescriptor = new List<ClassRessourceDescPair>();
+    [SerializeField]
+    private List<ClassModelPair> _classModels = new List<ClassModelPair>();
 
     #endregion
 
@@ -29,7 +31,7 @@ public class AppearanceData : ScriptableObject
     {
         if (_instance == null)
         {
-            _instance = Resources.Load("ScriptableObjects/Settings/" + typeof(AppearanceData).Name) as AppearanceData;
+            _instance = Resources.Load("Settings/" + typeof(AppearanceData).Name) as AppearanceData;
         }
         return _instance;
     }
@@ -86,6 +88,16 @@ public class AppearanceData : ScriptableObject
 
         throw new KeyNotFoundException(classType.ToString() + "does not exist in ClassRessourceDescriptors.");
     }
+
+    public GameObject GetModelForClasssType(CharacterClassType classType)
+    {
+        if (_classModels.Any(entry => entry.ClassType == classType))
+        {
+            return _classModels.FirstOrDefault(entry => entry.ClassType == classType).Model;
+        }
+
+        throw new KeyNotFoundException(classType.ToString() + "does not exist in ClassRessourceDescriptors.");
+    }
 }
 
     #region Collection Classes
@@ -121,6 +133,13 @@ public class ClassRessourceDescPair
     public CharacterClassType ClassType;
     public ResourceType ResourceType;
     public string Descriptor;
+}
+
+[Serializable]
+public class ClassModelPair
+{ 
+    public CharacterClassType ClassType;
+    public GameObject Model;
 }
 
 #endregion

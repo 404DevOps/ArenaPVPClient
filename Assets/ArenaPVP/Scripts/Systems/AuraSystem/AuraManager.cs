@@ -111,13 +111,13 @@ public class AuraManager : NetworkBehaviour
     private void AuraAppliedClient(int targetId, AuraInfo aura)
     {
         //local event so UI can react.
-        GameEvents.OnAuraApplied.Invoke(targetId, aura);
+        ClientEvents.OnAuraApplied.Invoke(targetId, aura);
     }
     [ObserversRpc]
     private void AuraRemovedClient(int targetId, AuraInfo aura)
     {
         //local event so UI can react.
-        GameEvents.OnAuraExpired.Invoke(targetId, aura);
+        ClientEvents.OnAuraExpired.Invoke(targetId, aura);
     }
 
     public List<AuraInfo> GetAuraInfosForPlayer(int playerId)

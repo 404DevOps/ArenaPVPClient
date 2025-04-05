@@ -1,4 +1,13 @@
-﻿using FishNet.Connection;
+﻿#if UNITY_EDITOR || DEVELOPMENT_BUILD
+#define DEVELOPMENT
+#endif
+
+#if UNITY_EDITOR
+using FishNet.Editing.PrefabCollectionGenerator;
+using UnityEditor;
+#endif
+
+using FishNet.Connection;
 using FishNet.Managing.Client;
 using FishNet.Managing.Server;
 using FishNet.Managing.Timing;
@@ -24,10 +33,7 @@ using FishNet.Managing.Predicting;
 using System.Runtime.CompilerServices;
 using GameKit.Dependencies.Utilities;
 
-#if UNITY_EDITOR
-using FishNet.Editing.PrefabCollectionGenerator;
-using UnityEditor;
-#endif
+
 
 namespace FishNet.Managing
 {
@@ -48,6 +54,7 @@ namespace FishNet.Managing
             ServerFirst,
             ClientFirst
         }
+
         /// <summary>
         /// How to persist with multiple NetworkManagers.
         /// </summary>
@@ -66,7 +73,6 @@ namespace FishNet.Managing
             /// </summary>
             AllowMultiple
         }
-
         #endregion
 
         #region Public.
@@ -74,10 +80,12 @@ namespace FishNet.Managing
         /// True if this instance of the NetworkManager is initialized.
         /// </summary>
         public bool Initialized { get; private set; }
+
         /// <summary>
         /// 
         /// </summary>
-        private static List<NetworkManager> _instances = new List<NetworkManager>();
+        private static List<NetworkManager> _instances = new();
+
         /// <summary>
         /// Currently initialized NetworkManagers.
         /// </summary>
@@ -86,9 +94,9 @@ namespace FishNet.Managing
             get
             {
                 /* Remove null instances of NetworkManager.
-                * This shouldn't happen because instances are removed
-                * OnDestroy but none the less something is causing
-                * it. */
+                 * This shouldn't happen because instances are removed
+                 * OnDestroy but none the less something is causing
+                 * it. */
                 for (int i = 0; i < _instances.Count; i++)
                 {
                     if (_instances[i] == null)
@@ -97,50 +105,61 @@ namespace FishNet.Managing
                         i--;
                     }
                 }
+
                 return _instances;
             }
         }
+
         /// <summary>
         /// PredictionManager for this NetworkManager.
         /// </summary>
         internal PredictionManager PredictionManager { get; private set; }
+
         /// <summary>
         /// ServerManager for this NetworkManager.
         /// </summary>
         public ServerManager ServerManager { get; private set; }
+
         /// <summary>
         /// ClientManager for this NetworkManager.
         /// </summary>
         public ClientManager ClientManager { get; private set; }
+
         /// <summary>
         /// TransportManager for this NetworkManager.
         /// </summary>
         public TransportManager TransportManager { get; private set; }
+
         /// <summary>
         /// TimeManager for this NetworkManager.
         /// </summary>
         public TimeManager TimeManager { get; private set; }
+
         /// <summary>
         /// SceneManager for this NetworkManager.
         /// </summary>
         public SceneManager SceneManager { get; private set; }
+
         /// <summary>
         /// ObserverManager for this NetworkManager.
         /// </summary>
         public ObserverManager ObserverManager { get; private set; }
+
         /// <summary>
         /// DebugManager for this NetworkManager.
         /// </summary>
         public DebugManager DebugManager { get; private set; }
+
         /// <summary>
         /// StatisticsManager for this NetworkManager.
         /// </summary>
         public StatisticsManager StatisticsManager { get; private set; }
+
         /// <summary>
         /// An empty connection reference. Used when a connection cannot be found to prevent object creation.
         /// </summary>
         [APIExclude]
-        public static NetworkConnection EmptyConnection { get; private set; } = new NetworkConnection();
+        public static NetworkConnection EmptyConnection { get; private set; } = new();
         #endregion
 
         #region Internal.
@@ -148,15 +167,23 @@ namespace FishNet.Managing
         /// Starting index for RpcLinks.
         /// </summary>
         internal static ushort StartingRpcLinkIndex;
+#if DEVELOPMENT
+        /// <summary>
+        /// Logs data about parser to help debug.
+        /// </summary>
+        internal PacketIdHistory PacketIdHistory = new();
+#endif
         #endregion
 
         #region Serialized.
+#if UNITY_EDITOR
         /// <summary>
         /// True to refresh the DefaultPrefabObjects collection whenever the editor enters play mode. This is an attempt to alleviate the DefaultPrefabObjects scriptable object not refreshing when using multiple editor applications such as ParrelSync.
         /// </summary>
         [Tooltip("True to refresh the DefaultPrefabObjects collection whenever the editor enters play mode. This is an attempt to alleviate the DefaultPrefabObjects scriptable object not refreshing when using multiple editor applications such as ParrelSync.")]
         [SerializeField]
         private bool _refreshDefaultPrefabs = false;
+#endif
         /// <summary>
         /// True to have your application run while in the background.
         /// </summary>
@@ -169,10 +196,12 @@ namespace FishNet.Managing
         [Tooltip("True to make this instance DontDestroyOnLoad. This is typical if you only want one NetworkManager.")]
         [SerializeField]
         private bool _dontDestroyOnLoad = true;
+
         /// <summary>
         /// Object pool to use for this NetworkManager. Value may be null.
         /// </summary>
         public ObjectPool ObjectPool => _objectPool;
+
         [Tooltip("Object pool to use for this NetworkManager. Value may be null.")]
         [SerializeField]
         private ObjectPool _objectPool;
@@ -195,13 +224,12 @@ namespace FishNet.Managing
         /// <summary>
         /// Version of this release.
         /// </summary>
-        public const string FISHNET_VERSION = "4.3.5";
+        public const string FISHNET_VERSION = "4.6.5";
         /// <summary>
         /// Maximum framerate allowed.
         /// </summary>
         internal const ushort MAXIMUM_FRAMERATE = 500;
         #endregion
-
 
         private void Awake()
         {
@@ -224,7 +252,7 @@ namespace FishNet.Managing
             {
                 Generator.IgnorePostProcess = true;
                 Debug.Log("DefaultPrefabCollection is being refreshed.");
-                Generator.GenerateFull();
+                Generator.GenerateFull(initializeAdded: false);
                 Generator.IgnorePostProcess = false;
             }
 #endif
@@ -234,7 +262,7 @@ namespace FishNet.Managing
                 DefaultPrefabObjects originalDpo = (DefaultPrefabObjects)SpawnablePrefabs;
                 //If not editor then a new instance must be made and sorted.
                 DefaultPrefabObjects instancedDpo = ScriptableObject.CreateInstance<DefaultPrefabObjects>();
-                instancedDpo.AddObjects(originalDpo.Prefabs.ToList(), false);
+                instancedDpo.AddObjects(originalDpo.Prefabs.ToList(), checkForDuplicates: false, initializeAdded: false);
                 instancedDpo.Sort();
                 SpawnablePrefabs = instancedDpo;
             }
@@ -306,7 +334,7 @@ namespace FishNet.Managing
         {
             bool clientStarted = ClientManager.Started;
             bool serverStarted = ServerManager.Started;
-
+            
             int frameRate = 0;
             //If both client and server are started then use whichever framerate is higher.
             if (clientStarted && serverStarted)
@@ -319,8 +347,8 @@ namespace FishNet.Managing
             /* Make sure framerate isn't set to max on server.
              * If it is then default to tick rate. If framerate is
              * less than tickrate then also set to tickrate. */
-#if UNITY_SERVER
-            ushort minimumServerFramerate = (ushort)(TimeManager.TickRate + 1);
+#if UNITY_SERVER && !UNITY_EDITOR
+            ushort minimumServerFramerate = (ushort)(TimeManager.TickRate + 15);
             if (frameRate == MAXIMUM_FRAMERATE)
                 frameRate = minimumServerFramerate;
             else if (frameRate < TimeManager.TickRate)
@@ -337,9 +365,9 @@ namespace FishNet.Managing
         private void TimeManager_OnLateUpdate()
         {
             /* Some reason runinbackground becomes unset
-            * or the setting goes ignored some times when it's set
-            * in awake. Rather than try to fix or care why Unity
-            * does this just set it in LateUpdate(or Update). */
+             * or the setting goes ignored some times when it's set
+             * in awake. Rather than try to fix or care why Unity
+             * does this just set it in LateUpdate(or Update). */
             SetRunInBackground();
             //Let's object pooler do regular work.
             _objectPool.LateUpdate();
@@ -370,7 +398,7 @@ namespace FishNet.Managing
             if (_persistence == PersistenceType.DestroyNewest)
             {
                 InternalLog($"NetworkManager on object {gameObject.name} is being destroyed due to persistence type {_persistence}. A NetworkManager instance already exist on {firstInstance.name}.");
-                Destroy(gameObject);
+                DestroyImmediate(gameObject);
                 //This one is being destroyed because its the newest.
                 return false;
             }
@@ -378,7 +406,7 @@ namespace FishNet.Managing
             else if (_persistence == PersistenceType.DestroyOldest)
             {
                 InternalLog($"NetworkManager on object {firstInstance.name} is being destroyed due to persistence type {_persistence}. A NetworkManager instance has been created on {gameObject.name}.");
-                Destroy(firstInstance.gameObject);
+                DestroyImmediate(firstInstance.gameObject);
                 //This being the new one will persist, allow initialization.
                 return true;
             }
@@ -448,7 +476,7 @@ namespace FishNet.Managing
             if (presetValue != null)
                 return presetValue;
 
-            if (gameObject.TryGetComponent<T>(out T result))
+            if (gameObject.TryGetComponent(out T result))
                 return result;
             else
                 return gameObject.AddComponent<T>();
@@ -506,16 +534,13 @@ namespace FishNet.Managing
             if (SpawnablePrefabs == null)
                 Reset();
         }
+
         private void Reset()
         {
             ValidateSpawnablePrefabs(true);
         }
 
 #endif
-
         #endregion
-
     }
-
-
 }

@@ -129,18 +129,18 @@ public class AbilityExecutor : NetworkBehaviour
     [TargetRpc]
     public void OnCastCompletedTargetRpc(NetworkConnection conn, UseAbilityArgs args)
     {
-        GameEvents.OnCastCompleted.Invoke(new CastEventArgs(args.Origin.Id, args.AbilityId, args.CastId));
+        ClientEvents.OnCastCompleted.Invoke(new CastEventArgs(args.Origin.Id, args.AbilityId, args.CastId));
     }
     [TargetRpc]
     public void OnCooldownStartedTargetRpc(NetworkConnection conn, UseAbilityArgs args)
     {
-        GameEvents.OnCooldownStarted.Invoke(args.Origin.Id, args.AbilityId);
+        ClientEvents.OnCooldownStarted.Invoke(args.Origin.Id, args.AbilityId);
     }
 
     [TargetRpc]
     public void OnCastInterruptedTargetRpc(NetworkConnection conn, AbilityCastInfo args, bool isSender = false)
     {
-        GameEvents.OnCastInterrupted.Invoke(args);
+        ClientEvents.OnCastInterrupted.Invoke(args);
         if (isSender)
             UIEvents.OnShowInformationPopup.Invoke("Interrupted");
     }

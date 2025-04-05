@@ -1,10 +1,12 @@
-﻿using FishNet.Utility.Extension;
+﻿using System;
+using FishNet.Utility.Extension;
 using GameKit.Dependencies.Utilities;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace FishNet.Object.Prediction
 {
+    [Obsolete("This class will be removed in version 5.")]
     internal class LocalTransformTickSmoother : IResettable
     {
         #region Private.
@@ -131,7 +133,7 @@ namespace FishNet.Object.Prediction
         /// <summary>
         /// Moves transform to target values.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        
         private void MoveToTarget()
         {
             _moveRates.MoveLocalToTarget(_graphicalObject, _gfxInitializedLocalValues, Time.deltaTime);

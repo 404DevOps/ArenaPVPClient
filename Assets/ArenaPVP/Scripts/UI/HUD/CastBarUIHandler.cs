@@ -31,10 +31,10 @@ public class CastBarUIHandler : MonoBehaviour
 
     private void OnEnable()
     {
-        GameEvents.OnPlayerInitialized.AddListener(OnPlayerInitialized);
-        GameEvents.OnCastStarted.AddListener(OnCastStarted);
-        GameEvents.OnCastInterrupted.AddListener(OnCastInterrupted);
-        GameEvents.OnCastCompleted.AddListener(OnCastCompleted); 
+        ClientEvents.OnPlayerInitialized.AddListener(OnPlayerInitialized);
+        ClientEvents.OnCastStarted.AddListener(OnCastStarted);
+        ClientEvents.OnCastInterrupted.AddListener(OnCastInterrupted);
+        ClientEvents.OnCastCompleted.AddListener(OnCastCompleted); 
     }
 
     private void OnPlayerInitialized(Player player)
@@ -53,9 +53,10 @@ public class CastBarUIHandler : MonoBehaviour
     private void OnDisable()
     {
         _isCasting = false;
-        GameEvents.OnCastStarted.RemoveListener(OnCastStarted);
-        GameEvents.OnCastInterrupted.RemoveListener(OnCastInterrupted);
-        GameEvents.OnCastCompleted.RemoveListener(OnCastCompleted);
+        ClientEvents.OnPlayerInitialized.RemoveListener(OnPlayerInitialized);
+        ClientEvents.OnCastStarted.RemoveListener(OnCastStarted);
+        ClientEvents.OnCastInterrupted.RemoveListener(OnCastInterrupted);
+        ClientEvents.OnCastCompleted.RemoveListener(OnCastCompleted);
     }
 
     public void OnCastStarted(CastEventArgs args) //int ownerId, int abilityId)

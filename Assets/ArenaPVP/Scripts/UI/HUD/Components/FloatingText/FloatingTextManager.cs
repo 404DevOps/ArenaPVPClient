@@ -59,10 +59,10 @@ public class FloatingTextManager : MonoBehaviour
 
     void OnDisable()
     {
-        GameEvents.OnPlayerHealthChanged.RemoveListener(OnPlayerHealthChanged);
+        ClientEvents.OnPlayerHealthChanged.RemoveListener(OnPlayerHealthChanged);
     }
     void OnEnable()
     {
-        GameEvents.OnPlayerHealthChanged.AddListener(OnPlayerHealthChanged);
+        ClientEvents.OnPlayerHealthChanged.AddListener(OnPlayerHealthChanged);
     }
 }

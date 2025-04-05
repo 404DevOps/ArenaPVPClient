@@ -1,19 +1,22 @@
-﻿using FishNet.Component.Prediction;
+﻿#define NEW_RECONCILE_TEST
+using System;
+using FishNet.Component.Prediction;
 using FishNet.Component.Transforming;
 using FishNet.Managing;
 using FishNet.Managing.Timing;
 using FishNet.Object.Prediction;
 using GameKit.Dependencies.Utilities;
 using System.Collections.Generic;
+using FishNet.Connection;
+using FishNet.Managing.Server;
 using UnityEngine;
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace FishNet.Object
 {
-#if !PREDICTION_1
     public partial class NetworkObject : MonoBehaviour
     {
         #region Types.
-#if !PREDICTION_1
         /// <summary>
         /// Type of prediction movement being used.
         /// </summary>
@@ -24,28 +27,19 @@ namespace FishNet.Object
             Rigidbody = 1,
             Rigidbody2D = 2
         }
-#endif
         #endregion
 
         #region Public.
-#if !PREDICTION_1
         /// <summary>
         /// True if a reconcile is occuring on any NetworkBehaviour that is on or nested of this NetworkObject. Runtime NetworkBehaviours are not included, such as if you child a NetworkObject to another at runtime.
         /// </summary>
         public bool IsObjectReconciling { get; internal set; }
+
         /// <summary>
         /// Graphical smoother to use when using set for owner.
         /// </summary> 
-        public ChildTransformTickSmoother PredictionSmoother { get; private set; }
-#endif
-        /// <summary>
-        /// Last tick this object replicated.
-        /// </summary>
-        internal EstimatedTick ReplicateTick { get; private set; } = new EstimatedTick();
-        /// <summary>
-        /// Last tick to replicate even if out of order. This could be from tick events or even replaying inputs.
-        /// </summary>
-        internal uint LastUnorderedReplicateTick;
+        [Obsolete("This field will be removed in v5. Instead reference NetworkTickSmoother on each graphical object used.")]
+        public TransformTickSmoother PredictionSmoother { get; private set; }
         #endregion
 
         #region Internal.
@@ -53,15 +47,16 @@ namespace FishNet.Object
         /// Pauses and unpauses rigidbodies when they do not have data to reconcile to.
         /// </summary>
         public RigidbodyPauser RigidbodyPauser => _rigidbodyPauser;
+
         private RigidbodyPauser _rigidbodyPauser;
         #endregion
 
         #region Serialized.
-#if !PREDICTION_1
         /// <summary>
         /// True if this object uses prediciton methods.
         /// </summary>
         public bool EnablePrediction => _enablePrediction;
+
         [Tooltip("True if this object uses prediction methods.")]
         [SerializeField]
         private bool _enablePrediction;
@@ -77,11 +72,13 @@ namespace FishNet.Object
         [Tooltip("Object containing graphics when using prediction. This should be child of the predicted root.")]
         [SerializeField]
         private Transform _graphicalObject;
+
         /// <summary>
         /// Gets the current graphical object for prediction.
         /// </summary>
         /// <returns></returns>
         public Transform GetGraphicalObject() => _graphicalObject;
+
         /// <summary>
         /// Sets a new graphical object for prediction.
         /// </summary>
@@ -91,6 +88,7 @@ namespace FishNet.Object
             _graphicalObject = t;
             InitializeTickSmoother();
         }
+
         /// <summary>
         /// True to detach and re-attach the graphical object at runtime when the client initializes/deinitializes the item.
         /// This can resolve camera jitter or be helpful objects child of the graphical which do not handle reconiliation well, such as certain animation rigs.
@@ -99,10 +97,12 @@ namespace FishNet.Object
         [Tooltip("True to detach and re-attach the graphical object at runtime when the client initializes/deinitializes the item. This can resolve camera jitter or be helpful objects child of the graphical which do not handle reconiliation well, such as certain animation rigs. Transform is detached after OnStartClient, and reattached before OnStopClient.")]
         [SerializeField]
         private bool _detachGraphicalObject;
+
         /// <summary>
         /// True to forward replicate and reconcile states to all clients. This is ideal with games where you want all clients and server to run the same inputs. False to only use prediction on the owner, and synchronize to spectators using other means such as a NetworkTransform.
         /// </summary>
         public bool EnableStateForwarding => (_enablePrediction && _enableStateForwarding);
+
         [Tooltip("True to forward replicate and reconcile states to all clients. This is ideal with games where you want all clients and server to run the same inputs. False to only use prediction on the owner, and synchronize to spectators using other means such as a NetworkTransform.")]
         [SerializeField]
         private bool _enableStateForwarding = true;
@@ -129,7 +129,7 @@ namespace FishNet.Object
         /// </summary>
         [Tooltip("Interpolation amount of adaptive interpolation to use on non-owned objects. Higher levels result in more interpolation. When off spectatorInterpolation is used; when on interpolation based on strength and local client latency is used.")]
         [SerializeField]
-        private AdaptiveInterpolationType _adaptiveInterpolation = AdaptiveInterpolationType.Medium;
+        private AdaptiveInterpolationType _adaptiveInterpolation = AdaptiveInterpolationType.Low;
         /// <summary>
         /// Properties of the graphicalObject to smooth when the object is spectated.
         /// </summary>
@@ -155,25 +155,25 @@ namespace FishNet.Object
         [Range(0.001f, ushort.MaxValue)]
         [SerializeField]
         private float _teleportThreshold = 1f;
-#endif
         #endregion
 
         #region Private.
         /// <summary>
         /// NetworkBehaviours which use prediction.
         /// </summary>
-        private List<NetworkBehaviour> _predictionBehaviours = new List<NetworkBehaviour>();
+        private List<NetworkBehaviour> _predictionBehaviours = new();
         #endregion
 
-        private void Update_Prediction()
+        private void TimeManager_OnUpdate_Prediction()
         {
             if (!_enablePrediction)
                 return;
 
-            PredictionSmoother?.Update();
+            if (PredictionSmoother != null)
+                PredictionSmoother.OnUpdate();
         }
 
-        private void Preinitialize_Prediction(NetworkManager manager, bool asServer)
+        private void InitializePredictionEarly(NetworkManager manager, bool asServer)
         {
             if (!_enablePrediction)
                 return;
@@ -181,13 +181,10 @@ namespace FishNet.Object
             if (!_enableStateForwarding && _networkTransform != null)
                 _networkTransform.ConfigureForPrediction(_predictionType);
 
-            ReplicateTick.Initialize(manager.TimeManager);
             if (asServer)
                 return;
-            else
-                InitializeSmoothers();
 
-
+            InitializeSmoothers();
 
             if (_predictionBehaviours.Count > 0)
             {
@@ -197,7 +194,7 @@ namespace FishNet.Object
             }
         }
 
-        private void Prediction_Deinitialize(bool asServer)
+        private void Deinitialize_Prediction(bool asServer)
         {
             if (!_enablePrediction)
                 return;
@@ -208,7 +205,7 @@ namespace FishNet.Object
              * dropping their connection. */
             if (_predictionBehaviours.Count > 0)
             {
-                ChangePredictionSubscriptions(false, NetworkManager);
+                ChangePredictionSubscriptions(subscribe: false, NetworkManager);
                 foreach (NetworkBehaviour item in _predictionBehaviours)
                     item.Deinitialize_Prediction(asServer);
             }
@@ -244,7 +241,6 @@ namespace FishNet.Object
             }
         }
 
-
         /// <summary>
         /// Initializes tick smoothing.
         /// </summary>
@@ -266,7 +262,7 @@ namespace FishNet.Object
             else
             {
                 if (PredictionSmoother == null)
-                    PredictionSmoother = ResettableObjectCaches<ChildTransformTickSmoother>.Retrieve();
+                    PredictionSmoother = ResettableObjectCaches<TransformTickSmoother>.Retrieve();
                 InitializeTickSmoother();
             }
         }
@@ -279,8 +275,9 @@ namespace FishNet.Object
             if (PredictionSmoother == null)
                 return;
             float teleportT = (_enableTeleport) ? _teleportThreshold : MoveRatesCls.UNSET_VALUE;
-            PredictionSmoother.Initialize(this, _graphicalObject, _detachGraphicalObject, teleportT, (float)TimeManager.TickDelta, _ownerInterpolation, _ownerSmoothedProperties, _spectatorInterpolation, _spectatorSmoothedProperties, _adaptiveInterpolation);
+            PredictionSmoother.InitializeNetworked(this, _graphicalObject, _detachGraphicalObject, teleportT, (float)TimeManager.TickDelta, _ownerInterpolation, _ownerSmoothedProperties, _spectatorInterpolation, _spectatorSmoothedProperties, _adaptiveInterpolation);
         }
+
         /// <summary>
         /// Initializes tick smoothing.
         /// </summary>
@@ -289,12 +286,11 @@ namespace FishNet.Object
             if (PredictionSmoother != null)
             {
                 PredictionSmoother.Deinitialize();
-                ResettableObjectCaches<ChildTransformTickSmoother>.Store(PredictionSmoother);
+                ResettableObjectCaches<TransformTickSmoother>.Store(PredictionSmoother);
                 PredictionSmoother = null;
                 ResettableObjectCaches<RigidbodyPauser>.StoreAndDefault(ref _rigidbodyPauser);
             }
         }
-
 
         private void InvokeStartCallbacks_Prediction(bool asServer)
         {
@@ -302,49 +298,66 @@ namespace FishNet.Object
                 return;
 
             if (!asServer)
-                PredictionSmoother?.OnStartClient();
+            {
+                TimeManager.OnUpdate += TimeManager_Update;
+                if (PredictionSmoother != null)
+                    PredictionSmoother.OnStartClient();
+            }
         }
+
         private void InvokeStopCallbacks_Prediction(bool asServer)
         {
             if (_predictionBehaviours.Count == 0)
                 return;
 
             if (!asServer)
-                PredictionSmoother?.OnStopClient();
+            {
+                TimeManager.OnUpdate -= TimeManager_Update;
+                if (PredictionSmoother != null)
+                    PredictionSmoother.OnStopClient();
+            }
         }
 
         private void TimeManager_OnPreTick()
         {
-            PredictionSmoother?.OnPreTick();
+            if (PredictionSmoother != null)
+                PredictionSmoother.OnPreTick();
         }
 
         private void PredictionManager_OnPostReplicateReplay(uint clientTick, uint serverTick)
         {
-            PredictionSmoother?.OnPostReplay(clientTick);
+            if (PredictionSmoother != null)
+                PredictionSmoother.OnPostReplicateReplay(clientTick);
         }
 
         private void TimeManager_OnPostTick()
         {
-            PredictionSmoother?.OnPostTick(NetworkManager.TimeManager.LocalTick);
+            if (PredictionSmoother != null)
+                PredictionSmoother.OnPostTick(NetworkManager.TimeManager.LocalTick);
         }
 
         private void PredictionManager_OnPreReconcile(uint clientTick, uint serverTick)
         {
-            PredictionSmoother?.OnPreReconcile();
+            if (PredictionSmoother != null)
+                PredictionSmoother.OnPreReconcile();
         }
-
 
         private void PredictionManager_OnReconcile(uint clientReconcileTick, uint serverReconcileTick)
         {
+            /* Tell all prediction behaviours to set/validate their
+             * reconcile data now. This will use reconciles from the server
+             * whenever possible, and local reconciles if a server reconcile
+             * is not available. */
+            for (int i = 0; i < _predictionBehaviours.Count; i++)
+                _predictionBehaviours[i].Reconcile_Client_Start();
+
+            /* If still not reconciling then pause rigidbody.
+             * This shouldn't happen unless the user is not calling
+             * reconcile at all. */
             if (!IsObjectReconciling)
             {
                 if (_rigidbodyPauser != null)
                     _rigidbodyPauser.Pause();
-            }
-            else
-            {
-                for (int i = 0; i < _predictionBehaviours.Count; i++)
-                    _predictionBehaviours[i].Reconcile_Client_Start();
             }
         }
 
@@ -362,12 +375,11 @@ namespace FishNet.Object
             IsObjectReconciling = false;
         }
 
-
         private void PredictionManager_OnReplicateReplay(uint clientTick, uint serverTick)
         {
             uint replayTick = (IsOwner) ? clientTick : serverTick;
             for (int i = 0; i < _predictionBehaviours.Count; i++)
-                _predictionBehaviours[i].Replicate_Replay_Start(replayTick + 1);
+                _predictionBehaviours[i].Replicate_Replay_Start(replayTick);
         }
 
         /// <summary>
@@ -380,29 +392,71 @@ namespace FishNet.Object
         }
 
         /// <summary>
-        /// Resets replicate tick and unordered replicate tick.
+        /// Clears replication queue inserting them into the past replicates history when possible.
+        /// This should only be called when client only.
         /// </summary>
-        internal void ResetReplicateTick()
+        internal void EmptyReplicatesQueueIntoHistory()
         {
-            ReplicateTick.Reset();
-            LastUnorderedReplicateTick = 0;
+            for (int i = 0; i < _predictionBehaviours.Count; i++)
+                _predictionBehaviours[i].EmptyReplicatesQueueIntoHistory_Start();
         }
 
         /// <summary>
-        /// Sets the last tick this NetworkBehaviour replicated with.
+        /// Sets the last tick a NetworkBehaviour replicated with.
         /// </summary>
-        internal void SetReplicateTick(uint value, bool setUnordered)
+        /// <param name="setUnordered">True to set unordered value, false to set ordered.</param>
+        internal void SetReplicateTick(uint value, bool createdReplicate)
         {
-            if (setUnordered)
-                LastUnorderedReplicateTick = value;
-
-            ReplicateTick.Update(NetworkManager.TimeManager, value, EstimatedTick.OldTickOption.Discard);
-            if (Owner.IsValid)
+            if (createdReplicate && Owner.IsValid)
                 Owner.ReplicateTick.Update(NetworkManager.TimeManager, value, EstimatedTick.OldTickOption.Discard);
         }
 
-
+        /// <summary>
+        /// ResetState for prediction values.
+        /// </summary>
+        private void ResetState_Prediction(bool asServer) { }
     }
-#endif
-}
 
+    /// <summary>
+    /// Place this component on your NetworkManager object to remove ownership of objects for a disconnecting client.
+    /// This prevents any owned object from being despawned when the owner disconnects.
+    /// </summary>
+    public class GlobalPreserveOwnedObjects : MonoBehaviour
+    {
+        private void Awake()
+        {
+            ServerManager sm = GetComponent<ServerManager>();
+            sm.Objects.OnPreDestroyClientObjects += Objects_OnPreDestroyClientObjects;
+        }
+
+        protected virtual void Objects_OnPreDestroyClientObjects(NetworkConnection conn)
+        {
+            foreach (NetworkObject networkObject in conn.Objects)
+                networkObject.RemoveOwnership();
+        }
+    }
+
+    /// <summary>
+    /// Place this component on NetworkObjects you wish to remove ownership on for a disconnecting owner.
+    /// This prevents the object from being despawned when the owner disconnects.
+    /// </summary>
+    public class NetworkPreserveOwnedObjects : NetworkBehaviour
+    {
+        public override void OnStartServer()
+        {
+            ServerManager.Objects.OnPreDestroyClientObjects += OnPreDestroyClientObjects;
+        }
+
+        public override void OnStopServer()
+        {
+            if (ServerManager != null)
+                ServerManager.Objects.OnPreDestroyClientObjects -= OnPreDestroyClientObjects;
+        }
+
+        private void OnPreDestroyClientObjects(NetworkConnection conn)
+        {
+            if (conn == Owner)
+                RemoveOwnership();
+        }
+    }
+}

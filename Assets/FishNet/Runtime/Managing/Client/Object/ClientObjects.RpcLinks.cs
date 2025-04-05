@@ -1,15 +1,15 @@
-﻿using FishNet.Managing.Logging;
+﻿#if UNITY_EDITOR || DEVELOPMENT_BUILD
+#define DEVELOPMENT
+#endif
+
 using FishNet.Managing.Object;
 using FishNet.Managing.Utility;
 using FishNet.Object;
-using FishNet.Object.Helping;
 using FishNet.Serializing;
 using FishNet.Transporting;
-using FishNet.Utility.Extension;
 using GameKit.Dependencies.Utilities;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using UnityEngine;
+using FishNet.Serializing.Helping;
 
 namespace FishNet.Managing.Client
 {
@@ -18,12 +18,11 @@ namespace FishNet.Managing.Client
     /// </summary>
     public partial class ClientObjects : ManagedObjects
     {
-
         #region Private.
         /// <summary>
         /// RPCLinks of currently spawned objects.
         /// </summary>
-        private Dictionary<ushort, RpcLink> _rpcLinks = new Dictionary<ushort, RpcLink>();
+        private Dictionary<ushort, RpcLink> _rpcLinks = new();
         #endregion
 
         /// <summary>
@@ -31,33 +30,35 @@ namespace FishNet.Managing.Client
         /// </summary>
         /// <param name="reader"></param>
         /// <param name="index"></param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void ParseRpcLink(PooledReader reader, ushort index, Channel channel)
         {
+#if DEVELOPMENT
+            NetworkBehaviour.ReadDebugForValidatedRpc(base.NetworkManager, reader, out int startReaderRemaining, out string rpcInformation, out uint expectedReadAmount);
+#endif
+
             int dataLength;
             //Link index isn't stored.
             if (!_rpcLinks.TryGetValueIL2CPP(index, out RpcLink link))
             {
                 dataLength = Packets.GetPacketLength(ushort.MaxValue, reader, channel);
                 SkipDataLength(index, reader, dataLength);
-                return;
             }
             //Found NetworkObject for link.
             else if (Spawned.TryGetValueIL2CPP(link.ObjectId, out NetworkObject nob))
             {
                 //Still call GetPacketLength to remove any extra bytes at the front of the reader.
                 NetworkBehaviour nb = nob.NetworkBehaviours[link.ComponentIndex];
-                if (link.RpcType == RpcType.Target)
+                if (link.RpcPacketId == PacketId.TargetRpc)
                 {
                     Packets.GetPacketLength((ushort)PacketId.TargetRpc, reader, channel);
-                    nb.OnTargetRpc(link.RpcHash, reader, channel);
+                    nb.ReadTargetRpc(fromRpcLink: true, link.RpcHash, reader, channel);
                 }
-                else if (link.RpcType == RpcType.Observers)
+                else if (link.RpcPacketId == PacketId.ObserversRpc)
                 {
                     Packets.GetPacketLength((ushort)PacketId.ObserversRpc, reader, channel);
-                    nb.OnObserversRpc(link.RpcHash, reader, channel);
+                    nb.ReadObserversRpc(fromRpcLink: true, link.RpcHash, reader, channel);
                 }
-                else if (link.RpcType == RpcType.Reconcile)
+                else if (link.RpcPacketId == PacketId.Reconcile)
                 {
                     Packets.GetPacketLength((ushort)PacketId.Reconcile, reader, channel);
                     nb.OnReconcileRpc(link.RpcHash, reader, channel);
@@ -69,6 +70,10 @@ namespace FishNet.Managing.Client
                 dataLength = Packets.GetPacketLength(index, reader, channel);
                 SkipDataLength(index, reader, dataLength, link.ObjectId);
             }
+
+#if DEVELOPMENT
+            NetworkBehaviour.TryPrintDebugForValidatedRpc(fromRpcLink: true, base.NetworkManager, reader, startReaderRemaining, rpcInformation, expectedReadAmount, channel);
+#endif
         }
 
         /// <summary>
@@ -92,7 +97,5 @@ namespace FishNet.Managing.Client
             for (int i = 0; i < values.Count; i++)
                 _rpcLinks.Remove(values[i]);
         }
-
     }
-
 }

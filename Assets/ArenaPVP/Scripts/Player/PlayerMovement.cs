@@ -9,6 +9,7 @@ public class PlayerMovement: NetworkBehaviour
 {
     #region MovementVariables
 
+    Player _player;
     [SerializeField]
     private float _walkSpeed = 2f;
     [SerializeField]
@@ -23,7 +24,7 @@ public class PlayerMovement: NetworkBehaviour
     #endregion
     #region References
 
-    private PlayerStats _stats;
+    private StatSnapshot _stats;
     private float _rotation;
     private Vector3 _currentDirection;
     private CharacterController _characterController;
@@ -39,38 +40,27 @@ public class PlayerMovement: NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
-        if (base.IsOwner)
-        {
-            _characterController = GetComponent<CharacterController>();
-            _settings = FindObjectOfType<PlayerConfiguration>();
-            _stats = GetComponent<PlayerStats>();
-            _controls = _settings.Settings.Controls;
-            GameEvents.OnPlayerStatsInitialized.AddListener(OnStatsInitialized);
-        }
-        else 
+        if (!base.IsOwner)
         {
             this.enabled = false;
+            return;
         }
+        _player = GetComponent<Player>();
+        _characterController = GetComponent<CharacterController>();
+        _settings = PlayerConfiguration.Instance;
+        _controls = _settings.Settings.Controls;
     }
 
-    public void OnStatsInitialized(Player player)
+    public void OnStatsUpdated(StatSnapshot snapshot)
     {
-        if (GetComponent<Player>().Id == player.Id) 
-        {
-            _stats = player.GetComponent<PlayerStats>();
-            GameEvents.OnPlayerStatsInitialized.RemoveListener(OnStatsInitialized);
-        }     
+        _stats = snapshot;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!base.IsOwner)
+        if (!base.IsOwner || _controls == null)
             return;
-        if (_stats == null)
-            return;
-        //if (!base.IsOwner)
-        //    return;
 
         HandleCameraSteer();
        
@@ -104,12 +94,10 @@ public class PlayerMovement: NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if (!base.IsOwner)
-            return;
-        if (_stats == null)
+        if (!base.IsOwner || _controls == null)
             return;
 
-        _characterController.Move(new Vector3(_currentDirection.x * _walkSpeed, _velocityY, _currentDirection.z * _walkSpeed) * Time.deltaTime * _stats.MovementSpeed);  
+        _characterController.Move(new Vector3(_currentDirection.x * _walkSpeed, _velocityY, _currentDirection.z * _walkSpeed) * Time.fixedDeltaTime * _stats.MovementSpeed);  
     }
 
     private void HandleJump()
@@ -158,11 +146,13 @@ public class PlayerMovement: NetworkBehaviour
 
     private void OnEnable()
     {
+        ClientEvents.OnClientStatsUpdated.AddListener(OnStatsUpdated);
         UIEvents.OnSettingsLoaded.AddListener(ReloadControlSettings);
         UIEvents.OnControlsChanged.AddListener(ReloadControlSettings);
     }
     private void OnDisable()
     {
+        ClientEvents.OnClientStatsUpdated?.RemoveListener(OnStatsUpdated);
         UIEvents.OnSettingsLoaded.RemoveListener(ReloadControlSettings);
         UIEvents.OnControlsChanged.RemoveListener(ReloadControlSettings);
     }

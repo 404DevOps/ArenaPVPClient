@@ -39,7 +39,7 @@ public class CastManager : NetworkBehaviour
     [ObserversRpc]
     private void OnCastStartedClient(CastEventArgs args)
     {
-        GameEvents.OnCastStarted.Invoke(args);
+        ClientEvents.OnCastStarted.Invoke(args);
     }
 
     [Server]

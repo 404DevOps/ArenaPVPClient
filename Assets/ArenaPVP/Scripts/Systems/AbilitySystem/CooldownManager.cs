@@ -64,7 +64,7 @@ public class CooldownManager : NetworkBehaviour
     [ObserversRpc]
     public void OnCooldownStartedClient(int ownerId, int abilityId)
     {
-        GameEvents.OnCooldownStarted.Invoke(ownerId, abilityId);
+        ClientEvents.OnCooldownStarted.Invoke(ownerId, abilityId);
     }
 
     public float GetRemainingCooldown(AbilityCooldownInfo ability)

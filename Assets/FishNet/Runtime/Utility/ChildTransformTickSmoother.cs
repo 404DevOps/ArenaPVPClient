@@ -1,4 +1,5 @@
 ﻿#if !PREDICTION_1
+using FishNet.Component.Transforming;
 using FishNet.Managing;
 using FishNet.Managing.Timing;
 using FishNet.Utility.Extension;
@@ -251,7 +252,7 @@ namespace FishNet.Object.Prediction
                         case AdaptiveInterpolationType.Low:
                             interpolation *= 0.375f;
                             break;
-                        case AdaptiveInterpolationType.Medium:
+                        case AdaptiveInterpolationType.Moderate:
                             interpolation *= 0.5f;
                             break;
                         case AdaptiveInterpolationType.High:

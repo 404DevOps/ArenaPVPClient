@@ -19,7 +19,7 @@ public class ActionBarUIHandler : MonoBehaviour
     {
         //UIEvents.OnSettingsLoaded.AddListener(InitializeActionBars);
         UIEvents.OnKeyBindsChanged.AddListener(RebuildActionBars);
-        GameEvents.OnPlayerInitialized.AddListener(OnPlayerInitialized);
+        ClientEvents.OnPlayerInitialized.AddListener(OnPlayerInitialized);
     }
 
     private void OnPlayerInitialized(Player player)
@@ -29,7 +29,7 @@ public class ActionBarUIHandler : MonoBehaviour
             _player = player;
             actionBarMappingPath = Application.persistentDataPath + "/ActionBarMapping_" + _player.ClassType.ToString() + ".json";
             InitializeActionBars();
-            GameEvents.OnPlayerInitialized.RemoveListener(OnPlayerInitialized);
+            ClientEvents.OnPlayerInitialized.RemoveListener(OnPlayerInitialized);
         }
     }
 

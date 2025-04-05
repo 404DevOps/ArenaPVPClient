@@ -1,12 +1,10 @@
 ﻿#if UNITY_EDITOR
-#if !PREDICTION_1
-using FishNet.Object.Prediction;
+using FishNet.Component.Transforming;
 using UnityEditor;
 using UnityEngine;
 
 namespace FishNet.Object.Editing
 {
-
     [CustomEditor(typeof(NetworkObject), true)]
     [CanEditMultipleObjects]
     public class NetworkObjectEditor : Editor
@@ -15,6 +13,7 @@ namespace FishNet.Object.Editing
         private SerializedProperty _isSpawnable;
         private SerializedProperty _isGlobal;
         private SerializedProperty _initializeOrder;
+        private SerializedProperty _preventDespawnOnDisconnect;
         private SerializedProperty _defaultDespawnType;
 
         private SerializedProperty _enablePrediction;
@@ -32,14 +31,21 @@ namespace FishNet.Object.Editing
         private SerializedProperty _enableTeleport;
         private SerializedProperty _teleportThreshold;
 
+        private int _tabIndex;
+        private int _savedTabIndex;
 
+        private const string TAB_INDEX_PREFS_NAME = "FishNet_NetworkObject_TabIndex";
 
         protected virtual void OnEnable()
         {
+            _tabIndex = EditorPrefs.GetInt(TAB_INDEX_PREFS_NAME);
+            _savedTabIndex = _tabIndex;
+
             _isNetworked = serializedObject.FindProperty(nameof(_isNetworked));
             _isSpawnable = serializedObject.FindProperty(nameof(_isSpawnable));
             _isGlobal = serializedObject.FindProperty(nameof(_isGlobal));
             _initializeOrder = serializedObject.FindProperty(nameof(_initializeOrder));
+            _preventDespawnOnDisconnect = serializedObject.FindProperty(nameof(_preventDespawnOnDisconnect));
             _defaultDespawnType = serializedObject.FindProperty(nameof(_defaultDespawnType));
 
             _enablePrediction = serializedObject.FindProperty(nameof(_enablePrediction));
@@ -66,89 +72,116 @@ namespace FishNet.Object.Editing
             GUI.enabled = false;
             EditorGUILayout.ObjectField("Script:", MonoScript.FromMonoBehaviour(nob), typeof(NetworkObject), false);
             GUI.enabled = true;
-
-            EditorGUILayout.LabelField("Settings", EditorStyles.boldLabel);
-            EditorGUI.indentLevel++;
-            EditorGUILayout.PropertyField(_isNetworked);
-            EditorGUILayout.PropertyField(_isSpawnable);
-            EditorGUILayout.PropertyField(_isGlobal);
-            EditorGUILayout.PropertyField(_initializeOrder);
-            EditorGUILayout.PropertyField(_defaultDespawnType);
-            EditorGUI.indentLevel--;
             EditorGUILayout.Space();
 
-            EditorGUILayout.LabelField("Prediction", EditorStyles.boldLabel);
-            EditorGUI.indentLevel++;
-            EditorGUILayout.PropertyField(_enablePrediction);
-            if (_enablePrediction.boolValue == true)
+            _tabIndex = GUILayout.Toolbar(_tabIndex, new string[] { "Settings", "Prediction" });
+            EditorGUILayout.Space();
+            switch (_tabIndex)
             {
-                EditorGUI.indentLevel++;
-                EditorGUILayout.PropertyField(_predictionType);
-                EditorGUILayout.PropertyField(_enableStateForwarding);
-                if (_enableStateForwarding.boolValue == false)
-                {
-                    EditorGUI.indentLevel++;
-                    EditorGUILayout.PropertyField(_networkTransform);
-                    EditorGUI.indentLevel--;
-                }
+                case 0:
+                    ShowSettingsTab();
+                    break;
+                case 1:
+                    ShowPredictionTab();
+                    break;
+                default:
+                    ShowSettingsTab();
+                    break;
+            }
 
-                bool graphicalSet = (_graphicalObject.objectReferenceValue != null);
-                EditorGUILayout.PropertyField(_graphicalObject);
-                if (graphicalSet)
+
+            void ShowSettingsTab()
+            {
+                SaveTabIndex();
+                EditorGUILayout.PropertyField(_isNetworked);
+                EditorGUILayout.PropertyField(_isSpawnable);
+                EditorGUILayout.PropertyField(_isGlobal);
+                EditorGUILayout.PropertyField(_initializeOrder);
+                EditorGUILayout.PropertyField(_preventDespawnOnDisconnect);
+                EditorGUILayout.PropertyField(_defaultDespawnType);
+            }
+
+            void ShowPredictionTab()
+            {
+                SaveTabIndex();
+                EditorGUILayout.PropertyField(_enablePrediction);
+                if (_enablePrediction.boolValue == true)
                 {
                     EditorGUI.indentLevel++;
-                    EditorGUILayout.PropertyField(_detachGraphicalObject);
-                    EditorGUI.indentLevel--;
-                }
-                EditorGUILayout.LabelField("Smoothing", EditorStyles.boldLabel);
-                if (!graphicalSet)
-                {
-                    EditorGUILayout.HelpBox($"More smoothing settings will be displayed when a graphicalObject is set.", MessageType.Info);
-                }
-                else
-                {
-                    EditorGUI.indentLevel++;
-                    EditorGUILayout.PropertyField(_enableTeleport);
-                    if (_enableTeleport.boolValue == true)
+                    EditorGUILayout.PropertyField(_predictionType);
+                    EditorGUILayout.PropertyField(_enableStateForwarding);
+                    if (_enableStateForwarding.boolValue == false)
                     {
                         EditorGUI.indentLevel++;
-                        EditorGUILayout.PropertyField(_teleportThreshold, new GUIContent("Teleport Threshold"));
-                        EditorGUI.indentLevel--;
-                    }                    
-
-                    EditorGUILayout.LabelField("Owner", EditorStyles.boldLabel);
-                    EditorGUI.indentLevel++;
-                    EditorGUILayout.PropertyField(_ownerInterpolation, new GUIContent("Interpolation"));
-                    EditorGUILayout.PropertyField(_ownerSmoothedProperties, new GUIContent("Smoothed Properties"));
-                    EditorGUI.indentLevel--;
-
-                    EditorGUILayout.LabelField("Spectator", EditorStyles.boldLabel);
-                    EditorGUI.indentLevel++;
-                    EditorGUILayout.PropertyField(_adaptiveInterpolation);
-                    if (_adaptiveInterpolation.intValue == (int)AdaptiveInterpolationType.Off)
-                    {
-                        EditorGUI.indentLevel++;
-                        EditorGUILayout.PropertyField(_spectatorInterpolation, new GUIContent("Interpolation"));
+                        EditorGUILayout.PropertyField(_networkTransform);
                         EditorGUI.indentLevel--;
                     }
-                    EditorGUILayout.PropertyField(_spectatorSmoothedProperties, new GUIContent("Smoothed Properties"));
+
+                    EditorGUILayout.HelpBox("Smoothing settings on the NetworkObject will be obsoleted soon. Please unset the graphicalObject and use NetworkTickSmoother instead.", MessageType.Warning);
+                    
+                    bool graphicalSet = (_graphicalObject.objectReferenceValue != null);
+                    EditorGUILayout.PropertyField(_graphicalObject);
+                    if (graphicalSet)
+                    {
+                        EditorGUI.indentLevel++;
+                        EditorGUILayout.PropertyField(_detachGraphicalObject);
+                        EditorGUI.indentLevel--;
+                    }
+                    
+                    EditorGUILayout.LabelField("Smoothing", EditorStyles.boldLabel);
+                    if (!graphicalSet)
+                    {
+                        EditorGUILayout.HelpBox($"More smoothing settings will be displayed when a graphicalObject is set.", MessageType.Info);
+                    }
+                    else
+                    {
+                        EditorGUI.indentLevel++;
+                        EditorGUILayout.PropertyField(_enableTeleport);
+                        if (_enableTeleport.boolValue == true)
+                        {
+                            EditorGUI.indentLevel++;
+                            EditorGUILayout.PropertyField(_teleportThreshold, new GUIContent("Teleport Threshold"));
+                            EditorGUI.indentLevel--;
+                        }
+
+                        EditorGUILayout.LabelField("Owner", EditorStyles.boldLabel);
+                        EditorGUI.indentLevel++;
+                        EditorGUILayout.PropertyField(_ownerInterpolation, new GUIContent("Interpolation"));
+                        EditorGUILayout.PropertyField(_ownerSmoothedProperties, new GUIContent("Smoothed Properties"));
+                        EditorGUI.indentLevel--;
+
+                        EditorGUILayout.LabelField("Spectator", EditorStyles.boldLabel);
+                        EditorGUI.indentLevel++;
+                        EditorGUILayout.PropertyField(_adaptiveInterpolation);
+                        if (_adaptiveInterpolation.intValue == (int)AdaptiveInterpolationType.Off)
+                        {
+                            EditorGUI.indentLevel++;
+                            EditorGUILayout.PropertyField(_spectatorInterpolation, new GUIContent("Interpolation"));
+                            EditorGUI.indentLevel--;
+                        }
+                        EditorGUILayout.PropertyField(_spectatorSmoothedProperties, new GUIContent("Smoothed Properties"));
+                        EditorGUI.indentLevel--;
+                    }
+
                     EditorGUI.indentLevel--;
                 }
-
-                EditorGUI.indentLevel--;
             }
-            EditorGUI.indentLevel--;
-
 
             serializedObject.ApplyModifiedProperties();
         }
 
+        /// <summary>
+        /// Saves tabIndex if it has changed.
+        /// </summary>
+        private void SaveTabIndex()
+        {
+            if (_tabIndex == _savedTabIndex)
+                return;
 
-
+            _savedTabIndex = _tabIndex;
+            EditorPrefs.SetInt(TAB_INDEX_PREFS_NAME, _tabIndex);
+        }
     }
-
 }
 
-
-#endif
 #endif

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 0918ae3e707b5d74993a0bdc9b75ad1c
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 207815
+  packageName: 'FishNet: Networking Evolved'
+  packageVersion: 4.6.5R
+  assetPath: Assets/FishNet/Runtime/Managing/Debugging/PacketIdHistory.cs
+  uploadId: 745580

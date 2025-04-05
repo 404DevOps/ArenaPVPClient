@@ -179,7 +179,7 @@ public class TargetingSystem : MonoBehaviour
 
     private void OnEnable()
     {
-        GameEvents.OnPlayerInitialized.AddListener(OnPlayerInitialized);
+        ClientEvents.OnPlayerInitialized.AddListener(OnPlayerInitialized);
         UIEvents.OnSettingsLoaded.AddListener(ReloadControls);
         UIEvents.OnAbilityDrag.AddListener(SetTargetLock);
         UIEvents.OnMainMenuOpen.AddListener(SetMenuOpen);

@@ -16,7 +16,7 @@ public class NameplateUIHandler : MonoBehaviour
     void OnEnable()
     {
         _playerHealth = Player.GetComponent<PlayerHealth>();
-        GameEvents.OnPlayerHealthChanged.AddListener(OnHealthChanged);
+        ClientEvents.OnPlayerHealthChanged.AddListener(OnHealthChanged);
 
         _healthbar = GetComponentInChildren<Healthbar>();
         _healthbar.InitializeBar(Player.ClassType, _playerHealth.CurrentHealth.Value, _playerHealth.MaxHealth.Value);
@@ -26,7 +26,7 @@ public class NameplateUIHandler : MonoBehaviour
     }
     void OnDisable()
     {
-        GameEvents.OnPlayerHealthChanged.RemoveListener(OnHealthChanged);
+        ClientEvents.OnPlayerHealthChanged.RemoveListener(OnHealthChanged);
     }
 
     private void OnHealthChanged(HealthChangedEventArgs args)

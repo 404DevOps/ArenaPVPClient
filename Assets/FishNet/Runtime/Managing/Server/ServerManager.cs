@@ -55,7 +55,11 @@ namespace FishNet.Managing.Server
         /// Authenticated and non-authenticated connected clients.
         /// </summary>
         [HideInInspector]
-        public Dictionary<int, NetworkConnection> Clients = new Dictionary<int, NetworkConnection>();
+        public Dictionary<int, NetworkConnection> Clients = new();
+        /// <summary>
+        /// Clients dictionary as a list, containing only values.
+        /// </summary>        
+        private List<NetworkConnection> _clientsList = new();
         /// <summary>
         /// NetworkManager for server.
         /// </summary>
@@ -69,6 +73,7 @@ namespace FishNet.Managing.Server
         /// </summary>
         /// <returns></returns>
         public Authenticator GetAuthenticator() => _authenticator;
+
         /// <summary>
         /// Gets the Authenticator for this manager, and initializes it.
         /// </summary>
@@ -78,6 +83,7 @@ namespace FishNet.Managing.Server
             _authenticator = value;
             InitializeAuthenticator();
         }
+
         [Tooltip("Authenticator for this ServerManager. May be null if not using authentication.")]
         [SerializeField]
         private Authenticator _authenticator;
@@ -94,6 +100,7 @@ namespace FishNet.Managing.Server
         [Range(1, MAXIMUM_REMOTE_CLIENT_TIMEOUT_DURATION)]
         [SerializeField]
         private ushort _remoteClientTimeoutDuration = 60;
+
         /// <summary>
         /// Sets timeout settings. Can be used at runtime.
         /// </summary>
@@ -104,11 +111,13 @@ namespace FishNet.Managing.Server
             duration = (ushort)Mathf.Clamp(duration, 1, MAXIMUM_REMOTE_CLIENT_TIMEOUT_DURATION);
             _remoteClientTimeoutDuration = duration;
         }
+
         /// <summary>
         /// True to allow clients to use predicted spawning. While true, each NetworkObject you wish this feature to apply towards must have a PredictedSpawn component.
         /// Predicted spawns can have custom validation on the server.
         /// </summary>
         internal bool GetAllowPredictedSpawning() => _allowPredictedSpawning;
+
         [Tooltip("True to allow clients to use predicted spawning. While true, each NetworkObject you wish this feature to apply towards must have a PredictedSpawn component. Predicted spawns can have custom validation on the server.")]
         [SerializeField]
         private bool _allowPredictedSpawning = false;
@@ -119,17 +128,19 @@ namespace FishNet.Managing.Server
         [Range(1, 100)]
         [SerializeField]
         private byte _reservedObjectIds = 15;
+
         /// <summary>
         /// Maximum number of Ids to reserve on clients for predicted spawning. Higher values will allow clients to send more predicted spawns per second but may reduce availability of ObjectIds with high player counts.
         /// </summary>
         /// <returns></returns>
         internal byte GetReservedObjectIds() => _reservedObjectIds;
+
         /// <summary>
         /// Default send rate for SyncTypes. A value of 0f will send changed values every tick.
-        /// SyncTypeRate cannot yet be changed at runtime because this would require recalculating rates on SyncBase, which is not yet implemented.
         /// </summary>
         /// <returns></returns>
         internal float GetSyncTypeRate() => _syncTypeRate;
+
         [Tooltip("Default send rate for SyncTypes. A value of 0f will send changed values every tick.")]
         [Range(0f, 60f)]
         [SerializeField]
@@ -139,7 +150,7 @@ namespace FishNet.Managing.Server
         /// </summary>
         [Tooltip("How to pack object spawns.")]
         [SerializeField]
-        internal TransformPackingData SpawnPacking = new TransformPackingData()
+        internal TransformPackingData SpawnPacking = new()
         {
             Position = AutoPackType.Unpacked,
             Rotation = AutoPackType.PackedLess,
@@ -159,6 +170,7 @@ namespace FishNet.Managing.Server
         [Range(1, NetworkManager.MAXIMUM_FRAMERATE)]
         [SerializeField]
         private ushort _frameRate = NetworkManager.MAXIMUM_FRAMERATE;
+
         /// Sets the maximum frame rate the client may run at. Calling this method will enable ChangeFrameRate.
         /// </summary>
         /// <param name="value">New value.</param>
@@ -169,6 +181,7 @@ namespace FishNet.Managing.Server
             if (NetworkManager != null)
                 NetworkManager.UpdateFramerate();
         }
+
         /// <summary>
         /// True to share the Ids of clients and the objects they own with other clients. No sensitive information is shared.
         /// </summary>
@@ -176,15 +189,18 @@ namespace FishNet.Managing.Server
         [Tooltip("True to share the Ids of clients and the objects they own with other clients. No sensitive information is shared.")]
         [SerializeField]
         private bool _shareIds = true;
+
         /// <summary>
         /// Gets StartOnHeadless value.
         /// </summary>
         public bool GetStartOnHeadless() => _startOnHeadless;
+
         /// <summary>
         /// Sets StartOnHeadless value.
         /// </summary>
         /// <param name="value">New value to use.</param>
         public void SetStartOnHeadless(bool value) => _startOnHeadless = value;
+
         [Tooltip("True to automatically start the server connection when running as headless.")]
         [SerializeField]
         private bool _startOnHeadless = true;
@@ -202,12 +218,12 @@ namespace FishNet.Managing.Server
         /// <summary>
         /// Used to read splits.
         /// </summary>
-        private SplitReader _splitReader = new SplitReader();
+        private SplitReader _splitReader = new();
 #if DEVELOPMENT
         /// <summary>
         /// Logs data about parser to help debug.
         /// </summary>
-        private ParseLogger _parseLogger = new ParseLogger();
+        private PacketIdHistory _packetIdHistory = new();
 #endif
         #endregion
 
@@ -230,7 +246,7 @@ namespace FishNet.Managing.Server
         internal void InitializeOnce_Internal(NetworkManager manager)
         {
             NetworkManager = manager;
-            Objects = new ServerObjects(manager);
+            Objects = new(manager);
             Objects.SubscribeToSceneLoaded(true);
             InitializeRpcLinks();
             //Unsubscribe first incase already subscribed.
@@ -244,9 +260,6 @@ namespace FishNet.Managing.Server
                 _authenticator = GetComponent<Authenticator>();
             if (_authenticator != null)
                 InitializeAuthenticator();
-
-            _cachedLevelOfDetailInterval = NetworkManager.ClientManager.LevelOfDetailInterval;
-            _cachedUseLod = NetworkManager.ObserverManager.GetEnableNetworkLod();
         }
 
         /// <summary>
@@ -296,9 +309,9 @@ namespace FishNet.Managing.Server
         /// This does not iterate outgoing automatically.
         /// </summary>
         /// <param name="connectionIds"></param>
-        internal void SendDisconnectMessages(int[] connectionIds)
+        public void SendDisconnectMessages(int[] connectionIds)
         {
-            List<NetworkConnection> conns = new List<NetworkConnection>();
+            List<NetworkConnection> conns = new();
             foreach (int item in connectionIds)
             {
                 if (Clients.TryGetValueIL2CPP(item, out NetworkConnection c))
@@ -308,13 +321,14 @@ namespace FishNet.Managing.Server
             if (conns.Count > 0)
                 SendDisconnectMessages(conns, false);
         }
+
         /// <summary>
-        /// Sends a disconnect message to all clients and immediately iterates outgoing.
+        /// Sends a disconnect message to all clients and optionally immediately iterates outgoing.
         /// </summary>
-        private void SendDisconnectMessages(List<NetworkConnection> conns, bool iterate)
+        public void SendDisconnectMessages(List<NetworkConnection> conns, bool iterate)
         {
             PooledWriter writer = WriterPool.Retrieve();
-            writer.WritePacketId(PacketId.Disconnect);
+            writer.WritePacketIdUnpacked(PacketId.Disconnect);
             ArraySegment<byte> segment = writer.GetArraySegment();
             //Send segment to each client, authenticated or not.
             foreach (NetworkConnection c in conns)
@@ -323,7 +337,7 @@ namespace FishNet.Managing.Server
             writer.Store();
 
             if (iterate)
-                NetworkManager.TransportManager.IterateOutgoing(true);
+                NetworkManager.TransportManager.IterateOutgoing(asServer: true);
         }
 
         /// <summary>
@@ -333,6 +347,7 @@ namespace FishNet.Managing.Server
         {
             return NetworkManager.TransportManager.Transport.StartConnection(true);
         }
+
         /// <summary>
         /// Starts the local server using port.
         /// </summary>
@@ -354,7 +369,7 @@ namespace FishNet.Managing.Server
                 return;
 #if DEVELOPMENT
             //If development but not set to development return.
-            else if (_remoteClientTimeout != RemoteTimeoutType.Development)
+            if (_remoteClientTimeout != RemoteTimeoutType.Development)
                 return;
 #endif
             //Wait two timing intervals to give packets a chance to come through.
@@ -378,7 +393,7 @@ namespace FishNet.Managing.Server
                 _nextClientTimeoutCheckIndex = 0;
 
             //Number of ticks passed for client to be timed out.
-            uint requiredTicks = NetworkManager.TimeManager.TimeToTicks(_remoteClientTimeoutDuration, TickRounding.RoundUp);
+            uint requiredTicks = NetworkManager.TimeManager.TimeToTicks((double)_remoteClientTimeoutDuration, TickRounding.RoundUp);
 
             const float FULL_CHECK_TIME = 2f;
             /* Number of times this is expected to run every 2 seconds.
@@ -388,30 +403,24 @@ namespace FishNet.Managing.Server
             int targetIterations = Mathf.Max(clientsCount / checkCount, 1);
 
             uint localTick = NetworkManager.TimeManager.LocalTick;
-            //Number of connections iterated in Clients.Values.
-            int connsIterated = 0;
-            foreach (NetworkConnection item in Clients.Values)
+            for (int i = 0; i < targetIterations; i++)
             {
-                //If iterations are met then we can begin checking for timeouts.
-                if (connsIterated >= _nextClientTimeoutCheckIndex)
-                {
-                    uint clientLocalTick = item.PacketTick.LocalTick;
-                    /* If client tick has not been set yet then use the tick
-                     * when they connected to the server. */
-                    if (clientLocalTick == 0)
-                        clientLocalTick = item.ServerConnectionTick;
+                if (_nextClientTimeoutCheckIndex >= _clientsList.Count)
+                    _nextClientTimeoutCheckIndex = 0;
 
-                    uint difference = (localTick - clientLocalTick);
-                    //Client has timed out.
-                    if (difference >= requiredTicks)
-                        item.Kick(KickReason.UnexpectedProblem, LoggingType.Common, $"{item.ToString()} has timed out. You can modify this feature on the ServerManager component.");
-                    //If all iterations are complete.
-                    if (--targetIterations <= 0)
-                        break;
-                }
+                NetworkConnection item = _clientsList[_nextClientTimeoutCheckIndex];
+                uint clientLocalTick = item.PacketTick.LocalTick;
+                /* If client tick has not been set yet then use the tick
+                 * when they connected to the server. */
+                if (clientLocalTick == 0)
+                    clientLocalTick = item.ServerConnectionTick;
 
-                //Increase iterated count.
-                connsIterated++;
+                uint difference = (localTick - clientLocalTick);
+                //Client has timed out.
+                if (difference >= requiredTicks)
+                    item.Kick(KickReason.UnexpectedProblem, LoggingType.Common, $"{item.ToString()} has timed out. You can modify this feature on the ServerManager component.");
+
+                _nextClientTimeoutCheckIndex++;
             }
         }
 
@@ -501,14 +510,18 @@ namespace FishNet.Managing.Server
             /* Let the client manager know the server state is changing first.
              * This gives the client an opportunity to clean-up or prepare
              * before the server completes it's actions. */
-            Started = AnyServerStarted();
+            Started = IsAnyServerStarted();
             NetworkManager.ClientManager.Objects.OnServerConnectionState(args);
-            //If no servers are started then reset match conditions.
+            //If no servers are started then reset data.
             if (!Started)
             {
                 MatchCondition.StoreCollections(NetworkManager);
                 //Despawn without synchronizing network objects.
-                Objects.DespawnWithoutSynchronization(true);
+                Objects.DespawnWithoutSynchronization(recursive: true, asServer: true);
+                //Clear all clients.
+                Clients.Clear();
+                //Clients as list.
+                _clientsList.Clear();
             }
             Objects.OnServerConnectionState(args);
 
@@ -521,13 +534,12 @@ namespace FishNet.Managing.Server
                 string socketInformation = string.Empty;
                 if (state == LocalConnectionState.Starting)
                     socketInformation = $" Listening on port {t.GetPort()}.";
-                Debug.Log($"Local server is {state.ToString().ToLower()} for {tName}.{socketInformation}");
+                NetworkManagerExtensions.Log($"Local server is {state.ToString().ToLower()} for {tName}.{socketInformation}");
             }
 
             NetworkManager.UpdateFramerate();
             OnServerConnectionState?.Invoke(args);
         }
-
 
         /// <summary>
         /// Checks to make sure the client is on the same version.
@@ -543,7 +555,7 @@ namespace FishNet.Managing.Server
             }
 
             conn.HasSentVersion = true;
-            string version = reader.ReadString();
+            string version = reader.ReadStringAllocated();
             //Version match.
             if (version == NetworkManager.FISHNET_VERSION)
             {
@@ -557,7 +569,7 @@ namespace FishNet.Managing.Server
                 isDevelopmentBuild = false;
 #endif
                 PooledWriter writer = WriterPool.Retrieve();
-                writer.WritePacketId(PacketId.Version);
+                writer.WritePacketIdUnpacked(PacketId.Version);
                 writer.WriteBoolean(isDevelopmentBuild);
                 conn.SendToClient((byte)Channel.Reliable, writer.GetArraySegment());
                 WriterPool.Store(writer);
@@ -595,8 +607,9 @@ namespace FishNet.Managing.Server
                 if (args.ConnectionState == RemoteConnectionState.Started)
                 {
                     NetworkManager.Log($"Remote connection started for Id {id}.");
-                    NetworkConnection conn = new NetworkConnection(NetworkManager, id, args.TransportIndex, true);
+                    NetworkConnection conn = new(NetworkManager, id, args.TransportIndex, true);
                     Clients.Add(args.ConnectionId, conn);
+                    _clientsList.Add(conn);
                     OnRemoteConnectionState?.Invoke(conn, args);
 
                     //Do nothing else until the client sends it's version.
@@ -611,6 +624,7 @@ namespace FishNet.Managing.Server
                         conn.SetDisconnecting(true);
                         OnRemoteConnectionState?.Invoke(conn, args);
                         Clients.Remove(id);
+                        _clientsList.Remove(conn);
                         Objects.ClientDisconnected(conn);
                         BroadcastClientConnectionChange(false, conn);
                         //Return predictedObjectIds.
@@ -632,7 +646,7 @@ namespace FishNet.Managing.Server
         private void SendAuthenticated(NetworkConnection conn)
         {
             PooledWriter writer = WriterPool.Retrieve();
-            writer.WritePacketId(PacketId.Authenticated);
+            writer.WritePacketIdUnpacked(PacketId.Authenticated);
             writer.WriteNetworkConnection(conn);
             /* If predicted spawning is enabled then also send
              * reserved objectIds. */
@@ -641,7 +655,7 @@ namespace FishNet.Managing.Server
             if (GetAllowPredictedSpawning())
             {
                 int count = Mathf.Min(Objects.GetObjectIdCache().Count, GetReservedObjectIds());
-                writer.WriteByte((byte)count);
+                writer.WriteUInt8Unpacked((byte)count);
 
                 for (int i = 0; i < count; i++)
                 {
@@ -654,6 +668,7 @@ namespace FishNet.Managing.Server
             NetworkManager.TransportManager.SendToClient((byte)Channel.Reliable, writer.GetArraySegment(), conn);
             writer.Store();
         }
+
         /// <summary>
         /// Called when the server socket receives data.
         /// </summary>
@@ -668,10 +683,6 @@ namespace FishNet.Managing.Server
         /// <param name="args"></param>
         private void ParseReceived(ServerReceivedDataArgs args)
         {
-#if DEVELOPMENT
-            _parseLogger.Reset();
-#endif
-
             //Not from a valid connection.
             if (args.ConnectionId < 0)
                 return;
@@ -689,7 +700,7 @@ namespace FishNet.Managing.Server
             //FishNet internally splits packets so nothing should ever arrive over MTU.
             int channelMtu = NetworkManager.TransportManager.GetMTU(args.TransportIndex, (byte)args.Channel);
             //If over MTU kick client immediately.
-            if (segment.Count > channelMtu && !NetworkManager.TransportManager.IsLocalTransport(args.ConnectionId))
+            if (segment.Count > channelMtu)
             {
                 ExceededMTUKick();
                 return;
@@ -709,10 +720,13 @@ namespace FishNet.Managing.Server
             uint tick = reader.ReadTickUnpacked();
             timeManager.LastPacketTick.Update(tick);
             /* This is a special condition where a message may arrive split.
-            * When this occurs buffer each packet until all packets are
-            * received. */
+             * When this occurs buffer each packet until all packets are
+             * received. */
             if (reader.PeekPacketId() == PacketId.Split)
             {
+#if DEVELOPMENT
+                NetworkManager.PacketIdHistory.ReceivedPacket(PacketId.Split, packetFromServer: false);
+#endif
                 //Skip packetId.
                 reader.ReadPacketId();
 
@@ -730,7 +744,7 @@ namespace FishNet.Managing.Server
                     return;
 
                 /* If here then all data has been received.
-                 * It's possible the client could have exceeded 
+                 * It's possible the client could have exceeded
                  * maximum MTU but not the maximum number of splits.
                  * This is because the length of each split
                  * is not written, so we don't know how much data of the
@@ -746,7 +760,7 @@ namespace FishNet.Managing.Server
             {
                 packetId = reader.ReadPacketId();
 #if DEVELOPMENT
-                _parseLogger.AddPacket(packetId);
+                NetworkManager.PacketIdHistory.ReceivedPacket(packetId, packetFromServer: false);
 #endif
                 NetworkConnection conn;
 
@@ -769,16 +783,6 @@ namespace FishNet.Managing.Server
                     return;
                 }
 
-                //Only check if not developer build because users pay pause editor.
-#if !DEVELOPMENT
-                    /* If hasn't sent LOD recently enough. LODs are sent every half a second, so
-                     * by multiplaying interval by 60 this gives the client a 30 second window. */
-                    if (_cachedUseLod && conn.IsLateForLevelOfDetail(_cachedLevelOfDetailInterval * 60))
-                    {
-                        conn.Kick(KickReason.ExploitAttempt, LoggingType.Common, $"ConnectionId {conn.ClientId} has gone too long without sending a level of detail update. Connection will be kicked immediately.");
-                        return;
-                    }
-#endif
                 if (packetId == PacketId.Replicate)
                 {
                     Objects.ParseReplicateRpc(reader, conn, args.Channel);
@@ -794,7 +798,7 @@ namespace FishNet.Managing.Server
                         conn.Kick(KickReason.ExploitAttempt, LoggingType.Common, $"ConnectionId {conn.ClientId} sent a predicted spawn while predicted spawning is not enabled. Connection will be kicked immediately.");
                         return;
                     }
-                    Objects.ReadPredictedSpawn(reader, conn);
+                    Objects.ReadSpawn(reader, conn);
                 }
                 else if (packetId == PacketId.ObjectDespawn)
                 {
@@ -803,11 +807,7 @@ namespace FishNet.Managing.Server
                         conn.Kick(KickReason.ExploitAttempt, LoggingType.Common, $"ConnectionId {conn.ClientId} sent a predicted spawn while predicted spawning is not enabled. Connection will be kicked immediately.");
                         return;
                     }
-                    Objects.ReadPredictedDespawn(reader, conn);
-                }
-                else if (packetId == PacketId.NetworkLODUpdate)
-                {
-                    ParseNetworkLODUpdate(reader, conn);
+                    Objects.ReadDespawn(reader, conn);
                 }
                 else if (packetId == PacketId.Broadcast)
                 {
@@ -825,7 +825,7 @@ namespace FishNet.Managing.Server
                 {
 #if DEVELOPMENT
                     NetworkManager.LogError($"Server received an unhandled PacketId of {(ushort)packetId} on channel {args.Channel} from connectionId {args.ConnectionId}. Remaining data has been purged.");
-                    _parseLogger.Print(NetworkManager);
+                    NetworkManager.LogError(NetworkManager.PacketIdHistory.GetReceivedPacketIds(packetsFromServer: false));
 #else
                         NetworkManager.LogError($"Server received an unhandled PacketId of {(ushort)packetId} on channel {args.Channel} from connectionId {args.ConnectionId}. Connection will be kicked immediately.");
                         NetworkManager.TransportManager.Transport.StopConnection(args.ConnectionId, true);
@@ -852,7 +852,6 @@ namespace FishNet.Managing.Server
             {
                 Kick(args.ConnectionId, KickReason.ExploitExcessiveData, LoggingType.Common, $"ConnectionId {args.ConnectionId} sent a message larger than allowed amount. Connection will be kicked immediately.");
             }
-
         }
 
         /// <summary>
@@ -871,7 +870,6 @@ namespace FishNet.Managing.Server
                 NetworkManager.TimeManager.SendPong(conn, clientTick);
         }
 
-
         /// <summary>
         /// Called when a remote client authenticates with the server.
         /// </summary>
@@ -879,9 +877,9 @@ namespace FishNet.Managing.Server
         private void ClientAuthenticated(NetworkConnection connection)
         {
             /* Immediately send connectionId to client. Some transports
-            * don't give clients their remoteId, therefor it has to be sent
-            * by the ServerManager. This packet is very simple and can be built
-            * on the spot. */
+             * don't give clients their remoteId, therefor it has to be sent
+             * by the ServerManager. This packet is very simple and can be built
+             * on the spot. */
             connection.ConnectionAuthenticated();
             /* Send client Ids before telling the client
              * they are authenticated. This is important because when the client becomes
@@ -907,7 +905,7 @@ namespace FishNet.Managing.Server
             {
                 /* Send a broadcast to all authenticated clients with the clientId
                  * that just connected. The conn client will also get this. */
-                ClientConnectionChangeBroadcast changeMsg = new ClientConnectionChangeBroadcast()
+                ClientConnectionChangeBroadcast changeMsg = new()
                 {
                     Connected = connected,
                     Id = conn.ClientId
@@ -927,7 +925,7 @@ namespace FishNet.Managing.Server
                     foreach (int key in Clients.Keys)
                         cache.Add(key);
 
-                    ConnectedClientsBroadcast allMsg = new ConnectedClientsBroadcast()
+                    ConnectedClientsBroadcast allMsg = new()
                     {
                         Values = cache
                     };
@@ -943,7 +941,7 @@ namespace FishNet.Managing.Server
                     /* Send broadcast only to the client which just disconnected.
                      * Only send if connecting. If the client is disconnected there's no reason
                      * to send them a disconnect msg. */
-                    ClientConnectionChangeBroadcast changeMsg = new ClientConnectionChangeBroadcast()
+                    ClientConnectionChangeBroadcast changeMsg = new()
                     {
                         Connected = connected,
                         Id = conn.ClientId
@@ -951,10 +949,6 @@ namespace FishNet.Managing.Server
                     Broadcast(conn, changeMsg, true, Channel.Reliable);
                 }
             }
-
         }
-
     }
-
-
 }

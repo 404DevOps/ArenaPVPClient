@@ -37,7 +37,7 @@ public class AbilityStorage : MonoBehaviour
     private void LoadAbilities()
     {
         AllAbilities = new List<AbilityBase>();
-        var abilities = Resources.LoadAll("ScriptableObjects/Abilities/", typeof(AbilityBase));
+        var abilities = Resources.LoadAll("Abilities/", typeof(AbilityBase));
         foreach (var ability in abilities)
         {
             AllAbilities.Add((AbilityBase)ability);
@@ -46,7 +46,7 @@ public class AbilityStorage : MonoBehaviour
     private void LoadAuras()
     {
         AllAuras = new List<AuraBase>();
-        var abilities = Resources.LoadAll("ScriptableObjects/Aura/", typeof(AuraBase));
+        var abilities = Resources.LoadAll("Aura/", typeof(AuraBase));
         foreach (var ability in abilities)
         {
             AllAuras.Add((AuraBase)ability);

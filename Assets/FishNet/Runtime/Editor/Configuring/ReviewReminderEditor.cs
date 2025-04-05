@@ -30,11 +30,11 @@ namespace FishNet.Editing
              * to be passed before reminding. */
             int checkRemindCount = (EditorPrefs.GetInt(CHECK_REMIND_COUNT, 0) + 1);
             EditorPrefs.SetInt(CHECK_REMIND_COUNT, checkRemindCount);
-
+            
             //Not enough checks.
             if (checkRemindCount < 2)
                 return;
-
+            
             string dtStr = EditorPrefs.GetString(DATETIME_REMINDED, string.Empty);
             //Somehow got cleared. Reset.
             if (string.IsNullOrWhiteSpace(dtStr))
@@ -51,12 +51,14 @@ namespace FishNet.Editing
             }
             //Not enough time passed.
             DateTime dt = DateTime.FromBinary(binary);
+            
             if ((DateTime.Now - dt).TotalDays < 10)
                 return;
 
             //If here then the reminder can be shown.
             EditorPrefs.SetInt(CHECK_REMIND_COUNT, 0);
-
+            ResetDateTimeReminded();
+            
             ShowReminder();
         }
 
@@ -70,12 +72,12 @@ namespace FishNet.Editing
             InitializeWindow();
         }
       
-        static void InitializeWindow()
+        private static void InitializeWindow()
         {
             if (_window != null)
                 return;
             _window = (ReviewReminderEditor)EditorWindow.GetWindow(typeof(ReviewReminderEditor));
-            _window.position = new Rect(0f, 0f, 320f, 300f);
+            _window.position = new(0f, 0f, 320f, 300f);
             Rect mainPos;
             mainPos = EditorGUIUtility.GetMainWindowPosition();
             Rect pos = _window.position;
@@ -90,7 +92,7 @@ namespace FishNet.Editing
         {
             InitializeWindow();
             _window._fishnetLogo = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/FishNet/Runtime/Editor/Textures/UI/Logo_With_Text.png", typeof(Texture));
-            _window._labelStyle = new GUIStyle("label");
+            _window._labelStyle = new("label");
             _window._labelStyle.fontSize = 24;
             _window._labelStyle.wordWrap = true;
             //window.labelStyle.alignment = TextAnchor.MiddleCenter;
@@ -98,7 +100,7 @@ namespace FishNet.Editing
 
             _window._reviewButtonBg = MakeBackgroundTexture(1, 1, new Color32(52, 111, 255, 255));
             _window._reviewButtonBgHover = MakeBackgroundTexture(1, 1, new Color32(99, 153, 255, 255));
-            _window._reviewButtonStyle = new GUIStyle("button");
+            _window._reviewButtonStyle = new("button");
             _window._reviewButtonStyle.fontSize = 18;
             _window._reviewButtonStyle.fontStyle = FontStyle.Bold;
             _window._reviewButtonStyle.normal.background = _window._reviewButtonBg;
@@ -108,7 +110,7 @@ namespace FishNet.Editing
             _window._reviewButtonStyle.hover.background = _window._reviewButtonBgHover;
             _window._reviewButtonStyle.onHover.background = _window._reviewButtonBgHover;
             _window._reviewButtonStyle.alignment = TextAnchor.MiddleCenter;
-            _window._reviewButtonStyle.normal.textColor = new Color(1, 1, 1, 1);
+            _window._reviewButtonStyle.normal.textColor = new(1, 1, 1, 1);
 
         }
 
@@ -156,7 +158,7 @@ namespace FishNet.Editing
             Color[] pixels = new Color[width * height];
             for (int i = 0; i < pixels.Length; i++)
                 pixels[i] = color;
-            Texture2D backgroundTexture = new Texture2D(width, height);
+            Texture2D backgroundTexture = new(width, height);
             backgroundTexture.SetPixels(pixels);
             backgroundTexture.Apply();
             return backgroundTexture;

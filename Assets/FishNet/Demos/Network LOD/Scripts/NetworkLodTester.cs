@@ -38,9 +38,9 @@ namespace FishNet.Demo.NetworkLod
                 return;
             }
 
-            List<float> distances = _observerManager.GetLevelOfDetailDistances();
-            while (distances.Count > _lodLevel)
-                distances.RemoveAt(distances.Count - 1);
+            //List<float> distances = _observerManager.GetLevelOfDetailDistances();
+            //while (distances.Count > _lodLevel)
+            //    distances.RemoveAt(distances.Count - 1);
         }
 
         public override void OnStartServer()

@@ -9,30 +9,66 @@ using UnityEngine.Rendering;
 using FishNet.Object.Synchronizing;
 using FishNet.Demo.AdditiveScenes;
 using FishNet.CodeGenerating;
+using UnityEditorInternal.VersionControl;
+using FishNet.Connection;
 
 public class PlayerStats : NetworkBehaviour
 {
     private StatsMediator _mediator;
-    [AllowMutableSyncType]
-    private readonly SyncVar<BaseStats> _baseStats = new SyncVar<BaseStats>();
+    private BaseStats _baseStats;
     public StatsMediator Mediator => _mediator;
+    public StatSnapshot _clientSnapshot;
 
     public void Awake()
     {
         _mediator = GetComponent<StatsMediator>();
     }
-    public override void OnStartServer()
+    public void Initialize(Player player)
     {
-        var player = GetComponent<Player>();
-        _baseStats.Value = ClassStatMapping.Instance().GetBaseStats(player.ClassType);
+        _baseStats = ClassStatMapping.Instance().GetBaseStats(player.ClassType);
+        ServerEvents.OnPlayerStatsInitialized.Invoke(player);
+        PushSnapshotToClient();
+    }
 
-        GameEvents.OnPlayerStatsInitialized.Invoke(player);
+    [Server]
+    public StatSnapshot BuildSnapshot()
+    {
+        return new StatSnapshot
+        {
+            AttackPower = Attackpower,
+            Spellpower = Spellpower,
+            MovementSpeed = MovementSpeed,
+            ResourceRegenRate = ResourceRegenerationRate,
+            SpellResistance = SpellResistance,
+            Armor = Armor,
+            MaxHealth = MaxHealth,
+            MaxResource = MaxResource
+        };
+    }
+
+    [TargetRpc]
+    public void Target_UpdateClientSnapshot(NetworkConnection conn, StatSnapshot snapshot)
+    {
+        _clientSnapshot = snapshot;
+        ClientEvents.OnClientStatsUpdated?.Invoke(snapshot);
+    }
+
+    [Server]
+    public void PushSnapshotToClient()
+    {
+        var snapshot = BuildSnapshot();
+#if USE_TARGET_RPC
+    Target_UpdateClientSnapshot(Owner, snapshot);
+#else
+        _clientSnapshot = snapshot;
+        ClientEvents.OnClientStatsUpdated?.Invoke(snapshot);
+#endif
     }
 
     public float Attackpower
     {
         get {
-            var q = new StatQuery(StatType.AttackPower, _baseStats.Value.AttackPower);
+            var q = new StatQuery(StatType.AttackPower, _baseStats.AttackPower);
             _mediator.PerformQuery(this, q);
             return q.Value;
         }
@@ -40,7 +76,7 @@ public class PlayerStats : NetworkBehaviour
     public float Spellpower
     {
         get {
-            var q = new StatQuery(StatType.Spellpower, _baseStats.Value.Spellpower);
+            var q = new StatQuery(StatType.Spellpower, _baseStats.Spellpower);
             _mediator.PerformQuery(this, q);
             return q.Value;
         }
@@ -48,7 +84,7 @@ public class PlayerStats : NetworkBehaviour
     public float MovementSpeed
     {
         get {
-            var q = new StatQuery(StatType.MovementSpeed, _baseStats.Value.MovementSpeed);
+            var q = new StatQuery(StatType.MovementSpeed, _baseStats.MovementSpeed);
             _mediator.PerformQuery(this, q);
             return q.Value;
         }
@@ -58,7 +94,7 @@ public class PlayerStats : NetworkBehaviour
     {
         get
         {
-            var q = new StatQuery(StatType.RessourceRegenerationRate, _baseStats.Value.RessourceRegenerationRate);
+            var q = new StatQuery(StatType.RessourceRegenerationRate, _baseStats.RessourceRegenerationRate);
             _mediator.PerformQuery(this, q);
             return q.Value;
         }
@@ -67,7 +103,7 @@ public class PlayerStats : NetworkBehaviour
     {
         get
         {
-            var q = new StatQuery(StatType.SpellResistance, _baseStats.Value.SpellResistance);
+            var q = new StatQuery(StatType.SpellResistance, _baseStats.SpellResistance);
             _mediator.PerformQuery(this, q);
             return q.Value;
         }
@@ -77,7 +113,7 @@ public class PlayerStats : NetworkBehaviour
     {
         get
         {
-            var q = new StatQuery(StatType.Armor, _baseStats.Value.Armor);
+            var q = new StatQuery(StatType.Armor, _baseStats.Armor);
             _mediator.PerformQuery(this, q);
             return q.Value;
         }
@@ -87,7 +123,7 @@ public class PlayerStats : NetworkBehaviour
     {
         get
         {
-            var q = new StatQuery(StatType.Health, _baseStats.Value.Health);
+            var q = new StatQuery(StatType.Health, _baseStats.Health);
             _mediator.PerformQuery(this, q);
             return q.Value;
         }
@@ -97,7 +133,27 @@ public class PlayerStats : NetworkBehaviour
     {
         get
         {
-            var q = new StatQuery(StatType.Ressource, _baseStats.Value.Ressource);
+            var q = new StatQuery(StatType.Ressource, _baseStats.Ressource);
+            _mediator.PerformQuery(this, q);
+            return q.Value;
+        }
+
+    }
+    public float MaxShield
+    {
+        get
+        {
+            var q = new StatQuery(StatType.Shield, _baseStats.MaxShield);
+            _mediator.PerformQuery(this, q);
+            return q.Value;
+        }
+
+    }
+    public float MaxStamina
+    {
+        get
+        {
+            var q = new StatQuery(StatType.Stamina, _baseStats.MaxStamina);
             _mediator.PerformQuery(this, q);
             return q.Value;
         }

@@ -13,8 +13,8 @@ public class AuraContainerUIHandler : MonoBehaviour
 
     private void OnEnable()
     {
-        GameEvents.OnAuraApplied.AddListener(OnAuraApplied);
-        GameEvents.OnAuraExpired.AddListener(OnAuraExpired);
+        ClientEvents.OnAuraApplied.AddListener(OnAuraApplied);
+        ClientEvents.OnAuraExpired.AddListener(OnAuraExpired);
     }
 
     public void InitializeGrid(int ownerId, List<AuraInfo> auras)
@@ -36,8 +36,8 @@ public class AuraContainerUIHandler : MonoBehaviour
 
     private void OnDisable()
     {
-        GameEvents.OnAuraApplied.RemoveListener(OnAuraApplied);
-        GameEvents.OnAuraExpired.RemoveListener(OnAuraExpired);
+        ClientEvents.OnAuraApplied.RemoveListener(OnAuraApplied);
+        ClientEvents.OnAuraExpired.RemoveListener(OnAuraExpired);
     }
 
     private void OnAuraExpired(int ownerId, AuraInfo aura)

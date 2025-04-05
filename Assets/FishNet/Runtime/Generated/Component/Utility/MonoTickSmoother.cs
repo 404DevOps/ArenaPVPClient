@@ -4,6 +4,7 @@ using FishNet.Object;
 using FishNet.Object.Prediction;
 using GameKit.Dependencies.Utilities;
 using UnityEngine;
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace FishNet.Component.Transforming
 {
@@ -13,6 +14,11 @@ namespace FishNet.Component.Transforming
     /// </summary>
     public class MonoTickSmoother : MonoBehaviour
     {
+        //Lazy way to display obsolete message w/o using a custom editor.
+        [Header("This component will be obsoleted soon.")]
+        [Header("Use NetworkTickSmoother or OfflineTickSmoother.")]
+        [Header(" ")]
+            
         #region Serialized.
         /// <summary>
         /// True to use InstanceFinder to locate the TimeManager. When false specify which TimeManager to use by calling SetTimeManager.
@@ -52,13 +58,14 @@ namespace FishNet.Component.Transforming
         private LocalTransformTickSmoother _tickSmoother;
         #endregion
 
-        private void Awake()
+        private void OnEnable()
         {
-            InitializeOnce();
+            Initialize();
         }
 
-        private void OnDestroy()
+        private void OnDisable()
         {
+            _tickSmoother.ResetState();
             ChangeSubscription(false);
             ObjectCaches<LocalTransformTickSmoother>.StoreAndDefault(ref _tickSmoother);
         }
@@ -72,7 +79,7 @@ namespace FishNet.Component.Transforming
         /// <summary>
         /// Initializes this script for use.
         /// </summary>
-        private void InitializeOnce()
+        private void Initialize()
         {
             _tickSmoother = ObjectCaches<LocalTransformTickSmoother>.Retrieve();
             if (_useInstanceFinder)

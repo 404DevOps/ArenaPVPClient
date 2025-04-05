@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 7d2ed6d759957614d9ed14c7f06fb291
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 207815
+  packageName: 'FishNet: Networking Evolved'
+  packageVersion: 4.6.5R
+  assetPath: Assets/FishNet/Demos/ColliderRollback/ReadMe.txt
+  uploadId: 745580

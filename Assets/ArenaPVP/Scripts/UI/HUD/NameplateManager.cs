@@ -32,13 +32,13 @@ public class NameplateManager : MonoBehaviour
 
     private void InitializeNameplates()
     {
-        var players = FindObjectsOfType<Player>();
+        var players = FindObjectsByType<Player>(FindObjectsSortMode.InstanceID);
         foreach (Player player in players)
         {
             if (!PlayerConfiguration.Instance.Settings.ShowPlayerNameplate && player.IsOwnedByMe)
                 continue;
 
-            InstatiateNameplate(player);
+            OnPlayerInitialized(player);
         }
     }
 
@@ -90,7 +90,14 @@ public class NameplateManager : MonoBehaviour
 
         return distancePercentage;
     }
-    private void InstatiateNameplate(Player player)
+    private void OnPlayerInitialized(Player player)
+    {
+        if (player.IsOwnedByMe) return;
+
+        InstantiateNamePlate(player);
+    }
+
+    void InstantiateNamePlate(Player player)
     {
         var go = new GameObject();
         go.SetActive(false);
@@ -108,6 +115,7 @@ public class NameplateManager : MonoBehaviour
 
         _playerNameplates.Add(player, nameplate.transform);
     }
+
     public void OnSettingsLoaded()
     {
         if (!_firstLoad)
@@ -118,7 +126,7 @@ public class NameplateManager : MonoBehaviour
                 if (!_playerNameplates.Any(np => np.Key.IsOwnedByMe))
                 {
                     var player = FindObjectsOfType<Player>().First(p => p.IsOwnedByMe);
-                    InstatiateNameplate(player);
+                    OnPlayerInitialized(player);
                 }
             }
             else
@@ -136,13 +144,13 @@ public class NameplateManager : MonoBehaviour
 
     public void OnEnable()
     {
-        GameEvents.OnPlayerInitialized.AddListener(InstatiateNameplate);
+        ClientEvents.OnPlayerInitialized.AddListener(OnPlayerInitialized);
         UIEvents.OnSettingsLoaded.AddListener(OnSettingsLoaded);
     }
 
     public void OnDisable()
     {
-        GameEvents.OnPlayerInitialized.RemoveListener(InstatiateNameplate);
+        ClientEvents.OnPlayerInitialized.RemoveListener(OnPlayerInitialized);
         UIEvents.OnSettingsLoaded.RemoveListener(OnSettingsLoaded);
     }
 }

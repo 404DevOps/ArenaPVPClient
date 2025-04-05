@@ -7,7 +7,7 @@ namespace FishNet.Managing.Object
     {
         Unset = 0,
         /// <summary>
-        /// Is nested.
+        /// Is nested beneath a NetworkBehaviour.
         /// </summary>
         Nested = 1,
         /// <summary>
@@ -22,18 +22,19 @@ namespace FishNet.Managing.Object
         /// Instantiate into the global scene.
         /// </summary>
         InstantiatedGlobal = 8,
+        /// <summary>
+        /// Indicates the receiver is the predicted spawner.
+        /// </summary>
+        IsPredictedSpawner = 16,
     }
 
     [APIExclude]
-    internal static partial class SpawnTypeEnum
+    internal static class SpawnTypeExtensions
     {
         /// <summary>
         /// Returns if whole contains part.
         /// </summary>
-        /// <param name="whole"></param>
-        /// <param name="part"></param>
-        /// <returns></returns>
-        public static bool Contains(SpawnType whole, SpawnType part)
+        public static bool FastContains(this SpawnType whole, SpawnType part)
         {
             return (whole & part) == part;
         }

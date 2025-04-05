@@ -1,5 +1,37 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2455143995240586651
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2573024891430330831}
+  m_Layer: 0
+  m_Name: Model
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2573024891430330831
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2455143995240586651}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 5422836170801901130}
+  m_Father: {fileID: 1626817218917904353}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2876622032919891022
 GameObject:
   m_ObjectHideFlags: 0
@@ -27,12 +59,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2876622032919891022}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0, y: 0.46, z: 0.24}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.46000004, z: 0.2399999}
   m_LocalScale: {x: 0.565967, y: 0.36496803, z: 0.67519605}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1626817218917904353}
+  m_Father: {fileID: 5422836170801901130}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &1466349474246183210
 MeshFilter:
@@ -59,6 +91,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -136,8 +171,9 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1626817218917904353}
+  m_Children:
+  - {fileID: 3247040217999792365}
+  m_Father: {fileID: 2573024891430330831}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &3062035735616935809
 MeshFilter:
@@ -164,6 +200,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -251,8 +290,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 5422836170801901130}
-  - {fileID: 3247040217999792365}
+  - {fileID: 2573024891430330831}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: -47.199, z: 0}
 --- !u!143 &8512672299725450243
@@ -270,7 +308,6 @@ CharacterController:
     serializedVersion: 2
     m_Bits: 64
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -296,24 +333,17 @@ MonoBehaviour:
   <IsNested>k__BackingField: 0
   <ComponentIndex>k__BackingField: 0
   <PredictedSpawn>k__BackingField: {fileID: 0}
-  _networkBehaviours:
-  - {fileID: 5766355074762637793}
-  - {fileID: 1556117145722747551}
-  - {fileID: 0}
-  - {fileID: 8487011515013683118}
-  - {fileID: 6978229780223079540}
-  - {fileID: 3695227242969832241}
-  - {fileID: 6427213859635927307}
-  <SerializedRootNetworkBehaviour>k__BackingField: {fileID: 0}
-  <NestedRootNetworkBehaviours>k__BackingField: []
-  SerializedTransformProperties:
-    Position: {x: 6.32, y: 1, z: -2.85}
-    Rotation: {x: 0, y: -0.4003411, z: 0, w: 0.9163662}
-    LocalScale: {x: 1, y: 1, z: 1}
+  <PredictedOwner>k__BackingField: {fileID: 0}
+  NetworkBehaviours: []
+  InitializedParentNetworkBehaviour: {fileID: 0}
+  InitializedNestedNetworkObjects: []
+  RuntimeParentNetworkBehaviour: {fileID: 0}
+  RuntimeChildNetworkBehaviours: []
   _isNetworked: 1
   _isSpawnable: 1
   _isGlobal: 0
   _initializeOrder: 0
+  _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
   NetworkObserver: {fileID: 0}
   _enablePrediction: 0
@@ -331,8 +361,13 @@ MonoBehaviour:
   _teleportThreshold: 1
   <PrefabId>k__BackingField: 5
   <SpawnableCollectionId>k__BackingField: 0
-  <SceneId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 11687555018947644788
+  <SceneId>k__BackingField: 0
+  SerializedTransformProperties:
+    Position: {x: 6.32, y: 1, z: -2.85}
+    Rotation: {x: 0, y: -0.4003411, z: 0, w: 0.9163662}
+    Scale: {x: 0, y: 0, z: 0}
+    IsValid: 0
 --- !u!114 &5766355074762637793
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -358,10 +393,8 @@ MonoBehaviour:
   _extrapolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  _scaleThreshold: 1
   _clientAuthoritative: 1
   _sendToOwner: 1
-  _enableNetworkLod: 1
   _interval: 1
   _synchronizePosition: 1
   _positionSnapping:
@@ -396,6 +429,7 @@ MonoBehaviour:
   Name: Kevin
   IsOwnedByMe: 1
   ClassType: 2
+  ModelContainer: {fileID: 2573024891430330831}
   Id: 0
 --- !u!114 &4112767005670447131
 MonoBehaviour:
@@ -425,6 +459,10 @@ MonoBehaviour:
   _componentIndexCache: 255
   _addedNetworkObject: {fileID: 6437064650887940282}
   _networkObjectCache: {fileID: 0}
+  modifiers:
+    NetworkManager: {fileID: 0}
+    NetworkBehaviour: {fileID: 0}
+    Collection: []
 --- !u!114 &8487011515013683118
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -478,8 +516,12 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 6437064650887940282}
   _networkObjectCache: {fileID: 6437064650887940282}
   MaxHealth:
+    NetworkManager: {fileID: 0}
+    NetworkBehaviour: {fileID: 0}
     _value: 0
   CurrentHealth:
+    NetworkManager: {fileID: 0}
+    NetworkBehaviour: {fileID: 0}
     _value: 0
   Stats: {fileID: 0}
 --- !u!114 &6427213859635927307

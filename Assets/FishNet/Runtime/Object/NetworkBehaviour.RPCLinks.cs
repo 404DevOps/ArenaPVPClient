@@ -1,21 +1,31 @@
-﻿using FishNet.Managing.Server;
+﻿#if UNITY_EDITOR || DEVELOPMENT_BUILD
+#define DEVELOPMENT
+#endif
+using FishNet.Managing.Server;
 using FishNet.Object.Helping;
 using FishNet.Serializing;
 using FishNet.Transporting;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace FishNet.Object
 {
-
     public abstract partial class NetworkBehaviour : MonoBehaviour
     {
-        #region Private.        
+        #region Private.
         /// <summary>
         /// Link indexes for RPCs.
         /// </summary>
-        private Dictionary<uint, RpcLinkType> _rpcLinks = new Dictionary<uint, RpcLinkType>();
+        private Dictionary<uint, RpcLinkType> _rpcLinks = new();
+        #endregion
+
+        #region Consts.
+        /// <summary>
+        /// Number of bytes written for each RPCLinks.
+        /// </summary>
+        internal const int RPCLINK_RESERVED_BYTES = 2;
         #endregion
 
         /// <summary>
@@ -37,7 +47,7 @@ namespace FishNet.Object
             {
                 foreach (uint rpcHash in _observersRpcDelegates.Keys)
                 {
-                    if (!MakeLink(rpcHash, RpcType.Observers))
+                    if (!MakeLink(rpcHash, PacketId.ObserversRpc))
                         return;
                 }
             }
@@ -46,7 +56,7 @@ namespace FishNet.Object
             {
                 foreach (uint rpcHash in _targetRpcDelegates.Keys)
                 {
-                    if (!MakeLink(rpcHash, RpcType.Target))
+                    if (!MakeLink(rpcHash, PacketId.TargetRpc))
                         return;
                 }
             }
@@ -55,7 +65,7 @@ namespace FishNet.Object
             {
                 foreach (uint rpcHash in _reconcileRpcDelegates.Keys)
                 {
-                    if (!MakeLink(rpcHash, RpcType.Reconcile))
+                    if (!MakeLink(rpcHash, PacketId.Reconcile))
                         return;
                 }
             }
@@ -63,11 +73,11 @@ namespace FishNet.Object
             /* Tries to make a link and returns if
              * successful. When a link cannot be made the method
              * should exit as no other links will be possible. */
-            bool MakeLink(uint rpcHash, RpcType rpcType)
+            bool MakeLink(uint rpcHash, PacketId packetId)
             {
                 if (serverManager.GetRpcLink(out ushort linkIndex))
                 {
-                    _rpcLinks[rpcHash] = new RpcLinkType(linkIndex, rpcType);
+                    _rpcLinks[rpcHash] = new(rpcHash, packetId, linkIndex);
                     return true;
                 }
                 else
@@ -84,29 +94,37 @@ namespace FishNet.Object
         private int GetEstimatedRpcHeaderLength()
         {
             /* Imaginary number for how long RPC headers are.
-            * They are well under this value but this exist to
-            * ensure a writer of appropriate length is pulled
-            * from the pool. */
+             * They are well under this value but this exist to
+             * ensure a writer of appropriate length is pulled
+             * from the pool. */
             return 20;
         }
 
         /// <summary>
         /// Creates a PooledWriter and writes the header for a rpc.
         /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private PooledWriter CreateLinkedRpc(RpcLinkType link, PooledWriter methodWriter, Channel channel)
         {
             int rpcHeaderBufferLength = GetEstimatedRpcHeaderLength();
             int methodWriterLength = methodWriter.Length;
             //Writer containing full packet.
             PooledWriter writer = WriterPool.Retrieve(rpcHeaderBufferLength + methodWriterLength);
-            writer.WriteUInt16(link.LinkIndex);
+            writer.WriteUInt16(link.LinkPacketId);
+
+#if DEVELOPMENT
+            int written = WriteDebugForValidateRpc(writer, link.RpcPacketId, link.RpcHash);
+#endif
+
             //Write length only if reliable.
             if (channel == Channel.Reliable)
-                writer.WriteLength(methodWriter.Length);
+                writer.WriteInt32(methodWriter.Length);
             //Data.
             writer.WriteArraySegment(methodWriter.GetArraySegment());
-
+            
+#if DEVELOPMENT
+            WriteDebugLengthForValidateRpc(writer, written);
+#endif
+            
             return writer;
         }
 
@@ -127,20 +145,22 @@ namespace FishNet.Object
         /// </summary>
         internal void WriteRpcLinks(Writer writer)
         {
-            PooledWriter rpcLinkWriter = WriterPool.Retrieve();
+            int rpcLinksCount = _rpcLinks.Count;
+            if (rpcLinksCount == 0)
+                return;
+
+            writer.WriteNetworkBehaviourId(this);
+            writer.WriteUInt16((ushort)rpcLinksCount);
+
             foreach (KeyValuePair<uint, RpcLinkType> item in _rpcLinks)
             {
                 //RpcLink index.
-                rpcLinkWriter.WriteUInt16(item.Value.LinkIndex);
+                writer.WriteUInt16Unpacked(item.Value.LinkPacketId);
                 //Hash.
-                rpcLinkWriter.WriteUInt16((ushort)item.Key);
+                writer.WriteUInt16Unpacked((ushort)item.Key);
                 //True/false if observersRpc.
-                rpcLinkWriter.WriteByte((byte)item.Value.RpcType);
+                writer.WriteUInt16Unpacked((ushort)item.Value.RpcPacketId);
             }
-
-            writer.WriteBytesAndSize(rpcLinkWriter.GetBuffer(), 0, rpcLinkWriter.Length);
-            rpcLinkWriter.Store();
         }
     }
 }
-

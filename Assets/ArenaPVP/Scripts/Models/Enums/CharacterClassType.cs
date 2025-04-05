@@ -12,7 +12,7 @@ namespace Assets.ArenaPVP.Scripts.Enums
         Cryomancer = 2,
         Medic = 3, //Lightbearer
         Tracker = 4,
-        Voidweaver = 5,
+        Pyrohacker = 5,
         Spectre = 6
     }
 }
