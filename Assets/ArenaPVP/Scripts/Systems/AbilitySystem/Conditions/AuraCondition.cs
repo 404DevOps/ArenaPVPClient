@@ -10,19 +10,19 @@ namespace Assets.ArenaPVP.Scripts.Systems.AbilitySystem
     [CreateAssetMenu(fileName = "AuraCondition", menuName = "Conditions/AuraCondition")]
     public class AuraCondition : ConditionBase
     {
-        public AuraTargetType targetType;
+        public TargetType targetType;
         public List<AuraBase> Auras;
         public bool TrueOnAuraMissing;
         public bool TrueOnAllMatching;
 
-        public override bool IsTrue(Player origin, Player target)
+        public override bool IsTrue(Entity origin, Entity target)
         {
-            Player playerToInspect;
+            Entity playerToInspect;
             switch (targetType)
             {
-                case AuraTargetType.Player: playerToInspect = origin;
+                case TargetType.Player: playerToInspect = origin;
                     break;
-                case AuraTargetType.Target: playerToInspect = target;
+                case TargetType.Target: playerToInspect = target;
                     break;
                 default:
                     throw new Exception("AuraTarget Type not found.");

@@ -4,19 +4,19 @@ using UnityEngine.UI;
 
 public class NameplateUIHandler : MonoBehaviour
 {
-    public Player Player;
+    public Entity Player;
     public Transform CastbarParent;
     public Transform HealthbarParent;
 
     public float updateHealthSpeed = 0.2f;
 
-    private PlayerHealth _playerHealth;
+    private EntityHealth _playerHealth;
     private Healthbar _healthbar;
     // Start is called before the first frame update
     void OnEnable()
     {
-        _playerHealth = Player.GetComponent<PlayerHealth>();
-        ClientEvents.OnPlayerHealthChanged.AddListener(OnHealthChanged);
+        _playerHealth = Player.GetComponent<EntityHealth>();
+        ClientEvents.OnEntityHealthChanged.AddListener(OnHealthChanged);
 
         _healthbar = GetComponentInChildren<Healthbar>();
         _healthbar.InitializeBar(Player.ClassType, _playerHealth.CurrentHealth.Value, _playerHealth.MaxHealth.Value);
@@ -26,7 +26,7 @@ public class NameplateUIHandler : MonoBehaviour
     }
     void OnDisable()
     {
-        ClientEvents.OnPlayerHealthChanged.RemoveListener(OnHealthChanged);
+        ClientEvents.OnEntityHealthChanged.RemoveListener(OnHealthChanged);
     }
 
     private void OnHealthChanged(HealthChangedEventArgs args)

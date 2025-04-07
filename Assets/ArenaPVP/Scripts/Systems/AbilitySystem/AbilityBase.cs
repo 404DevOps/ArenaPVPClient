@@ -1,15 +1,12 @@
-using Assets.ArenaPVP.Scripts.Helpers;
-using Assets.ArenaPVP.Scripts.Models.Enums;
 using Assets.ArenaPVP.Scripts.Enums;
+using Assets.ArenaPVP.Scripts.Helpers;
+using Assets.ArenaPVP.Scripts.Systems.AbilitySystem;
 using FishNet;
 using GameKit.Dependencies.Utilities;
 using System;
-using System.Collections;
 using System.Linq;
 using UnityEngine;
-using static UnityEngine.UI.Image;
-using ArenaLogger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
-using Assets.ArenaPVP.Scripts.Systems.AbilitySystem;
+using ArenaLogger = Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 
 [Serializable]
 public abstract class AbilityBase : ScriptableObject
@@ -20,16 +17,17 @@ public abstract class AbilityBase : ScriptableObject
 
     public AuraBase[] ApplyAuras;
     public ConditionBase[] Conditions;
+    [SerializeReference] public AbilityEffectBase[] Effects;
 
     public bool NeedLineOfSight;
     public bool NeedTargetInFront;
 
-    public void TryUseAbility(Player origin, Player target)
+    public void TryUseAbility(Entity origin, Entity target)
     {
         AbilityExecutor.Instance.TryUseAbilityClient(new UseAbilityArgs(Id, origin, target, InstanceFinder.TimeManager.Tick));
     }
 
-    public bool CanBeUsed(Player owner, Player target)
+    public bool CanBeUsed(Entity owner, Entity target)
     {
         bool canbeUse = true;
 
@@ -103,7 +101,7 @@ public abstract class AbilityBase : ScriptableObject
 
         return canbeUse;
     }
-    public bool AreConditionsMet(Player owner, Player target)
+    public bool AreConditionsMet(Entity owner, Entity target)
     {
         if (Conditions == null || Conditions.Length == 0)
             return true;
@@ -117,9 +115,9 @@ public abstract class AbilityBase : ScriptableObject
 
         return true;
     }
-    private bool HasEnoughResource(Player owner)
+    private bool HasEnoughResource(Entity owner)
     {
-        var resComp = owner.GetComponent<PlayerResource>();
+        var resComp = owner.GetComponent<EntityResource>();
         if (resComp.CurrentResource.Value >= this.AbilityInfo.ResourceCost)
             return true;
 
@@ -217,14 +215,14 @@ public abstract class AbilityBase : ScriptableObject
     /// <summary>
     /// Checks if Instance is Server, then Applies "OnCastFinished" Auras (anything additional should be in override)
     /// </summary>
-    internal virtual void UseServer(Player origin, Player target) 
+    internal virtual void UseServer(Entity origin, Entity target) 
     {
         if (!InstanceFinder.IsServerStarted)
             throw new Exception("Tried execute Server function from Client");
 
         if (ApplyAuras != null)
         {
-            foreach (var aura in ApplyAuras.Where(a => a.AuraApplyTiming == AuraApplyTiming.OnCastFinished))
+            foreach (var aura in ApplyAuras.Where(a => a.AuraApplyTiming == ApplyTiming.OnCastFinished))
             {
                 aura.Apply(origin, origin);
             }
@@ -234,21 +232,36 @@ public abstract class AbilityBase : ScriptableObject
     /// <summary>
     /// All Animations, Sounds and Particles should be instantiated here.
     /// </summary>
-    internal virtual void UseClient(Player origin, Player target)
+    internal virtual void UseClient(Entity origin, Entity target)
     {
         if (!InstanceFinder.IsClientStarted)
             throw new Exception("Tried execute Client function from Server");
     }
 
-    /// <summary>
-    /// Checks if Instance is Server, then Applies "OnHit" Auras (anything additional such as Heal/Damage application should be in override)
-    /// </summary>
-    internal virtual void ApplyEffectsServer(Player origin, Player target)
+    internal virtual void ApplyEffectsServer(Entity origin, Entity target)
+    {
+        if (!InstanceFinder.IsServerStarted)
+            throw new Exception("Tried to execute Server function from Client");
+
+        // If we're the host (both server and client), only run this on the server side logic
+        if (InstanceFinder.IsHostStarted && InstanceFinder.IsClientStarted)
+        {
+            if (!target.IsServerStarted)
+                return;
+        }
+
+        ApplyEffects(origin, target);
+    }
+    internal virtual void ApplyEffects(Entity origin, Entity target)
     {
         if (!InstanceFinder.IsServerStarted)
             throw new Exception("Tried execute Server function from Client");
 
-        foreach (var aura in ApplyAuras.Where(a => a.AuraApplyTiming == AuraApplyTiming.OnHit))
+        foreach (var effect in Effects)
+        {
+            effect.Apply(this, origin, target);
+        }
+        foreach (var aura in ApplyAuras.Where(a => a.AuraApplyTiming == ApplyTiming.OnHit))
         {
             aura.Apply(origin, target);
         }
@@ -267,9 +280,6 @@ public class AbilityInfo
     public float Range;
 
     public Sprite Icon;
-
-    public DamageType DamageType;
-    public float Damage;
 
     public CharacterClassType ClassType;
     public AbilityType AbilityType;

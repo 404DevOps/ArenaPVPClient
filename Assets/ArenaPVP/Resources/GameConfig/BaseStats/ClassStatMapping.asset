@@ -21,3 +21,5 @@ MonoBehaviour:
     Stats: {fileID: 11400000, guid: 6e9bf61471ae0d14788db004addacf28, type: 2}
   - ClassType: 4
     Stats: {fileID: 11400000, guid: 9fdec0c55b7b01b478dec1f82828148e, type: 2}
+  - ClassType: 0
+    Stats: {fileID: 11400000, guid: 08e4b36fb1a8cd54fbf84e8631e6e666, type: 2}

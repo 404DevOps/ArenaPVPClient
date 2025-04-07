@@ -5,14 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Assets.ArenaPVP.Scripts.Systems.AbilitySystem
-{
-    public abstract class ConditionBase : ScriptableObject
-    {
 
-        public virtual bool IsTrue(Player origin, Player target)
-        {
-            return true;
-        }
+public abstract class ConditionBase : ScriptableObject
+{
+
+    public virtual bool IsTrue(Entity origin, Entity target)
+    {
+        return true;
     }
 }

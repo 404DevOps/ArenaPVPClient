@@ -59,7 +59,7 @@ public class TooltipManager : MonoBehaviour
                 break;
             case TooltipType.AbilityMenu:
             case TooltipType.AbilitySlot:
-                InstantiateTooltip((AbilityInfo)tooltipInfo);
+                InstantiateTooltip((AbilityBase)tooltipInfo);
                 break;
             default: break;
         }
@@ -84,13 +84,13 @@ public class TooltipManager : MonoBehaviour
             Destroy(_tooltip);
     }
 
-    private void InstantiateTooltip(AbilityInfo tooltipInfo)
+    private void InstantiateTooltip(AbilityBase ability)
     {
         var go = new GameObject();
         go.SetActive(false);
         _tooltip = Instantiate(abilityTooltipPrefab, go.transform);
         var tooltipComponent = _tooltip.GetComponent<AbilityTooltipUIDisplay>();
-        tooltipComponent.AbilityInfo = tooltipInfo;
+        tooltipComponent.Ability = ability;
         _tooltip.transform.SetParent(_canvas);
         tooltipComponent.OnTooltipInstantiated += SetTooltipPosition;
         Destroy(go);

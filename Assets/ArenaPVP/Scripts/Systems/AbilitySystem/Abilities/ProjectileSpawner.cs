@@ -35,26 +35,28 @@ public class ProjectileSpawner : NetworkBehaviour
     {
         ArenaLogger.Log("ObserverFireTargeted Client");
         SpawnProjectile(args, 0f);
-        ServerFireTargeted(args, base.TimeManager.Tick);
+        //ServerFireTargeted(args, base.TimeManager.Tick);
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void ServerFireTargeted(FireTargetedProjectileArgs args, uint tick, NetworkConnection sender = null)
+    public void ServerFireTargeted(FireTargetedProjectileArgs args, uint tick, NetworkConnection sender = null)
     {
         ArenaLogger.Log("ServerFireTargeted called");
+
         float passedTime = (float)base.TimeManager.TimePassed(tick, false);
         passedTime = Mathf.Min(MAX_PASSED_TIME / 2f, passedTime);
+
         SpawnProjectile(args, passedTime);
 
-        foreach (var conn in _nob.Observers)
-        {
-            if (conn != sender)
-                ObserverFireTargeted(conn, args, tick);
-        }
+        //foreach (var conn in _nob.Observers)
+        //{
+        //    if (conn != sender && conn != base.NetworkManager.ClientManager.Connection)
+        //        ObserverFireTargeted(conn, args, tick);
+        //}
     }
 
     [TargetRpc]
-    private void ObserverFireTargeted(NetworkConnection target, FireTargetedProjectileArgs args, uint tick)
+    private void ObserverFireTargeted(NetworkConnection conn, FireTargetedProjectileArgs args, uint tick)
     {
         ArenaLogger.Log("ObserverFireTargeted Client");
         float passedTime = (float)base.TimeManager.TimePassed(tick, false);
@@ -80,7 +82,7 @@ public class ProjectileSpawner : NetworkBehaviour
 [Serializable]
 public struct FireTargetedProjectileArgs
 {
-    public FireTargetedProjectileArgs(int abilityId, Player origin, Player target, ProjectileIdentifier identifier)
+    public FireTargetedProjectileArgs(int abilityId, Entity origin, Entity target, ProjectileIdentifier identifier)
     {
         AbilityId = abilityId;
         Origin = origin;
@@ -89,8 +91,8 @@ public struct FireTargetedProjectileArgs
     }
 
     public int AbilityId;
-    public Player Origin;
-    public Player Target;
+    public Entity Origin;
+    public Entity Target;
     public ProjectileIdentifier Identifier;
 }
 

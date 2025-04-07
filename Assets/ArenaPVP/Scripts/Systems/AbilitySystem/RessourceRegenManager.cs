@@ -6,18 +6,18 @@ using UnityEngine;
 
 public class RessourceRegenManager : NetworkBehaviour
 {
-    private Dictionary<Player, ResourceContext> _playerResourceDict = new Dictionary<Player, ResourceContext>();
+    private Dictionary<Entity, ResourceContext> _playerResourceDict = new Dictionary<Entity, ResourceContext>();
     
     public float TickInterval = 2;
     private float _timer = 0;
 
     public override void OnStartServer()
     {
-        ServerEvents.OnPlayerStatsInitialized.AddListener(AddPlayer);
+        ServerEvents.OnEntityStatsInitialized.AddListener(AddPlayer);
     }
     public override void OnStopServer()
     {
-        ServerEvents.OnPlayerStatsInitialized.RemoveListener(AddPlayer);
+        ServerEvents.OnEntityStatsInitialized.RemoveListener(AddPlayer);
     }
     public override void OnStartClient()
     {
@@ -25,10 +25,10 @@ public class RessourceRegenManager : NetworkBehaviour
     }
 
     [Server]
-    private void AddPlayer(Player player)
+    private void AddPlayer(Entity player)
     {
         var resourceType = AppearanceData.Instance().GetRessourceType(player.ClassType);
-        _playerResourceDict.Add(player, new ResourceContext(player.GetComponent<PlayerResource>(), player.GetComponent<PlayerStats>(), resourceType));
+        _playerResourceDict.Add(player, new ResourceContext(player.GetComponent<EntityResource>(), player.GetComponent<EntityStats>(), resourceType));
     }
 
     private void Update()
@@ -50,7 +50,7 @@ public class RessourceRegenManager : NetworkBehaviour
 
 public class ResourceContext
 {
-    public ResourceContext(PlayerResource playerResource, PlayerStats playerStats, ResourceType type)
+    public ResourceContext(EntityResource playerResource, EntityStats playerStats, ResourceType type)
     {
         ResourceType = type;
         PlayerResource = playerResource;
@@ -58,6 +58,6 @@ public class ResourceContext
     }
 
     public ResourceType ResourceType;
-    public PlayerResource PlayerResource;
-    public PlayerStats PlayerStats;
+    public EntityResource PlayerResource;
+    public EntityStats PlayerStats;
 }

@@ -6,7 +6,7 @@ using Logger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 
 public abstract class ProjectileBase : MonoBehaviour
 {
-    public Player Origin;
+    public Entity Origin;
     public float MoveSpeed;
 
     public LayerMask LayerMask;

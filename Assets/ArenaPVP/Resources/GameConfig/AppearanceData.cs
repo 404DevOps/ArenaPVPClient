@@ -31,7 +31,7 @@ public class AppearanceData : ScriptableObject
     {
         if (_instance == null)
         {
-            _instance = Resources.Load("Settings/" + typeof(AppearanceData).Name) as AppearanceData;
+            _instance = Resources.Load("GameConfig/" + typeof(AppearanceData).Name) as AppearanceData;
         }
         return _instance;
     }

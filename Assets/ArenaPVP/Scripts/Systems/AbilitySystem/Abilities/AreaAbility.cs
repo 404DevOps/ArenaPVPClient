@@ -9,7 +9,7 @@ using Logger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 public class AreaAbility : AbilityBase
 {
     [SerializeField] private AreaSelectorBase _areaSelector;
-    internal override void UseServer(Player origin, Player target = null)
+    internal override void UseServer(Entity origin, Entity target = null)
     {
         if (InstanceFinder.IsServerStarted)
         {
@@ -26,20 +26,5 @@ public class AreaAbility : AbilityBase
                 }
             }
         }
-    }
-
-    internal override void ApplyEffectsServer(Player origin, Player target) 
-    {
-        var args = new HealthChangedEventArgs()
-        {
-            Player = target.GetComponent<Player>(),
-            Source = origin.GetComponent<Player>(),
-            HealthChangeAmount = -DamageCalculator.CalculateDamage(origin, target, this),
-            HealthChangeType = HealthChangeType.Damage,
-            DamageType = AbilityInfo.DamageType,
-            AbilityId = Id
-        };
-
-        target.GetComponent<PlayerHealth>().UpdateHealthServer(args);
     }
 }

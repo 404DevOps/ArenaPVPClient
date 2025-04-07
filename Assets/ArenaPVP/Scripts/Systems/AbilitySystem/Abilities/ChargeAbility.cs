@@ -10,7 +10,7 @@ public class ChargeAbility : AbilityBase
 {
     public float chargeSpeed;
     public float stunDuration;
-    internal override void UseServer(Player owner, Player target)
+    internal override void UseServer(Entity owner, Entity target)
     {
         //applyAura(AuraType.Stun, target)
         //get transform, move towards
@@ -18,7 +18,7 @@ public class ChargeAbility : AbilityBase
         ApplyEffectsServer(owner, target);
     }
 
-    internal override void ApplyEffectsServer(Player owner, Player target)
+    internal override void ApplyEffectsServer(Entity owner, Entity target)
     {
         throw new System.NotImplementedException();
     }

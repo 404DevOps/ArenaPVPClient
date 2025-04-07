@@ -53,8 +53,6 @@ public class AuraContainerUIHandler : MonoBehaviour
         if (ownerId != OwnerId)
             return;
 
-        ArenaLogger.Log("On Aura Applied called.");
-
         AddAura(aura);
     }
 
@@ -70,8 +68,6 @@ public class AuraContainerUIHandler : MonoBehaviour
                 auraFoundAndRemoved |= true;
             }
         }
-
-        ArenaLogger.Log("Tried remove expired Aura: Success = " + auraFoundAndRemoved);
     }
 
     private void AddAura(AuraInfo auraInfo)

@@ -32,9 +32,9 @@ public class AbilityUIDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExi
             if (_timer >= _delay)
             {
                 if (_isInActionSlot)
-                    UIEvents.OnShowTooltip.Invoke(TooltipType.AbilitySlot, Ability.AbilityInfo);
+                    UIEvents.OnShowTooltip.Invoke(TooltipType.AbilitySlot, Ability);
                 else
-                    UIEvents.OnShowTooltip.Invoke(TooltipType.AbilityMenu, Ability.AbilityInfo);
+                    UIEvents.OnShowTooltip.Invoke(TooltipType.AbilityMenu, Ability);
 
                 _showTooltip = false;
             }

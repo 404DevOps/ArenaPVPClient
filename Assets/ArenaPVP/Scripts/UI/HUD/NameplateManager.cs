@@ -1,3 +1,4 @@
+using FishNet.Object;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ public class NameplateManager : MonoBehaviour
     [SerializeField] private float offsetY = 50;
     [SerializeField] private float smoothMoveSpeed = 0.2f;
 
-    Dictionary<Player, Transform> _playerNameplates = new Dictionary<Player, Transform>();
+    Dictionary<Entity, Transform> _playerNameplates = new Dictionary<Entity, Transform>();
     private CameraController _camController;
 
     [SerializeField] private float _maxScale = 0.8f;
@@ -28,18 +29,6 @@ public class NameplateManager : MonoBehaviour
     void Awake()
     {
         _camController = Camera.main.GetComponentInParent<CameraController>();
-    }
-
-    private void InitializeNameplates()
-    {
-        var players = FindObjectsByType<Player>(FindObjectsSortMode.InstanceID);
-        foreach (Player player in players)
-        {
-            if (!PlayerConfiguration.Instance.Settings.ShowPlayerNameplate && player.IsOwnedByMe)
-                continue;
-
-            OnPlayerInitialized(player);
-        }
     }
 
     // Update is called once per frame
@@ -90,14 +79,14 @@ public class NameplateManager : MonoBehaviour
 
         return distancePercentage;
     }
-    private void OnPlayerInitialized(Player player)
+    private void OnEntityInitialized(Entity player)
     {
-        if (player.IsOwnedByMe) return;
+        if (player.IsOwnedByMe && PlayerConfiguration.Instance.Settings.ShowPlayerNameplate) return;
 
         InstantiateNamePlate(player);
     }
 
-    void InstantiateNamePlate(Player player)
+    void InstantiateNamePlate(Entity player)
     {
         var go = new GameObject();
         go.SetActive(false);
@@ -113,7 +102,7 @@ public class NameplateManager : MonoBehaviour
         nameplate.SetActive(true);
         Destroy(go);
 
-        _playerNameplates.Add(player, nameplate.transform);
+        _playerNameplates[player] = nameplate.transform;
     }
 
     public void OnSettingsLoaded()
@@ -125,8 +114,8 @@ public class NameplateManager : MonoBehaviour
             {
                 if (!_playerNameplates.Any(np => np.Key.IsOwnedByMe))
                 {
-                    var player = FindObjectsOfType<Player>().First(p => p.IsOwnedByMe);
-                    OnPlayerInitialized(player);
+                    var player = FindObjectsOfType<Entity>().First(p => p.IsOwnedByMe);
+                    OnEntityInitialized(player);
                 }
             }
             else
@@ -144,13 +133,13 @@ public class NameplateManager : MonoBehaviour
 
     public void OnEnable()
     {
-        ClientEvents.OnPlayerInitialized.AddListener(OnPlayerInitialized);
+        ClientEvents.OnEntityInitialized.AddListener(OnEntityInitialized);
         UIEvents.OnSettingsLoaded.AddListener(OnSettingsLoaded);
     }
 
     public void OnDisable()
     {
-        ClientEvents.OnPlayerInitialized.RemoveListener(OnPlayerInitialized);
+        ClientEvents.OnEntityInitialized.RemoveListener(OnEntityInitialized);
         UIEvents.OnSettingsLoaded.RemoveListener(OnSettingsLoaded);
     }
 }

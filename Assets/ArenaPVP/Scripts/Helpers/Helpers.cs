@@ -19,6 +19,23 @@ public static class Helpers
     {
         while (t.childCount > 0) Object.DestroyImmediate(t.GetChild(0).gameObject);
     }
+
+    private static Entity _localPlayer;
+    public static Entity LocalPlayer => _localPlayer;
+
+    [RuntimeInitializeOnLoadMethod]
+    private static void Init()
+    {
+        ClientEvents.OnEntityInitialized.AddListener(OnEntityInitialized);
+    }
+
+    private static void OnEntityInitialized(Entity entity)
+    {
+        if (entity.IsOwnedByMe) // Or however you identify the local player
+        {
+            _localPlayer = entity;
+        }
+    }
 }
 
 public static class WaitManager

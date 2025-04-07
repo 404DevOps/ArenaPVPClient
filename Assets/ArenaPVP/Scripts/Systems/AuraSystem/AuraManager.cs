@@ -58,7 +58,7 @@ public class AuraManager : NetworkBehaviour
 
 
     [Server]
-    public int AddAura(Player source, Player target, AuraBase aura)
+    public int AddAura(Entity source, Entity target, AuraBase aura)
     {
         var auraInfo = new AuraInfo(IdentifierService.GetAuraId(), source, target, aura);
 
@@ -85,14 +85,14 @@ public class AuraManager : NetworkBehaviour
             {
                 playerEntry.Add(auraInfo);
                 _playerAurasDict[target.Id] = playerEntry; //set variable back to dict so it syncs
-                AuraAppliedClient(target.Id, auraInfo);
+                AuraAppliedClientRPC(target.Id, auraInfo);
                 return auraInfo.AuraInstanceId;
             }
         }
         else 
         {
             _playerAurasDict.Add(target.Id, new List<AuraInfo> { auraInfo });
-            AuraAppliedClient(target.Id, auraInfo);
+            AuraAppliedClientRPC(target.Id, auraInfo);
             return auraInfo.AuraInstanceId;
         }
     }
@@ -101,20 +101,20 @@ public class AuraManager : NetworkBehaviour
     {
         var playeEntry = _playerAurasDict[playerId];
         AbilityStorage.GetAura(playeEntry[auraIndex].AuraId).Fade(playeEntry[auraIndex].AppliedTo, playeEntry[auraIndex].AuraInstanceId);
-        AuraRemovedClient(playerId, playeEntry[auraIndex]);
+        AuraRemovedClientRPC(playerId, playeEntry[auraIndex]);
 
         playeEntry.RemoveAt(auraIndex);
         _playerAurasDict[playerId] = playeEntry;
     }
 
     [ObserversRpc]
-    private void AuraAppliedClient(int targetId, AuraInfo aura)
+    private void AuraAppliedClientRPC(int targetId, AuraInfo aura)
     {
         //local event so UI can react.
         ClientEvents.OnAuraApplied.Invoke(targetId, aura);
     }
     [ObserversRpc]
-    private void AuraRemovedClient(int targetId, AuraInfo aura)
+    private void AuraRemovedClientRPC(int targetId, AuraInfo aura)
     {
         //local event so UI can react.
         ClientEvents.OnAuraExpired.Invoke(targetId, aura);
@@ -199,7 +199,7 @@ public class AuraManager : NetworkBehaviour
 public class AuraInfo
 {
     public AuraInfo() { }
-    public AuraInfo(int id, Player appliedById, Player appliedToId, AuraBase aura)
+    public AuraInfo(int id, Entity appliedById, Entity appliedToId, AuraBase aura)
     {
         AuraInstanceId = id;
         AuraId = aura.Id;
@@ -213,8 +213,8 @@ public class AuraInfo
 
     public int AuraInstanceId;
     public int AuraId;
-    public Player AppliedBy;
-    public Player AppliedTo;
+    public Entity AppliedBy;
+    public Entity AppliedTo;
     public int Stacks;
     public float Duration;
     public float RemainingDuration;

@@ -12,22 +12,23 @@ using FishNet.CodeGenerating;
 using UnityEditorInternal.VersionControl;
 using FishNet.Connection;
 
-public class PlayerStats : NetworkBehaviour
+public class EntityStats : NetworkBehaviour
 {
     private StatsMediator _mediator;
     private BaseStats _baseStats;
     public StatsMediator Mediator => _mediator;
-    public StatSnapshot _clientSnapshot;
+    public StatSnapshot Snapshot;
 
     public void Awake()
     {
         _mediator = GetComponent<StatsMediator>();
     }
-    public void Initialize(Player player)
+    public void Initialize(Entity player)
     {
         _baseStats = ClassStatMapping.Instance().GetBaseStats(player.ClassType);
-        ServerEvents.OnPlayerStatsInitialized.Invoke(player);
-        PushSnapshotToClient();
+        ServerEvents.OnEntityStatsInitialized.Invoke(player);
+        if(IsServerStarted)
+            PushSnapshotToClient();
     }
 
     [Server]
@@ -49,7 +50,7 @@ public class PlayerStats : NetworkBehaviour
     [TargetRpc]
     public void Target_UpdateClientSnapshot(NetworkConnection conn, StatSnapshot snapshot)
     {
-        _clientSnapshot = snapshot;
+        Snapshot = snapshot;
         ClientEvents.OnClientStatsUpdated?.Invoke(snapshot);
     }
 
@@ -57,12 +58,9 @@ public class PlayerStats : NetworkBehaviour
     public void PushSnapshotToClient()
     {
         var snapshot = BuildSnapshot();
-#if USE_TARGET_RPC
-    Target_UpdateClientSnapshot(Owner, snapshot);
-#else
-        _clientSnapshot = snapshot;
-        ClientEvents.OnClientStatsUpdated?.Invoke(snapshot);
-#endif
+
+        foreach(var conn in Observers)
+            Target_UpdateClientSnapshot(conn, snapshot);
     }
 
     public float Attackpower

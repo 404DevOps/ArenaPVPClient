@@ -9,7 +9,7 @@ public class PlayerMovement: NetworkBehaviour
 {
     #region MovementVariables
 
-    Player _player;
+    Entity _player;
     [SerializeField]
     private float _walkSpeed = 2f;
     [SerializeField]
@@ -17,7 +17,7 @@ public class PlayerMovement: NetworkBehaviour
 
     #endregion
     #region JumpVariables
-    [SerializeField] bool _isGrounded => _characterController.isGrounded;
+    [SerializeField] bool _isGrounded;// => _characterController.isGrounded;
     [SerializeField] private float _jumpForce = 15;
     [SerializeField] private float _velocityY;
     [SerializeField] private float _gravityModifier = 5;
@@ -37,30 +37,45 @@ public class PlayerMovement: NetworkBehaviour
     //set by camera
     public bool steer;
 
-    public override void OnStartClient()
+    public void Start()
     {
         base.OnStartClient();
-        if (!base.IsOwner)
-        {
-            this.enabled = false;
-            return;
-        }
-        _player = GetComponent<Player>();
+        //if (!base.IsOwner)
+        //{
+        //    this.enabled = false;
+        //    return;
+        //}
+        _player = GetComponent<Entity>();
         _characterController = GetComponent<CharacterController>();
         _settings = PlayerConfiguration.Instance;
         _controls = _settings.Settings.Controls;
+
+        _characterController.Move(Vector3.down * 0.01f); //needed to first detect ground
     }
 
     public void OnStatsUpdated(StatSnapshot snapshot)
     {
+        Debug.Log("StatsClient updated");
         _stats = snapshot;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!base.IsOwner || _controls == null)
+
+        if (IsServerStarted)
+        {
+            bool grounded = _characterController.isGrounded;
+            if (_isGrounded != grounded)
+            {
+                _isGrounded = grounded;
+                UpdateGroundedStatusOnClients(_isGrounded); // Call a ServerRpc to notify clients
+            }
+        }
+        if (!IsOwner  || _controls == null)
             return;
+
+        Debug.Log("Character Controller Grounded = " + _characterController.isGrounded);
 
         HandleCameraSteer();
        
@@ -71,8 +86,26 @@ public class PlayerMovement: NetworkBehaviour
         HandleJump();
     }
 
+    [Server]
+    private void UpdateGroundedStatusOnClients(bool grounded)
+    {
+        _isGrounded = grounded;
+        foreach (var conn in Observers)
+        {
+            UpdateGroundedStatusTargetRpc(conn, grounded); // Use TargetRpc to update specific clients
+        }
+    }
+
+    // TargetRpc to notify each client
+    [TargetRpc]
+    void UpdateGroundedStatusTargetRpc(NetworkConnection conn, bool grounded)
+    {
+        _isGrounded = grounded;
+    }
+
     private void HandleCameraSteer()
     {
+        if (mainCam == null) return;
         if (steer)
         {
             _rotation = Input.GetAxis("Mouse X") * mainCam.CameraSpeed * 100;
@@ -97,6 +130,8 @@ public class PlayerMovement: NetworkBehaviour
         if (!base.IsOwner || _controls == null)
             return;
 
+
+        Debug.Log("Character Stats = " + _stats.ToString());
         _characterController.Move(new Vector3(_currentDirection.x * _walkSpeed, _velocityY, _currentDirection.z * _walkSpeed) * Time.fixedDeltaTime * _stats.MovementSpeed);  
     }
 

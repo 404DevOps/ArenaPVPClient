@@ -1,3 +1,5 @@
+using FishNet;
+using FishNet.Managing.Timing;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,7 +20,7 @@ public class CastBarUIHandler : MonoBehaviour
     [SerializeField] Color CastbarColor;
 
     public AbilityBase Ability;
-    public Player Player;
+    public Entity Player;
 
     private bool _isCasting;
     private float _remainingCastTime;
@@ -31,13 +33,13 @@ public class CastBarUIHandler : MonoBehaviour
 
     private void OnEnable()
     {
-        ClientEvents.OnPlayerInitialized.AddListener(OnPlayerInitialized);
+        ClientEvents.OnEntityInitialized.AddListener(OnPlayerInitialized);
         ClientEvents.OnCastStarted.AddListener(OnCastStarted);
         ClientEvents.OnCastInterrupted.AddListener(OnCastInterrupted);
         ClientEvents.OnCastCompleted.AddListener(OnCastCompleted); 
     }
 
-    private void OnPlayerInitialized(Player player)
+    private void OnPlayerInitialized(Entity player)
     {
         if (_isMainCastBar) 
         {
@@ -53,7 +55,7 @@ public class CastBarUIHandler : MonoBehaviour
     private void OnDisable()
     {
         _isCasting = false;
-        ClientEvents.OnPlayerInitialized.RemoveListener(OnPlayerInitialized);
+        ClientEvents.OnEntityInitialized.RemoveListener(OnPlayerInitialized);
         ClientEvents.OnCastStarted.RemoveListener(OnCastStarted);
         ClientEvents.OnCastInterrupted.RemoveListener(OnCastInterrupted);
         ClientEvents.OnCastCompleted.RemoveListener(OnCastCompleted);

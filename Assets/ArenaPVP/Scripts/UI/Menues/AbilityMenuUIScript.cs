@@ -16,7 +16,7 @@ public class AbilityMenuUIScript : MonoBehaviour
     {
         CloseButton.onClick.AddListener(CloseMenu);
 
-        Player player = FindObjectsOfType<Player>().FirstOrDefault(p => p.IsOwnedByMe);
+        Entity player = FindObjectsOfType<Entity>().FirstOrDefault(p => p.IsOwnedByMe);
 
         ClearGrid();
 

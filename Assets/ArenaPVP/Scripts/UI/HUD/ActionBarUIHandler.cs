@@ -13,23 +13,23 @@ public class ActionBarUIHandler : MonoBehaviour
 
     private string actionBarMappingPath;
     private ActionBarMapping actionBarMapping;
-    private Player _player;
+    private Entity _player;
 
     public void OnEnable()
     {
         //UIEvents.OnSettingsLoaded.AddListener(InitializeActionBars);
         UIEvents.OnKeyBindsChanged.AddListener(RebuildActionBars);
-        ClientEvents.OnPlayerInitialized.AddListener(OnPlayerInitialized);
+        ClientEvents.OnEntityInitialized.AddListener(OnPlayerInitialized);
     }
 
-    private void OnPlayerInitialized(Player player)
+    private void OnPlayerInitialized(Entity player)
     {
         if (player.IsOwnedByMe)
         {
             _player = player;
             actionBarMappingPath = Application.persistentDataPath + "/ActionBarMapping_" + _player.ClassType.ToString() + ".json";
             InitializeActionBars();
-            ClientEvents.OnPlayerInitialized.RemoveListener(OnPlayerInitialized);
+            ClientEvents.OnEntityInitialized.RemoveListener(OnPlayerInitialized);
         }
     }
 

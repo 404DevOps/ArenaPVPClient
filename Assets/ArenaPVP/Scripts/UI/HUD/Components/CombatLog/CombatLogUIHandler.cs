@@ -14,13 +14,13 @@ public class CombatLogUIHandler : MonoBehaviour
     // Start is called before the first frame update
     void OnEnable()
     {
-        ClientEvents.OnPlayerHealthChanged.AddListener(OnPlayerHealthChanged);
+        ClientEvents.OnEntityHealthChanged.AddListener(OnPlayerHealthChanged);
         ClientEvents.OnAuraApplied.AddListener(OnAuraApplied);
         ClientEvents.OnAuraExpired.AddListener(OnAuraExpired);
     }
     void OnDisable()
     {
-        ClientEvents.OnPlayerHealthChanged.RemoveListener(OnPlayerHealthChanged);
+        ClientEvents.OnEntityHealthChanged.RemoveListener(OnPlayerHealthChanged);
         ClientEvents.OnAuraApplied.RemoveListener(OnAuraApplied);
         ClientEvents.OnAuraExpired.RemoveListener(OnAuraExpired);
     }

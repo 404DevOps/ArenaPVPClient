@@ -10,24 +10,24 @@ namespace Assets.ArenaPVP.Scripts.Systems.AbilitySystem
     [CreateAssetMenu(fileName = "HealthCondition", menuName = "Conditions/HealthCondition")]
     public class HealthCondition : ConditionBase
     {
-        AuraTargetType targetType;
+        TargetType targetType;
         public int HealthPercentage;
         public bool TrueIfBelow;
 
-        public override bool IsTrue(Player origin, Player target)
+        public override bool IsTrue(Entity origin, Entity target)
         {
-            Player playerToInspect;
+            Entity playerToInspect;
             switch (targetType)
             {
-                case AuraTargetType.Player: playerToInspect = origin;
+                case TargetType.Player: playerToInspect = origin;
                     break;
-                case AuraTargetType.Target: playerToInspect = target;
+                case TargetType.Target: playerToInspect = target;
                     break;
                 default:
                     throw new Exception("AuraTarget Type not found.");
             }
 
-            var healthComponent = playerToInspect.GetComponent<PlayerHealth>();
+            var healthComponent = playerToInspect.GetComponent<EntityHealth>();
             var healthPercentage = (healthComponent.CurrentHealth.Value / healthComponent.MaxHealth.Value) * 100;
 
             if (HealthPercentage <= healthPercentage)

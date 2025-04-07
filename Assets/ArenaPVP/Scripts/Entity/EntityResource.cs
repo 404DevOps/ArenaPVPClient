@@ -4,12 +4,12 @@ using System;
 using UnityEngine;
 using Logger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 
-public class PlayerResource : NetworkBehaviour
+public class EntityResource : NetworkBehaviour
 {
     public readonly SyncVar<float> MaxResource = new SyncVar<float>();
     public readonly SyncVar<float> CurrentResource = new SyncVar<float>();
 
-    public PlayerStats Stats;
+    private EntityStats Stats;
 
     [Server]
     public void UpdateResourceServer(ResourceChangedEventArgs args)
@@ -24,12 +24,12 @@ public class PlayerResource : NetworkBehaviour
     [ObserversRpc]
     public void ResourceUpdatedClient(ResourceChangedEventArgs args)
     {
-        ClientEvents.OnPlayerResourceChanged.Invoke(args);
+        ClientEvents.OnEntityResourceChanged.Invoke(args);
     }
 
     internal void Initialize()
     {
-        Stats = GetComponent<PlayerStats>();
+        Stats = GetComponent<EntityStats>();
         MaxResource.Value = Stats.MaxResource;
         CurrentResource.Value = Stats.MaxResource;
     }

@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class FloatingTextContainer : MonoBehaviour
 {
-    public Player Player;
+    public Entity Player;
     public float offsetY = 5f;
     public float moveSpeed = 0.5f;
 

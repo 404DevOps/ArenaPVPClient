@@ -40,6 +40,9 @@ MonoBehaviour:
   - ClassType: 6
     MainColor: {r: 0.8962264, g: 0.7409632, b: 0.063412234, a: 1}
     ResourceColor: {r: 0.8396226, g: 0.011881431, b: 0.573725, a: 1}
+  - ClassType: 0
+    MainColor: {r: 0.9716981, g: 0.5950817, b: 0.132921, a: 1}
+    ResourceColor: {r: 0.3301887, g: 0.31617126, b: 0.32567123, a: 1}
   _combatLogColors:
   - LogType: 0
     Color: {r: 0.031149892, g: 0.8887376, b: 0.9433962, a: 1}
@@ -77,6 +80,9 @@ MonoBehaviour:
   - ClassType: 4
     ResourceType: 2
     Descriptor: Focus
+  - ClassType: 0
+    ResourceType: 0
+    Descriptor: Focus
   _classModels:
   - ClassType: 2
     Model: {fileID: 919132149155446097, guid: d687b5524a0069f4dab29f2d042f9f27, type: 3}
@@ -84,5 +90,5 @@ MonoBehaviour:
     Model: {fileID: 919132149155446097, guid: 8ae3a107e83e9684aae27f55e112c2ce, type: 3}
   - ClassType: 4
     Model: {fileID: 919132149155446097, guid: ad2a8a8b1553ef74fa866ee3d2fbff4f, type: 3}
-  - ClassType: 1
-    Model: {fileID: 919132149155446097, guid: 89b1bf437010dc14598f1dbff4c97f28, type: 3}
+  - ClassType: 0
+    Model: {fileID: 7241880526925800077, guid: 4059913ecbe9f3f4cb9f9811958c2745, type: 3}

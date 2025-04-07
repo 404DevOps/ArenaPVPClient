@@ -38,7 +38,7 @@ public class CameraController: MonoBehaviour
     private bool _isCamLocked;
 
 
-    void OnPlayerInitialized(Player player)
+    void OnEntityInitialized(Entity player)
     {
         if(!InstanceFinder.IsClientStarted)
             return;
@@ -56,7 +56,7 @@ public class CameraController: MonoBehaviour
             Tilt.eulerAngles = new Vector3(currentTilt, transform.eulerAngles.y, transform.eulerAngles.z);
             mainCam.transform.position += Tilt.forward * -currentDistance;
 
-            ClientEvents.OnPlayerInitialized.RemoveListener(OnPlayerInitialized);
+            ClientEvents.OnEntityInitialized.RemoveListener(OnEntityInitialized);
         }
     }
 
@@ -165,13 +165,13 @@ public class CameraController: MonoBehaviour
 
     private void OnEnable()
     {
-        ClientEvents.OnPlayerInitialized.AddListener(OnPlayerInitialized);
+        ClientEvents.OnEntityInitialized.AddListener(OnEntityInitialized);
         UIEvents.OnAbilityDrag.AddListener(SetCamLock);
         UIEvents.OnMainMenuOpen.AddListener(SetCamLock);
     }
     private void OnDisable()
     {
-        ClientEvents.OnPlayerInitialized.RemoveListener(OnPlayerInitialized);
+        ClientEvents.OnEntityInitialized.RemoveListener(OnEntityInitialized);
         UIEvents.OnAbilityDrag.RemoveListener(SetCamLock);
         UIEvents.OnMainMenuOpen.RemoveListener(SetCamLock);
     }

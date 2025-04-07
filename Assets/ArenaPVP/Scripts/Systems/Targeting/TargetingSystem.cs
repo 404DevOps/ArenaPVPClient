@@ -16,14 +16,14 @@ public class TargetingSystem : MonoBehaviour
 
     private Controls _controls;
     private Camera _mainCam;
-    private Player _player;
+    private Entity _player;
     private CameraController _camController;
     private PlayerConfiguration _playerSettings;
     private bool _isMenuOpen;
     private bool _isClickTargetLocked;
 
     // Start is called before the first frame update
-    void OnPlayerInitialized(Player player)
+    void OnPlayerInitialized(Entity player)
     {
         if (player.IsOwnedByMe)
         {
@@ -115,7 +115,7 @@ public class TargetingSystem : MonoBehaviour
             _targetClosedList.Add(target);
             CurrentTarget = target;
             target.Select();
-            var player = target.GetComponent<Player>();
+            var player = target.GetComponent<Entity>();
             UIEvents.OnTargetChanged.Invoke(player);
 
         }
@@ -179,7 +179,7 @@ public class TargetingSystem : MonoBehaviour
 
     private void OnEnable()
     {
-        ClientEvents.OnPlayerInitialized.AddListener(OnPlayerInitialized);
+        ClientEvents.OnEntityInitialized.AddListener(OnPlayerInitialized);
         UIEvents.OnSettingsLoaded.AddListener(ReloadControls);
         UIEvents.OnAbilityDrag.AddListener(SetTargetLock);
         UIEvents.OnMainMenuOpen.AddListener(SetMenuOpen);

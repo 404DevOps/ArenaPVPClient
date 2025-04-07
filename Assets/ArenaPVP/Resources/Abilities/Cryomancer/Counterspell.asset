@@ -21,11 +21,15 @@ MonoBehaviour:
     ResourceCost: 50
     Range: 30
     Icon: {fileID: 21300000, guid: bc894b40f78a8124480df3a9a3f41f33, type: 3}
-    DamageType: 2
-    Damage: 0
     ClassType: 2
     AbilityType: 0
+    IgnoreGCD: 0
   TargetingType: 3
   ApplyAuras: []
+  Conditions: []
+  Effects: []
   NeedLineOfSight: 1
   NeedTargetInFront: 1
+  references:
+    version: 2
+    RefIds: []

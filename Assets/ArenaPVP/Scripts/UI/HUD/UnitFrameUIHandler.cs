@@ -14,11 +14,11 @@ public class UnitFrameUIHandler : MonoBehaviour
     private Healthbar _healthbar;
     private Resourcebar _resourcebar;
 
-    public Player Player;
+    public Entity Player;
 
     [SerializeField] private bool _isPlayerFrame;
-    private PlayerHealth _playerHealth;
-    private PlayerResource _playerResource;
+    private EntityHealth _playerHealth;
+    private EntityResource _playerResource;
 
     // Start is called before the first frame update
     void OnEnable()
@@ -26,9 +26,9 @@ public class UnitFrameUIHandler : MonoBehaviour
         _healthbar = GetComponentInChildren<Healthbar>(true);
         _resourcebar = GetComponentInChildren<Resourcebar>(true);
 
-        ClientEvents.OnPlayerInitialized.AddListener(OnPlayerInitialized);
-        ClientEvents.OnPlayerHealthChanged.AddListener(OnHealthChanged);
-        ClientEvents.OnPlayerResourceChanged.AddListener(OnResourceChanged);
+        ClientEvents.OnEntityInitialized.AddListener(OnPlayerInitialized);
+        ClientEvents.OnEntityHealthChanged.AddListener(OnHealthChanged);
+        ClientEvents.OnEntityResourceChanged.AddListener(OnResourceChanged);
     }
     private void OnDisable()
     {
@@ -36,12 +36,12 @@ public class UnitFrameUIHandler : MonoBehaviour
         {
             UIEvents.OnTargetChanged.RemoveListener(OnTargetChanged);
         }
-        ClientEvents.OnPlayerHealthChanged.RemoveListener(OnHealthChanged);
-        ClientEvents.OnPlayerInitialized.RemoveListener(OnPlayerInitialized);
-        ClientEvents.OnPlayerResourceChanged.RemoveListener(OnResourceChanged);
+        ClientEvents.OnEntityHealthChanged.RemoveListener(OnHealthChanged);
+        ClientEvents.OnEntityInitialized.RemoveListener(OnPlayerInitialized);
+        ClientEvents.OnEntityResourceChanged.RemoveListener(OnResourceChanged);
     }
 
-    private void OnPlayerInitialized(Player player)
+    private void OnPlayerInitialized(Entity player)
     {
         if (IconRightSide)
         {
@@ -56,8 +56,8 @@ public class UnitFrameUIHandler : MonoBehaviour
             {
                 Player = player;
                 SetUnitFrameIcon();
-                _playerHealth = Player.GetComponent<PlayerHealth>();
-                _playerResource = Player.GetComponent<PlayerResource>();
+                _playerHealth = Player.GetComponent<EntityHealth>();
+                _playerResource = Player.GetComponent<EntityResource>();
                 _healthbar.InitializeBar(Player.ClassType, _playerHealth.CurrentHealth.Value, _playerHealth.MaxHealth.Value);
                 _resourcebar.InitializeBar(Player.ClassType, _playerResource.CurrentResource.Value, _playerResource.MaxResource.Value);
                 ActivateAuraGrid();
@@ -84,13 +84,13 @@ public class UnitFrameUIHandler : MonoBehaviour
 
         _resourcebar.SetNewValue(_playerResource.CurrentResource.Value, _playerResource.MaxResource.Value);
     }
-    private void OnTargetChanged(Player player)
+    private void OnTargetChanged(Entity player)
     {
         if (player != null)
         {
             Player = player;
-            _playerHealth = Player.GetComponent<PlayerHealth>();
-            _playerResource = Player.GetComponent<PlayerResource>();
+            _playerHealth = Player.GetComponent<EntityHealth>();
+            _playerResource = Player.GetComponent<EntityResource>();
             SetUnitFrameIcon();
             _healthbar.InitializeBar(Player.ClassType, _playerHealth.CurrentHealth.Value, _playerHealth.MaxHealth.Value);
             _resourcebar.InitializeBar(Player.ClassType, _playerResource.CurrentResource.Value, _playerResource.MaxResource.Value);

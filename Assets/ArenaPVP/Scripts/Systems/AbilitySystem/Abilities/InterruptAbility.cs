@@ -9,7 +9,7 @@ using ArenaLogger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 [CreateAssetMenu(menuName = "Abilities/InterruptAbility", fileName = "InterrupAbility")]
 public class InterruptAbility : AbilityBase
 {
-    internal override void UseServer(Player owner, Player target)
+    internal override void UseServer(Entity owner, Entity target)
     {
         base.UseServer(owner, target);
 
@@ -17,12 +17,12 @@ public class InterruptAbility : AbilityBase
         ArenaLogger.Log($"InterruptAbility:UseServer called, target = {target.Id}");
         ApplyEffectsServer(owner, target);
     }
-    internal override void UseClient(Player owner, Player target)
+    internal override void UseClient(Entity owner, Entity target)
     {
         base.UseClient(owner, target);
         return;
     }
-    internal override void ApplyEffectsServer(Player owner, Player target)
+    internal override void ApplyEffectsServer(Entity owner, Entity target)
     {
         base.ApplyEffectsServer(owner, target);
         return;

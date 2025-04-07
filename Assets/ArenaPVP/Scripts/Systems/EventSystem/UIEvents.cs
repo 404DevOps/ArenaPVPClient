@@ -15,7 +15,7 @@ public static class UIEvents
     public static readonly Event OnKeyBindsChanged = new Event();
     public static readonly Event OnControlsChanged = new Event();
 
-    public static readonly Event<Player> OnTargetChanged = new Event<Player>();
+    public static readonly Event<Entity> OnTargetChanged = new Event<Entity>();
 
     //LoadEvents
     public static readonly Event OnSettingsSaved = new Event();

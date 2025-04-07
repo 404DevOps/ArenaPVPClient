@@ -22,7 +22,7 @@ public class AbilityUIDragHandler : MonoBehaviour, IDragHandler, IBeginDragHandl
     {
         canvasGroup = GetComponent<CanvasGroup>();
         rect = GetComponent<RectTransform>();
-        canvas = FindObjectOfType<Canvas>();
+        canvas = FindAnyObjectByType<Canvas>();
     }
 
     public void OnDrag(PointerEventData eventData)

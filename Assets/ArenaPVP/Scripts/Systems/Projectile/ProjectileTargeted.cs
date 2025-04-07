@@ -6,7 +6,7 @@ using ArenaLogger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 
 public class ProjectileTargeted : ProjectileBase
 {
-    public Player Target;
+    public Entity Target;
 
     private float _currentRotateSpeed;
     private float _rotateMaxSpeed = 1400;
@@ -16,7 +16,7 @@ public class ProjectileTargeted : ProjectileBase
 
 
 
-    public void Initialize(int abilityId, Player origin, Player target, float passedTime)
+    public void Initialize(int abilityId, Entity origin, Entity target, float passedTime)
     {
         Origin = origin;
         Target = target;
@@ -51,7 +51,8 @@ public class ProjectileTargeted : ProjectileBase
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.GetComponent<Player>()?.Id == Target.Id)
+        var entity = other.GetComponentInParent<Entity>();
+        if (entity.Id == Target.Id)
         {
             if (InstanceFinder.IsClientStarted)
             {
@@ -65,6 +66,7 @@ public class ProjectileTargeted : ProjectileBase
                 AbilityStorage.GetAbility(_abilityId).ApplyEffectsServer(Origin,Target);
             }
 
+            //TODO: return to a pool
             Destroy(gameObject);
         }
     }

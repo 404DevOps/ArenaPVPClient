@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class AbilityTooltipUIDisplay : TooltipBaseUIDisplay
 {
-    public AbilityInfo AbilityInfo;
+    public AbilityBase Ability;
     public TextMeshProUGUI Name;
     public TextMeshProUGUI Description;
     public TextMeshProUGUI Cooldown;
@@ -18,20 +18,40 @@ public class AbilityTooltipUIDisplay : TooltipBaseUIDisplay
 
     public void OnEnable()
     {
-        var player = FindObjectsOfType<Player>().FirstOrDefault(p => p.IsOwnedByMe);
-        Name.text = AbilityInfo.Name;
-        Description.text = AbilityInfo.Description.Replace("$DAMAGE$", DamageCalculator.GetDamageAfterPowerModifiers(player, AbilityInfo.Damage, AbilityInfo.DamageType).ToString());
-        Cooldown.text = AbilityInfo.Cooldown > 0 ? AbilityInfo.Cooldown.ToString() + "sec Cooldown" : "";
-        CastTime.text = AbilityInfo.CastTime == 0 ? "Instant" : AbilityInfo.CastTime.ToString() + "sec Cast";
-        Range.text = AbilityInfo.Range <= 5 ? "Melee Range" : AbilityInfo.Range.ToString() + "yd Range";
-        Cost.text = AbilityInfo.ResourceCost == 0 ? "" : AbilityInfo.ResourceCost.ToString() + " " + GetResourceName();
+        var player = Helpers.LocalPlayer;
+        Name.text = Ability.AbilityInfo.Name;
+        Description.text = GetDescriptionText(player);
+        Cooldown.text = Ability.AbilityInfo.Cooldown > 0 ? Ability.AbilityInfo.Cooldown.ToString() + "sec Cooldown" : "";
+        CastTime.text = Ability.AbilityInfo.CastTime == 0 ? "Instant" : Ability.AbilityInfo.CastTime.ToString() + "sec Cast";
+        Range.text = Ability.AbilityInfo.Range <= 5 ? "Melee Range" : Ability.AbilityInfo.Range.ToString() + "yd Range";
+        Cost.text = Ability.AbilityInfo.ResourceCost == 0 ? "" : Ability.AbilityInfo.ResourceCost.ToString() + " " + GetResourceName();
 
         StartCoroutine(WaitForFrame());
     }
 
+    /// <summary>
+    /// Replace all pssible Variables in Description Text.
+    /// </summary>
+    /// <param name="player"></param>
+    /// <returns></returns>
+    private string GetDescriptionText(Entity player)
+    {   
+        string desc = string.Empty;
+        if (Ability.Effects != null)
+        {
+            var dmgEffect = Ability.Effects.FirstOrDefault(fx => fx is DamageEntityEffect) as DamageEntityEffect;
+            if(dmgEffect != null)
+                desc = Ability.AbilityInfo.Description.Replace("$DAMAGE$", DamageCalculator.GetDamageAfterPowerModifiers(player, dmgEffect.DamageAmount, dmgEffect.DamageType).ToString());
+        }
+        if (!string.IsNullOrEmpty(desc))
+            return desc;
+        else
+            return Ability.AbilityInfo.Description;
+    }
+
     private string GetResourceName()
     {
-        switch (AbilityInfo.ClassType)
+        switch (Ability.AbilityInfo.ClassType)
         {
             case CharacterClassType.Trooper:
                 return "Rage";

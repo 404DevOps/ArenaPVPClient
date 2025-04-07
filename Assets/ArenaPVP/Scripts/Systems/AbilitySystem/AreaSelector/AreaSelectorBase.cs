@@ -4,6 +4,6 @@ using UnityEngine;
 
 public abstract class AreaSelectorBase : ScriptableObject
 {
-    public abstract List<Player> GetTargetsInArea(Player source);
+    public abstract List<Entity> GetTargetsInArea(Entity source);
 
 }

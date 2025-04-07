@@ -8,21 +8,21 @@ using ArenaLogger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 public class CircleAreaSelector : AreaSelectorBase
 {
     [SerializeField] private float _radius;
-    private Player _source;
-    public override List<Player> GetTargetsInArea(Player source)
+    private Entity _source;
+    public override List<Entity> GetTargetsInArea(Entity source)
     {
         if (InstanceFinder.IsServerStarted)
         {
             _source = source;
 
             Collider[] colliders;
-            var playersInArea = new List<Player>();
+            var playersInArea = new List<Entity>();
 
             var layerMask = LayerMask.GetMask(new string[] { "Player" });
             colliders = Physics.OverlapSphere(source.transform.position, _radius, layerMask);
             foreach (Collider collider in colliders)
             {
-                var player = collider.GetComponent<Player>();
+                var player = collider.GetComponent<Entity>();
                 if (player != null)
                 {
                     playersInArea.Add(player);

@@ -1,14 +1,10 @@
 using Assets.ArenaPVP.Scripts.Models.Enums;
 using FishNet;
-using FishNet.CodeGenerating;
 using FishNet.Object;
-using FishNet.Object.Synchronizing;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using ArenaLogger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 
 public class CastManager : NetworkBehaviour
@@ -30,14 +26,14 @@ public class CastManager : NetworkBehaviour
 
     private void Update()
     {
-        if (InstanceFinder.IsServerStarted) 
+        if (IsServerStarted) 
         {
             UpdateCastTimers();
         }
     }
 
     [ObserversRpc]
-    private void OnCastStartedClient(CastEventArgs args)
+    private void OnCastStartedClientRPC(CastEventArgs args)
     {
         ClientEvents.OnCastStarted.Invoke(args);
     }
@@ -68,7 +64,7 @@ public class CastManager : NetworkBehaviour
             _castTimerDict.Add(owner, castInfo);
         }
 
-        OnCastStartedClient(new CastEventArgs(owner, castInfo.AbilityId, castInfo.CastId));
+        OnCastStartedClientRPC(new CastEventArgs(owner, castInfo.AbilityId, castInfo.CastId, TimeManager.Tick));
     }
     public AbilityCastInfo GetCastInfo(int owner)
     {

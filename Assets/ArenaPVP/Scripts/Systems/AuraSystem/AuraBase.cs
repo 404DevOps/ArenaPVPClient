@@ -14,9 +14,9 @@ public class AuraBase : ScriptableObject
     public string Name;
     public string Description;
     public float Duration;
-    public AuraTargetType AuraTarget;
+    public TargetType AuraTarget;
     public AuraType AuraType;
-    public AuraApplyTiming AuraApplyTiming;
+    public ApplyTiming AuraApplyTiming;
     public Sprite Icon;
     public List<StatModifier> StatModifiers;
     public bool isDebuff;
@@ -25,17 +25,17 @@ public class AuraBase : ScriptableObject
     public int MaxStacks;
 
 
-    public void Apply(Player owner, Player target) 
+    public void Apply(Entity owner, Entity target) 
     {
         if (InstanceFinder.IsServerStarted)
         {
-            Player applyTo;
+            Entity applyTo;
             switch (AuraTarget)
             {
-                case AuraTargetType.Player:
+                case TargetType.Player:
                     applyTo = owner;
                     break;
-                case AuraTargetType.Target:
+                case TargetType.Target:
                     applyTo = target;
                     break;
                 default: throw new ArgumentOutOfRangeException();
@@ -51,12 +51,11 @@ public class AuraBase : ScriptableObject
                 {
                     statMod.SourceAuraId = _auraId;
                     applyTo.GetComponent<StatsMediator>().AddModifierServer(statMod);
-                    ArenaLogger.Log($"Applied {Name} Aura to Player with ID {applyTo.Id}");
                 }
             }
         }
     }
-    public void Fade(Player player, int auraId) 
+    public void Fade(Entity player, int auraId) 
     {
         if (InstanceFinder.IsServerStarted)
         {
@@ -64,9 +63,4 @@ public class AuraBase : ScriptableObject
             ArenaLogger.Log($"Applied {Name} Aura to Player with ID {player.Id}");
         }
     }
-}
-public enum AuraTargetType
-{
-    Player, 
-    Target
 }

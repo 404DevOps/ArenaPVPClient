@@ -1,21 +1,17 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using static Unity.VisualScripting.Member;
 
 public static class DamageCalculator
 {
-    public static float CalculateDamage(Player source, Player target, AbilityBase ability)
+    public static float CalculateDamage(Entity source, Entity target, DamageEntityEffect damageEffect)
     {
-        var dmgAfterPowerMod = GetDamageAfterPowerModifiers(source, ability.AbilityInfo.Damage, ability.AbilityInfo.DamageType);
-        var result = GetDamageAfterDefenseModifiers(target, dmgAfterPowerMod, ability.AbilityInfo.DamageType);
+        var dmgAfterPowerMod = GetDamageAfterPowerModifiers(source, damageEffect.DamageAmount, damageEffect.DamageType);
+        var result = GetDamageAfterDefenseModifiers(target, dmgAfterPowerMod, damageEffect.DamageType);
         return result;
     }
-    public static float GetDamageAfterPowerModifiers(Player source, float abilityBaseDamage, DamageType damageType) 
+    public static float GetDamageAfterPowerModifiers(Entity source, float abilityBaseDamage, DamageType damageType) 
     {
         float result = 0;
-        var playerStats = source.GetComponent<PlayerStats>();
+        var playerStats = source.GetComponent<EntityStats>();
         switch (damageType) 
         {
             case DamageType.Magic: result = playerStats.Spellpower + abilityBaseDamage; break;
@@ -26,10 +22,10 @@ public static class DamageCalculator
         return result;
     }
 
-    public static float GetDamageAfterDefenseModifiers(Player target, float damageAfterPower, DamageType damageType)
+    public static float GetDamageAfterDefenseModifiers(Entity target, float damageAfterPower, DamageType damageType)
     {
         float result = 0;
-        var playerStats = target.GetComponent<PlayerStats>();
+        var playerStats = target.GetComponent<EntityStats>();
 
         switch (damageType)
         {

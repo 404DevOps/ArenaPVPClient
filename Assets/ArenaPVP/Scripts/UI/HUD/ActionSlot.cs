@@ -23,7 +23,7 @@ public class ActionSlot : MonoBehaviour, IDropHandler
     private float _flashTimePassed = 0f;
     private bool _flashTimerStarted = false;
 
-    private Player _player;
+    private Entity _player;
     private AbilityUIDisplay _abilityDisplay;
     public Action<int, AbilityBase> OnAbilityChanged;
 
@@ -45,7 +45,7 @@ public class ActionSlot : MonoBehaviour, IDropHandler
 
         if (KeyBind.IsKeyUp())
         {
-            var target = _targetingSystem.CurrentTarget?.GetComponent<Player>();
+            var target = _targetingSystem.CurrentTarget?.GetComponent<Entity>();
 
             FlashActionSlot();
             if (Ability != null)
@@ -163,7 +163,7 @@ public class ActionSlot : MonoBehaviour, IDropHandler
             }
         }
     }
-    public void InitializeSlot(Player player)
+    public void InitializeSlot(Entity player)
     {
         _player = player;
         _abilityDisplay = GetComponent<AbilityUIDisplay>();

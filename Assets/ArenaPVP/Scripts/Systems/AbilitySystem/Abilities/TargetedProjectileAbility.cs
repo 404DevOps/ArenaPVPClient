@@ -1,5 +1,6 @@
 using Assets.ArenaPVP.Scripts.Models.Enums;
 using FishNet;
+using FishNet.Managing.Timing;
 using FishNet.Object;
 using GameKit.Dependencies.Utilities.ObjectPooling.Examples;
 using System.Linq;
@@ -12,29 +13,17 @@ public class TargetedProjectileAbility : AbilityBase
 {
     public ProjectileIdentifier ProjectileIdentifier;
 
-    internal override void UseServer(Player origin, Player target)
+    internal override void UseServer(Entity origin, Entity target)
     {
+        Debug.Log("UserServer");
         base.UseServer(origin, target); 
+        ProjectileSpawner.Instance.ServerFireTargeted(new FireTargetedProjectileArgs(Id, origin, target, ProjectileIdentifier), InstanceFinder.TimeManager.Tick);
     }
-    internal override void UseClient(Player origin, Player target)
+    internal override void UseClient(Entity origin, Entity target)
     {
+        Debug.Log("UserClient");
         base.UseClient(origin, target);
-        ProjectileSpawner.Instance.ClientFireTargeted(new FireTargetedProjectileArgs(Id, origin, target, ProjectileIdentifier));
-    }
-
-    internal override void ApplyEffectsServer(Player origin,Player target)
-    {
-        base.ApplyEffectsServer(origin, target);
-
-            var args = new HealthChangedEventArgs()
-            {
-                Player = target.GetComponent<Player>(),
-                Source = origin.GetComponent<Player>(),
-                HealthChangeAmount = -DamageCalculator.CalculateDamage(origin, target, this),
-                HealthChangeType = HealthChangeType.Damage,
-                DamageType = AbilityInfo.DamageType,
-                AbilityId = Id
-            };
-            target.GetComponent<PlayerHealth>().UpdateHealthServer(args);
+        if(!origin.IsHostStarted)
+            ProjectileSpawner.Instance.ClientFireTargeted(new FireTargetedProjectileArgs(Id, origin, target, ProjectileIdentifier));
     }
 }

@@ -10,7 +10,7 @@ public class FloatingTextManager : MonoBehaviour
     [SerializeField] Transform _textContainerParent;
 
     private Dictionary<int, Transform> _playerTextContainers = new Dictionary<int, Transform>();
-    private void OnPlayerHealthChanged(HealthChangedEventArgs args)
+    private void OnEntityHealthChanged(HealthChangedEventArgs args)
     {
         if (!args.Source.IsOwnedByMe) //if damage/healing wasnt done by me, dont show floating text.
             return;
@@ -19,7 +19,7 @@ public class FloatingTextManager : MonoBehaviour
         InstantiateText(args.Player, absAmountChanged, args.HealthChangeType);
     }
 
-    private void InstantiateText(Player player, float absAmountChanged, HealthChangeType healthChangeType)
+    private void InstantiateText(Entity player, float absAmountChanged, HealthChangeType healthChangeType)
     {
         var gO = new GameObject();
         gO.SetActive(false);
@@ -34,7 +34,7 @@ public class FloatingTextManager : MonoBehaviour
 
 
 
-    private void TryInitializePlayerTextContainers(Player player)
+    private void TryInitializePlayerTextContainers(Entity player)
     {
         if (player.IsOwnedByMe) return;
 
@@ -44,7 +44,7 @@ public class FloatingTextManager : MonoBehaviour
             _playerTextContainers.Add(player.Id, transform);
         }
     }
-    private Transform InstantiateContainer(Player player)
+    private Transform InstantiateContainer(Entity player)
     {
         var gO = new GameObject();
         gO.SetActive(false);
@@ -59,10 +59,10 @@ public class FloatingTextManager : MonoBehaviour
 
     void OnDisable()
     {
-        ClientEvents.OnPlayerHealthChanged.RemoveListener(OnPlayerHealthChanged);
+        ClientEvents.OnEntityHealthChanged.RemoveListener(OnEntityHealthChanged);
     }
     void OnEnable()
     {
-        ClientEvents.OnPlayerHealthChanged.AddListener(OnPlayerHealthChanged);
+        ClientEvents.OnEntityHealthChanged.AddListener(OnEntityHealthChanged);
     }
 }

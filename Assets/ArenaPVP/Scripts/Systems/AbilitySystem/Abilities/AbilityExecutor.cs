@@ -1,5 +1,6 @@
 using FishNet.Connection;
 using FishNet.Object;
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -33,12 +34,12 @@ public class AbilityExecutor : NetworkBehaviour
         var ability = AbilityStorage.GetAbility(args.AbilityId);
         if (ability.CanBeUsed(args.Origin, args.Target))
         {
-            TryUseAbilityServer(args);
+            TryUseAbility_ServerRPC(args);
         }
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void TryUseAbilityServer(UseAbilityArgs args, NetworkConnection sender = null)
+    public void TryUseAbility_ServerRPC(UseAbilityArgs args, NetworkConnection sender = null)
     {
         var ability = AbilityStorage.GetAbility(args.AbilityId);
         args.CastId = TimeManager.LocalTick;
@@ -79,7 +80,7 @@ public class AbilityExecutor : NetworkBehaviour
             }
         }
         if (ability.AbilityInfo.ResourceCost > 0)
-            args.Origin.GetComponent<PlayerResource>().UpdateResourceServer(new ResourceChangedEventArgs() { Player = args.Origin, ResourceChangeAmount = -ability.AbilityInfo.ResourceCost });
+            args.Origin.GetComponent<EntityResource>().UpdateResourceServer(new ResourceChangedEventArgs() { Player = args.Origin, ResourceChangeAmount = -ability.AbilityInfo.ResourceCost });
 
         ability.UseServer(args.Origin, args.Target);
     }
@@ -88,17 +89,18 @@ public class AbilityExecutor : NetworkBehaviour
     IEnumerator CastTimer(UseAbilityArgs args, NetworkConnection sender)
     {
         var ability = AbilityStorage.GetAbility(args.AbilityId);
-        //wait till casttimer hit 0
-        yield return new WaitUntil(() => CastManager.Instance.GetRemainingCastTime(args.Origin.Id) <= 0 || CastManager.Instance.GetInterrupted(args.Origin.Id) == true);
-
         var castInfo = CastManager.Instance.GetCastInfo(args.Origin.Id);
+
         //enemy interrupt
         if (CastManager.Instance.GetInterrupted(args.Origin.Id) == true)
         {
             SendClientInterrupt(castInfo, sender);
         }
+        //wait till casttimer hit 0
+        yield return new WaitUntil(() => CastManager.Instance.GetRemainingCastTime(args.Origin.Id) <= 0 || CastManager.Instance.GetInterrupted(args.Origin.Id) == true);
+
         //moved to invalid position during cast results in interrupt aswell
-        else if(ability.AbilityInfo.AbilityType != AbilityType.AreaOfEffect && (!ability.IsInFront(args.Origin.transform, args.Target.transform) || !ability.IsLineOfSight(args.Origin.transform, args.Target.transform)))
+        if(ability.AbilityInfo.AbilityType != AbilityType.AreaOfEffect && (!ability.IsInFront(args.Origin.transform, args.Target.transform) || !ability.IsLineOfSight(args.Origin.transform, args.Target.transform)))
         {
             SendClientInterrupt(castInfo, sender);
         }
@@ -109,8 +111,7 @@ public class AbilityExecutor : NetworkBehaviour
             foreach (var conn in _nob.Observers)
             {
                 OnCastCompletedTargetRpc(conn, args);
-                if (conn != sender)
-                    OnUseAbilityTargetRpc(conn, args);
+                OnUseAbilityTargetRpc(conn, args);
             }
         }
 
@@ -129,7 +130,7 @@ public class AbilityExecutor : NetworkBehaviour
     [TargetRpc]
     public void OnCastCompletedTargetRpc(NetworkConnection conn, UseAbilityArgs args)
     {
-        ClientEvents.OnCastCompleted.Invoke(new CastEventArgs(args.Origin.Id, args.AbilityId, args.CastId));
+        ClientEvents.OnCastCompleted.Invoke(new CastEventArgs(args.Origin.Id, args.AbilityId, args.CastId, 0));
     }
     [TargetRpc]
     public void OnCooldownStartedTargetRpc(NetworkConnection conn, UseAbilityArgs args)
@@ -151,11 +152,18 @@ public class AbilityExecutor : NetworkBehaviour
         var ability = AbilityStorage.GetAbility(args.AbilityId);
         ability.UseClient(args.Origin, args.Target);
     }
+
+    [ServerRpc]
+    internal void ApplyEffectsServerRpc(ApplyEffectArgs args)
+    {
+        var ability = AbilityStorage.GetAbility(args.AbilityId);
+        ability.ApplyEffects(args.Origin, args.Target);
+    }
 }
 
 public struct UseAbilityArgs 
 {
-    public UseAbilityArgs(int abilityId, Player origin, Player target, uint castId) 
+    public UseAbilityArgs(int abilityId, Entity origin, Entity target, uint castId) 
     {
         AbilityId = abilityId;
         Origin = origin;
@@ -163,7 +171,20 @@ public struct UseAbilityArgs
         CastId = castId;
     }
     public int AbilityId;
-    public Player Origin;
-    public Player Target;
+    public Entity Origin;
+    public Entity Target;
     public uint CastId;
+}
+
+public struct ApplyEffectArgs
+{
+    public ApplyEffectArgs(int abilityId, Entity origin, Entity target)
+    {
+        AbilityId = abilityId;
+        Origin = origin;
+        Target = target;
+    }
+    public int AbilityId;
+    public Entity Origin;
+    public Entity Target;
 }

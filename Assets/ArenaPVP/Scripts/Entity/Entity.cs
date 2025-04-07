@@ -5,7 +5,8 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class Player : NetworkBehaviour
+[RequireComponent(typeof(EntityHealth), typeof(EntityStats), typeof(EntityResource))]
+public class Entity : NetworkBehaviour
 {
     public string Name;
     public bool IsOwnedByMe;
@@ -16,17 +17,9 @@ public class Player : NetworkBehaviour
 
     private bool _initialized = false;
 
-    public PlayerHealth Health;
-    public PlayerStats Stats;
-    public PlayerResource Resource;
-    //BaseStats baseStats;
-    //public PlayerStats Stats { get; private set; }
-
-    void Awake()
-    {
-        //baseStats = ClassStatMapping.Instance().GetBaseStats(ClassType);
-        //Stats = new PlayerStats(new StatsMediator(), baseStats);
-    }
+    [HideInInspector] public EntityHealth Health;
+    [HideInInspector] public EntityStats Stats;
+    [HideInInspector] public EntityResource Resource;
 
     public override void OnStartClient()
     {
@@ -47,17 +40,16 @@ public class Player : NetworkBehaviour
 
     public override void OnStartServer()
     {
-        Stats = GetComponent<PlayerStats>();
+        Stats = GetComponent<EntityStats>();
         Stats.Initialize(this);
 
-        Health = GetComponent<PlayerHealth>();
+        Health = GetComponent<EntityHealth>();
         Health.Initialize();
 
-        Resource = GetComponent<PlayerResource>();
+        Resource = GetComponent<EntityResource>();
         Resource.Initialize();
 
-
-        ClientEvents.OnPlayerInitialized.Invoke(this);
+        ServerEvents.OnEntityInitialized.Invoke(this);
     }
 
     private IEnumerator DelayedClientInit()
@@ -76,7 +68,7 @@ public class Player : NetworkBehaviour
         if (!IsServerOnlyStarted)
         {
             // Only invoke on clients that are not hosts, these reeive onstartServer()
-            ClientEvents.OnPlayerInitialized.Invoke(this);
+            ClientEvents.OnEntityInitialized.Invoke(this);
         }
     }
 }

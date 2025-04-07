@@ -4,8 +4,8 @@ using UnityEngine;
 
 public struct HealthChangedEventArgs
 {
-    public Player Player;
-    public Player Source;
+    public Entity Player;
+    public Entity Source;
 
     public int AbilityId;
 

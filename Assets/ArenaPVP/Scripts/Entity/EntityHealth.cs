@@ -7,12 +7,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using Logger =Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
 
-public class PlayerHealth : NetworkBehaviour
+public class EntityHealth : NetworkBehaviour
 {
     [SerializeField][AllowMutableSyncType] public  SyncVar<float> MaxHealth = new SyncVar<float>();
     [SerializeField][AllowMutableSyncType] public  SyncVar<float> CurrentHealth = new SyncVar<float>();
 
-    private PlayerStats Stats;
+    private EntityStats Stats;
 
     [Server]
     public void UpdateHealthServer(HealthChangedEventArgs args)
@@ -23,24 +23,24 @@ public class PlayerHealth : NetworkBehaviour
         if (CurrentHealth.Value <= 0)
         {
             CurrentHealth.Value = 0;
-            ServerEvents.OnPlayerDied.Invoke(args.Player);
+            ServerEvents.OnEntityDied.Invoke(args.Player);
         }
 
-        HealthUpdatedClient(args);
+        HealthUpdatedClientRPC(args);
     }
 
     [ObserversRpc]
-    public void HealthUpdatedClient(HealthChangedEventArgs args)
+    public void HealthUpdatedClientRPC(HealthChangedEventArgs args)
     {
-        if(CurrentHealth.Value <= 0)
-            ClientEvents.OnPlayerDied.Invoke(args.Player);
+        ClientEvents.OnEntityHealthChanged.Invoke(args);
 
-        ClientEvents.OnPlayerHealthChanged.Invoke(args);
+        if (CurrentHealth.Value <= 0)
+            ClientEvents.OnEntityDied.Invoke(args.Player);
     }
 
     internal void Initialize()
     {
-        Stats = GetComponent<PlayerStats>();
+        Stats = GetComponent<EntityStats>();
         MaxHealth.Value = Stats.MaxHealth;
         CurrentHealth.Value = Stats.MaxHealth;
     }

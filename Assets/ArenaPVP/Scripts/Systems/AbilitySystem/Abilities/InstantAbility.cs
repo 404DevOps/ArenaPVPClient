@@ -9,17 +9,17 @@ using Assets.ArenaPVP.Scripts.Helpers;
 [CreateAssetMenu(menuName = "Abilities/InstantAbility", fileName = "InstantAbility")]
 public class InstantAbility : AbilityBase
 {
-    internal override void UseServer(Player owner, Player target)
+    internal override void UseServer(Entity owner, Entity target)
     {
         base.UseServer(owner, target);
         ApplyEffectsServer(owner, target);
     }
-    internal override void UseClient(Player owner, Player target)
+    internal override void UseClient(Entity owner, Entity target)
     {
         base.UseClient(owner, target);
         return;
     }
-    internal override void ApplyEffectsServer(Player owner, Player target)
+    internal override void ApplyEffectsServer(Entity owner, Entity target)
     {
         base.ApplyEffectsServer(owner, target);
         return;
