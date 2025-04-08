@@ -257,13 +257,19 @@ public abstract class AbilityBase : ScriptableObject
         if (!InstanceFinder.IsServerStarted)
             throw new Exception("Tried execute Server function from Client");
 
-        foreach (var effect in Effects)
+        if (Effects.Any())
         {
-            effect.Apply(this, origin, target);
+            foreach (var effect in Effects)
+            {
+                effect.Apply(this, origin, target);
+            }
         }
-        foreach (var aura in ApplyAuras.Where(a => a.AuraApplyTiming == ApplyTiming.OnHit))
+        if (ApplyAuras.Any())
         {
-            aura.Apply(origin, target);
+            foreach (var aura in ApplyAuras.Where(a => a.AuraApplyTiming == ApplyTiming.OnHit))
+            {
+                aura.Apply(origin, target);
+            }
         }
     }
 }

@@ -15,6 +15,8 @@ public class StatsMediator : NetworkBehaviour
     [SerializeField]
     private List<StatModifier> modifiers = new();
 
+    public Action<StatType> OnModifiersChanged;
+
     public void PerformQuery(object sender, StatQuery query) 
     {
         foreach (StatModifier mod in modifiers) 
@@ -27,6 +29,7 @@ public class StatsMediator : NetworkBehaviour
     public void AddModifierServer(StatModifier modifier)
     {
         modifiers.Add(modifier);
+        OnModifiersChanged?.Invoke(modifier._statType);
     }
 
     [Server]
@@ -38,11 +41,13 @@ public class StatsMediator : NetworkBehaviour
             if (node.SourceAuraId == auraId)
             {
                 modifiers.RemoveAt(i);
+                OnModifiersChanged?.Invoke(node._statType);
                 node.Dispose();
                 if (i > 0)
                 {
                     i--; //since index shifts on a remove action, we count it back to make sure we dont skip any element.
                 }
+
             }
         }
     }

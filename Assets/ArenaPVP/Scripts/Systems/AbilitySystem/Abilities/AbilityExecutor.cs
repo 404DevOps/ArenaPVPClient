@@ -92,15 +92,15 @@ public class AbilityExecutor : NetworkBehaviour
         var castInfo = CastManager.Instance.GetCastInfo(args.Origin.Id);
 
         //enemy interrupt
+
+        //wait till casttimer hit 0
+        yield return new WaitUntil(() => CastManager.Instance.GetRemainingCastTime(args.Origin.Id) <= 0 || CastManager.Instance.GetInterrupted(args.Origin.Id) == true);
+
         if (CastManager.Instance.GetInterrupted(args.Origin.Id) == true)
         {
             SendClientInterrupt(castInfo, sender);
         }
-        //wait till casttimer hit 0
-        yield return new WaitUntil(() => CastManager.Instance.GetRemainingCastTime(args.Origin.Id) <= 0 || CastManager.Instance.GetInterrupted(args.Origin.Id) == true);
-
-        //moved to invalid position during cast results in interrupt aswell
-        if(ability.AbilityInfo.AbilityType != AbilityType.AreaOfEffect && (!ability.IsInFront(args.Origin.transform, args.Target.transform) || !ability.IsLineOfSight(args.Origin.transform, args.Target.transform)))
+        else if (ability.AbilityInfo.AbilityType != AbilityType.AreaOfEffect && (!ability.IsInFront(args.Origin.transform, args.Target.transform) || !ability.IsLineOfSight(args.Origin.transform, args.Target.transform)))
         {
             SendClientInterrupt(castInfo, sender);
         }

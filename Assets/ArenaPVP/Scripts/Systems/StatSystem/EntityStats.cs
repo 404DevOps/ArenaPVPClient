@@ -1,40 +1,52 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Assets.ArenaPVP.Scripts.Models.Enums;
-using System;
-using FishNet.Object;
-using UnityEditor;
-using UnityEngine.Rendering;
-using FishNet.Object.Synchronizing;
-using FishNet.Demo.AdditiveScenes;
 using FishNet.CodeGenerating;
-using UnityEditorInternal.VersionControl;
-using FishNet.Connection;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
+using System;
 
 public class EntityStats : NetworkBehaviour
 {
     private StatsMediator _mediator;
     private BaseStats _baseStats;
     public StatsMediator Mediator => _mediator;
-    public StatSnapshot Snapshot;
+    [AllowMutableSyncType]
+    public SyncVar<StatSnapshot> Snapshot;
 
     public void Awake()
     {
         _mediator = GetComponent<StatsMediator>();
     }
-    public void Initialize(Entity player)
+    private void OnEnable()
     {
-        _baseStats = ClassStatMapping.Instance().GetBaseStats(player.ClassType);
-        ServerEvents.OnEntityStatsInitialized.Invoke(player);
-        if(IsServerStarted)
-            PushSnapshotToClient();
+        if (IsServerStarted)
+            _mediator.OnModifiersChanged += OnModifiersChanged;
+    }
+    private void OnDisable()
+    {
+        if (IsServerStarted)
+            _mediator.OnModifiersChanged += OnModifiersChanged;
     }
 
     [Server]
-    public StatSnapshot BuildSnapshot()
+    private void OnModifiersChanged(StatType type)
     {
-        return new StatSnapshot
+        BuildSnapshot();
+    }
+
+    public void Initialize(Entity player)
+    {
+        _baseStats = ClassStatMapping.Instance().GetBaseStats(player.ClassType);
+        if (IsServerStarted)
+        {
+            ServerEvents.OnEntityStatsInitialized.Invoke(player);
+            BuildSnapshot();
+        }
+    }
+
+    [Server]
+    public void BuildSnapshot()
+    {
+        Snapshot.Value = new StatSnapshot()
         {
             AttackPower = Attackpower,
             Spellpower = Spellpower,
@@ -43,29 +55,49 @@ public class EntityStats : NetworkBehaviour
             SpellResistance = SpellResistance,
             Armor = Armor,
             MaxHealth = MaxHealth,
-            MaxResource = MaxResource
+            MaxResource = MaxResource,
+            MaxStamina = MaxStamina,
+            MaxShield = MaxShield
         };
+        //    Snapshot.Value.Attackpower = Attackpower;
+        //    Snapshot.Value.Spellpower = Spellpower;
+        //    Snapshot.Value.MovementSpeed = MovementSpeed;
+        //    Snapshot.Value.ResourceRegenRate = ResourceRegenerationRate;
+        //    Snapshot.Value.SpellResistance = SpellResistance;
+        //    Snapshot.Value.Armor = Armor;
+        //    Snapshot.Value.MaxHealth = MaxHealth;
+        //    Snapshot.Value.MaxResource = MaxResource;
+        //    Snapshot.Value.MaxStamina = MaxStamina;
+        //    Snapshot.Value.MaxShield = MaxShield; 
     }
 
-    [TargetRpc]
-    public void Target_UpdateClientSnapshot(NetworkConnection conn, StatSnapshot snapshot)
-    {
-        Snapshot = snapshot;
-        ClientEvents.OnClientStatsUpdated?.Invoke(snapshot);
-    }
 
-    [Server]
-    public void PushSnapshotToClient()
-    {
-        var snapshot = BuildSnapshot();
 
-        foreach(var conn in Observers)
-            Target_UpdateClientSnapshot(conn, snapshot);
-    }
+
+    //[TargetRpc]
+    //public void Target_UpdateClientSnapshot(NetworkConnection conn, StatSnapshot snapshot)
+    //{
+    //    Snapshot = snapshot;
+    //    ClientEvents.OnClientStatsUpdated?.Invoke(snapshot);
+    //}
+
+    //[Server]
+    //public IEnumerator PushSnapshotToClient()
+    //{
+    //    var snapshot = BuildSnapshot();
+
+    //    foreach (var conn in Observers)
+    //    {
+    //        yield return new WaitUntil(() => conn.IsValid);
+    //        Target_UpdateClientSnapshot(conn, snapshot);
+    //    }
+    //    ClientEvents.OnClientStatsUpdated?.Invoke(snapshot);
+    //}
 
     public float Attackpower
     {
-        get {
+        get
+        {
             var q = new StatQuery(StatType.AttackPower, _baseStats.AttackPower);
             _mediator.PerformQuery(this, q);
             return q.Value;
@@ -73,7 +105,8 @@ public class EntityStats : NetworkBehaviour
     }
     public float Spellpower
     {
-        get {
+        get
+        {
             var q = new StatQuery(StatType.Spellpower, _baseStats.Spellpower);
             _mediator.PerformQuery(this, q);
             return q.Value;
@@ -81,7 +114,8 @@ public class EntityStats : NetworkBehaviour
     }
     public float MovementSpeed
     {
-        get {
+        get
+        {
             var q = new StatQuery(StatType.MovementSpeed, _baseStats.MovementSpeed);
             _mediator.PerformQuery(this, q);
             return q.Value;
@@ -106,7 +140,7 @@ public class EntityStats : NetworkBehaviour
             return q.Value;
         }
 
-        }
+    }
     public float Armor
     {
         get

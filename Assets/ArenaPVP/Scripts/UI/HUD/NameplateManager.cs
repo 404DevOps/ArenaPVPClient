@@ -81,8 +81,9 @@ public class NameplateManager : MonoBehaviour
     }
     private void OnEntityInitialized(Entity player)
     {
-        if (player.IsOwnedByMe && PlayerConfiguration.Instance.Settings.ShowPlayerNameplate) return;
-
+        if (player.IsOwnedByMe && !PlayerConfiguration.Instance.Settings.ShowPlayerNameplate) 
+            return;
+        
         InstantiateNamePlate(player);
     }
 
