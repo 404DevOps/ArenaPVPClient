@@ -17,6 +17,7 @@ public class BaseStats : ScriptableObject
     public float Ressource;
     public float MaxStamina;
     public float MaxShield;
+    public float StaminaRegenerationRate;
 }
 [System.Serializable]
 public struct StatSnapshot
@@ -31,6 +32,7 @@ public struct StatSnapshot
     public float MaxResource;
     public float MaxStamina;
     public float MaxShield;
+    public float StaminaRegenerationRate;
 }
 
 

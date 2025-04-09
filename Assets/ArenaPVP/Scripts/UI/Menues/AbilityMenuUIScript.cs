@@ -1,3 +1,4 @@
+using Assets.ArenaPVP.Scripts.Enums;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEditor;
@@ -16,11 +17,11 @@ public class AbilityMenuUIScript : MonoBehaviour
     {
         CloseButton.onClick.AddListener(CloseMenu);
 
-        Entity player = FindObjectsOfType<Entity>().FirstOrDefault(p => p.IsOwnedByMe);
+        Entity player = FindObjectsByType<Entity>(FindObjectsSortMode.None).FirstOrDefault(p => p.IsOwnedByMe);
 
         ClearGrid();
 
-        foreach (var ability in AbilityStorage.AllAbilities.Where(a => a.AbilityInfo.ClassType == player.ClassType))
+        foreach (var ability in AbilityStorage.AllAbilities.Where(a => a.AbilityInfo.ClassType == player.ClassType || a.AbilityInfo.ClassType == CharacterClassType.None))
         {
             var abilityDisplay = Instantiate(AbilityDisplayPrefab, SkillGrid);
             var holder = abilityDisplay.GetComponent<AbilityUIDisplay>();

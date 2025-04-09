@@ -57,7 +57,8 @@ public class EntityStats : NetworkBehaviour
             MaxHealth = MaxHealth,
             MaxResource = MaxResource,
             MaxStamina = MaxStamina,
-            MaxShield = MaxShield
+            MaxShield = MaxShield,
+            StaminaRegenerationRate = StaminaRegenerationRate
         };
         //    Snapshot.Value.Attackpower = Attackpower;
         //    Snapshot.Value.Spellpower = Spellpower;
@@ -191,5 +192,16 @@ public class EntityStats : NetworkBehaviour
         }
 
     }
+    public float StaminaRegenerationRate
+    {
+        get
+        {
+            var q = new StatQuery(StatType.Stamina, _baseStats.StaminaRegenerationRate);
+            _mediator.PerformQuery(this, q);
+            return q.Value;
+        }
+
+    }
+    
 
 }

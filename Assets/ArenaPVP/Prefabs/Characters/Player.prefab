@@ -245,6 +245,7 @@ GameObject:
   - component: {fileID: 6978229780223079540}
   - component: {fileID: 5461752018993889622}
   - component: {fileID: 4797203598155459740}
+  - component: {fileID: 4247101453464638413}
   - component: {fileID: 6123630820266809329}
   m_Layer: 6
   m_Name: Player
@@ -464,6 +465,7 @@ MonoBehaviour:
       MaxResource: 0
       MaxStamina: 0
       MaxShield: 0
+      StaminaRegenerationRate: 0
 --- !u!114 &6978229780223079540
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -524,6 +526,21 @@ MonoBehaviour:
   _componentIndexCache: 5
   _addedNetworkObject: {fileID: 6437064650887940282}
   _networkObjectCache: {fileID: 6437064650887940282}
+--- !u!114 &4247101453464638413
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8063676432945403057}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12895b5a1645dae448b6abaac7c08fa6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 6437064650887940282}
+  _networkObjectCache: {fileID: 0}
 --- !u!114 &6123630820266809329
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -547,3 +564,7 @@ MonoBehaviour:
   Health: {fileID: 0}
   Stats: {fileID: 0}
   Resource: {fileID: 0}
+  IsDodging:
+    NetworkManager: {fileID: 0}
+    NetworkBehaviour: {fileID: 0}
+    _value: 0

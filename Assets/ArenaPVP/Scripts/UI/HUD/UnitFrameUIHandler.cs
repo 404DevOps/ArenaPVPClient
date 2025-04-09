@@ -79,7 +79,7 @@ public class UnitFrameUIHandler : MonoBehaviour
     }
     private void OnResourceChanged(ResourceChangedEventArgs args)
     {
-        if (Player == null || Player.Id != args.Player.Id)
+        if (Player == null || Player.Id != args.Entity.Id)
             return;
 
         _resourcebar.SetNewValue(_playerResource.CurrentResource.Value, _playerResource.MaxResource.Value);

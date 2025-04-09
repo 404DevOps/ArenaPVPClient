@@ -17,7 +17,8 @@ namespace Assets.ArenaPVP.Scripts.Models.Enums
         Health,
         MovementSpeed,
         Shield,
-        Stamina
+        Stamina,
+        StaminaRegenerationRate
     }
 
 }

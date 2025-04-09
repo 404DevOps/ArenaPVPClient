@@ -20,3 +20,6 @@ MonoBehaviour:
   MovementSpeed: 1
   Health: 2500
   Ressource: 4000
+  MaxStamina: 100
+  MaxShield: 500
+  StaminaRegenerationRate: 10

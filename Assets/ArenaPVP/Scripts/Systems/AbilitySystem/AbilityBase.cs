@@ -4,6 +4,7 @@ using Assets.ArenaPVP.Scripts.Systems.AbilitySystem;
 using FishNet;
 using GameKit.Dependencies.Utilities;
 using System;
+using System.Collections;
 using System.Linq;
 using UnityEngine;
 using ArenaLogger = Assets.ArenaPVP.Scripts.Helpers.ArenaLogger;
@@ -27,7 +28,7 @@ public abstract class AbilityBase : ScriptableObject
         AbilityExecutor.Instance.TryUseAbilityClient(new UseAbilityArgs(Id, origin, target, InstanceFinder.TimeManager.Tick));
     }
 
-    public bool CanBeUsed(Entity owner, Entity target)
+    public virtual bool CanBeUsed(Entity owner, Entity target)
     {
         bool canbeUse = true;
 
@@ -115,15 +116,14 @@ public abstract class AbilityBase : ScriptableObject
 
         return true;
     }
-    private bool HasEnoughResource(Entity owner)
+    protected bool HasEnoughResource(Entity owner)
     {
-        var resComp = owner.GetComponent<EntityResource>();
-        if (resComp.CurrentResource.Value >= this.AbilityInfo.ResourceCost)
+        if (owner.Resource.CurrentResource.Value >= this.AbilityInfo.ResourceCost)
             return true;
 
         return false;
     }
-    private bool IsAlreadyCasting(int ownerId)
+    protected bool IsAlreadyCasting(int ownerId)
     {
         if (CastManager.Instance.Contains(ownerId, Id) && CastManager.Instance.GetRemainingCastTime(ownerId) > 0)
         {
@@ -131,7 +131,7 @@ public abstract class AbilityBase : ScriptableObject
         }
         return false;
     }
-    private bool IsCooldownReady(int ownerId)
+    protected bool IsCooldownReady(int ownerId)
     {
         var abilityWithOwner = new AbilityCooldownInfo(ownerId, Id);
         
@@ -148,7 +148,7 @@ public abstract class AbilityBase : ScriptableObject
             return false;
         }
     }
-    private bool IsGCDReady(int ownerId)
+    protected bool IsGCDReady(int ownerId)
     {
         if (AbilityInfo.IgnoreGCD)
         {
@@ -163,13 +163,13 @@ public abstract class AbilityBase : ScriptableObject
             return false;
         }
     }
-    internal bool IsInFront(Transform owner, Transform target)
+    public bool IsInFront(Transform owner, Transform target)
     {
         if (!NeedTargetInFront)
             return true;
         return PositionHelper.IsInFront(owner, target);
     }
-    internal bool IsLineOfSight(Transform owner, Transform target)
+    public bool IsLineOfSight(Transform owner, Transform target)
     {
         if (!NeedLineOfSight)
             return true;
@@ -191,7 +191,7 @@ public abstract class AbilityBase : ScriptableObject
 
         return true;
     }
-    private bool IsInRange(Transform self, Transform target)
+    protected bool IsInRange(Transform self, Transform target)
     {
         switch (TargetingType)
         {
@@ -227,6 +227,7 @@ public abstract class AbilityBase : ScriptableObject
                 aura.Apply(origin, origin);
             }
         }
+
     }
 
     /// <summary>
@@ -246,7 +247,7 @@ public abstract class AbilityBase : ScriptableObject
         // If we're the host (both server and client), only run this on the server side logic
         if (InstanceFinder.IsHostStarted && InstanceFinder.IsClientStarted)
         {
-            if (!target.IsServerStarted)
+            if (target != null && !target.IsServerStarted)
                 return;
         }
 
@@ -296,5 +297,6 @@ public class AbilityInfo
 public enum AbilityType
 { 
     Targeted,
-    AreaOfEffect
+    AreaOfEffect,
+    Dodge
 }

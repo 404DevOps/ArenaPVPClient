@@ -80,7 +80,7 @@ public class AbilityExecutor : NetworkBehaviour
             }
         }
         if (ability.AbilityInfo.ResourceCost > 0)
-            args.Origin.GetComponent<EntityResource>().UpdateResourceServer(new ResourceChangedEventArgs() { Player = args.Origin, ResourceChangeAmount = -ability.AbilityInfo.ResourceCost });
+            args.Origin.GetComponent<EntityResource>().UpdateResourceServer(new ResourceChangedEventArgs() { Entity = args.Origin, ResourceChangeAmount = -ability.AbilityInfo.ResourceCost });
 
         ability.UseServer(args.Origin, args.Target);
     }

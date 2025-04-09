@@ -14,6 +14,7 @@ public static class ClientEvents
     public static readonly Event<int, int> OnCooldownStarted = new Event<int, int>(); //playerId, AbilityId
     public static readonly Event<HealthChangedEventArgs> OnEntityHealthChanged = new Event<HealthChangedEventArgs>();
     public static readonly Event<ResourceChangedEventArgs> OnEntityResourceChanged = new Event<ResourceChangedEventArgs>();
+    public static readonly Event<StaminaChangedEventArgs> OnEntityStaminaChanged = new Event<StaminaChangedEventArgs>();
 
     public static readonly Event<int, AuraInfo> OnAuraExpired = new Event<int, AuraInfo>(); //ownerId, auraId
     public static readonly Event<int, AuraInfo> OnAuraApplied = new Event<int, AuraInfo>(); //ownerId, auraId

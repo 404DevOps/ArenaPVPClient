@@ -8,6 +8,7 @@ namespace Assets.ArenaPVP.Scripts.Enums
 {
     public enum CharacterClassType
     {
+        None = -1,
         Dummy = 0,
         Trooper = 1,
         Cryomancer = 2,

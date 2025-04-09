@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class RessourceRegenManager : NetworkBehaviour
 {
-    private Dictionary<Entity, ResourceContext> _playerResourceDict = new Dictionary<Entity, ResourceContext>();
+    private Dictionary<Entity, ResourceContext> _entityResourceDict = new Dictionary<Entity, ResourceContext>();
     
     public float TickInterval = 2;
     private float _timer = 0;
@@ -28,7 +28,7 @@ public class RessourceRegenManager : NetworkBehaviour
     private void AddPlayer(Entity player)
     {
         var resourceType = AppearanceData.Instance().GetRessourceType(player.ClassType);
-        _playerResourceDict.Add(player, new ResourceContext(player.GetComponent<EntityResource>(), player.GetComponent<EntityStats>(), resourceType));
+        _entityResourceDict.Add(player, new ResourceContext(player.GetComponent<EntityResource>(), player.GetComponent<EntityStats>(), resourceType));
     }
 
     private void Update()
@@ -38,9 +38,10 @@ public class RessourceRegenManager : NetworkBehaviour
             _timer += Time.deltaTime;
             if (_timer >= TickInterval)
             {
-                foreach (var entry in _playerResourceDict)
+                foreach (var entry in _entityResourceDict)
                 {
-                    entry.Value.PlayerResource.UpdateResourceServer(new ResourceChangedEventArgs() { Player = entry.Key, ResourceChangeAmount = entry.Value.PlayerStats.ResourceRegenerationRate });
+                    entry.Value.EntityResource.UpdateResourceServer(new ResourceChangedEventArgs() { Entity = entry.Key, ResourceChangeAmount = entry.Value.EntityStats.ResourceRegenerationRate });
+                    entry.Value.EntityStamina.UpdateStaminaServer(new StaminaChangedEventArgs() { Entity = entry.Key, StaminaChangedAmount = entry.Value.EntityStats.StaminaRegenerationRate });
                 }
                 _timer = 0;
             }
@@ -50,14 +51,15 @@ public class RessourceRegenManager : NetworkBehaviour
 
 public class ResourceContext
 {
-    public ResourceContext(EntityResource playerResource, EntityStats playerStats, ResourceType type)
+    public ResourceContext(EntityResource entityResource, EntityStats entityStats, ResourceType type)
     {
         ResourceType = type;
-        PlayerResource = playerResource;
-        PlayerStats = playerStats;
+        EntityResource = entityResource;
+        EntityStats = entityStats;
     }
 
     public ResourceType ResourceType;
-    public EntityResource PlayerResource;
-    public EntityStats PlayerStats;
+    public EntityResource EntityResource;
+    public EntityStamina EntityStamina;
+    public EntityStats EntityStats;
 }

@@ -1,11 +1,14 @@
 using Assets.ArenaPVP.Scripts.Enums;
 using FishNet;
+using FishNet.CodeGenerating;
 using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using System;
 using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(EntityHealth), typeof(EntityStats), typeof(EntityResource))]
+[RequireComponent(typeof(EntityStamina))]
 public class Entity : NetworkBehaviour
 {
     public string Name;
@@ -20,6 +23,10 @@ public class Entity : NetworkBehaviour
     [HideInInspector] public EntityHealth Health;
     [HideInInspector] public EntityStats Stats;
     [HideInInspector] public EntityResource Resource;
+    [HideInInspector] public EntityStamina Stamina;
+
+    [AllowMutableSyncType]
+    public SyncVar<bool> IsDodging = new SyncVar<bool>();
 
     public override void OnStartClient()
     {
@@ -49,7 +56,12 @@ public class Entity : NetworkBehaviour
         Resource = GetComponent<EntityResource>();
         Resource.Initialize();
 
+        Stamina = GetComponent<EntityStamina>();
+        Stamina.Initialize();
+
         ServerEvents.OnEntityInitialized.Invoke(this);
+
+        IsDodging.Value = false;
     }
 
     private IEnumerator DelayedClientInit()
@@ -70,5 +82,11 @@ public class Entity : NetworkBehaviour
             // Only invoke on clients that are not hosts, these reeive onstartServer()
             ClientEvents.OnEntityInitialized.Invoke(this);
         }
+    }
+
+    [Server]
+    public void SetDodging(bool isDodging)
+    {
+        IsDodging.Value = isDodging;
     }
 }

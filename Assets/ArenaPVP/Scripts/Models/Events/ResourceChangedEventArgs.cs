@@ -4,6 +4,6 @@ using UnityEngine;
 
 public struct ResourceChangedEventArgs
 {
-    public Entity Player;
+    public Entity Entity;
     public float ResourceChangeAmount;
 }

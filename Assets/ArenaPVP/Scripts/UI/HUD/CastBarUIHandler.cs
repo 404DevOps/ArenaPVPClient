@@ -33,13 +33,13 @@ public class CastBarUIHandler : MonoBehaviour
 
     private void OnEnable()
     {
-        ClientEvents.OnEntityInitialized.AddListener(OnPlayerInitialized);
+        ClientEvents.OnEntityInitialized.AddListener(OnEntityInitialized);
         ClientEvents.OnCastStarted.AddListener(OnCastStarted);
         ClientEvents.OnCastInterrupted.AddListener(OnCastInterrupted);
         ClientEvents.OnCastCompleted.AddListener(OnCastCompleted); 
     }
 
-    private void OnPlayerInitialized(Entity player)
+    private void OnEntityInitialized(Entity player)
     {
         if (_isMainCastBar) 
         {
@@ -55,7 +55,7 @@ public class CastBarUIHandler : MonoBehaviour
     private void OnDisable()
     {
         _isCasting = false;
-        ClientEvents.OnEntityInitialized.RemoveListener(OnPlayerInitialized);
+        ClientEvents.OnEntityInitialized.RemoveListener(OnEntityInitialized);
         ClientEvents.OnCastStarted.RemoveListener(OnCastStarted);
         ClientEvents.OnCastInterrupted.RemoveListener(OnCastInterrupted);
         ClientEvents.OnCastCompleted.RemoveListener(OnCastCompleted);
